@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { BadgeCheck, CircleDollarSign, ClipboardList, Eye, FileText, Layers3, PackagePlus, Shield, Sparkles, Trash2, UserRoundCheck, UsersRound } from 'lucide-react'
 import { kindNames, krw, number, relativeTime, roles } from './data'
-import { hasSubscription, isPublic, useApp } from './store'
+import { isPublic, subscriberCount, useApp } from './store'
 import { Avatar, Badge, Button, Empty, field, fileData, Label, Modal, PageTitle, panel } from './ui'
 import { Ledger } from './shared'
 import { ContentPreview } from './customer'
+import { ProductThumbnail } from './product-media'
 
 const statusText = { pending: '검토 대기', approved: '승인', rejected: '반려' }
 const value = (data, key) => String(data.get(key) ?? '')
@@ -55,7 +56,6 @@ export function Studio({ account, notify }) {
   const [preview, setPreview] = useState(null)
   const creator = state.creators[account.id]
   const posts = state.posts.filter((p) => p.owner === account.id)
-  const subscribers = Object.keys(state.subscriptions).filter((id) => hasSubscription(state, id, account.id)).length
   const finish = (result, message) => {
     notify(result, message)
     if (!result.error) setDialog(null)
@@ -65,7 +65,7 @@ export function Studio({ account, notify }) {
       <Button onClick={() => { setKind('post'); setDialog('publish') }}><FileText size={17} /> 콘텐츠 등록</Button>
     </PageTitle>
     <div className="mb-5 grid gap-3 sm:grid-cols-3">
-      <Stat label="구독자" value={number(creator.fans + subscribers) + '명'} icon={UsersRound} />
+      <Stat label="구독자" value={number(subscriberCount(state, account.id)) + '명'} icon={UsersRound} />
       <Stat label="월 구독료" value={krw(creator.price)} icon={CircleDollarSign} />
       <Stat label="등록 콘텐츠" value={posts.length + '개'} icon={Layers3} />
     </div>
@@ -143,7 +143,8 @@ export function Catalog({ account, notify }) {
       <h2 className="p-5 font-black">개별 상품</h2>
       {!products.length && <p className="p-5 text-sm text-dim">등록된 상품이 없어요.</p>}
       {products.map((p) => <div key={p.id} className="flex items-center justify-between gap-3 px-5 py-3">
-        <div className="min-w-0"><p className="text-sm font-bold break-words">{p.name} · {number(p.cost)} 코인</p><p className="mt-1 text-xs break-words text-dim">{p.detail}</p></div>
+        <ProductThumbnail product={p} className="aspect-video w-[72px] sm:w-[100px]" />
+        <div className="min-w-0 flex-1"><p className="text-sm font-bold break-words">{p.name} · {number(p.cost)} 코인</p><p className="mt-1 text-xs break-words text-dim">{p.detail}</p></div>
         <Button tone="plain" aria-label={p.name + ' 판매 종료'} onClick={() => setDialog(p)}><Trash2 size={17} /></Button>
       </div>)}
     </div>
@@ -162,7 +163,7 @@ export function Catalog({ account, notify }) {
         const data = new FormData(event.currentTarget)
         const file = data.get('media')
         try {
-          const media = file?.size ? await fileData(file) : ''
+          const media = file?.size ? await fileData(file, true) : ''
           finish(state.addProduct(value(data, 'name'), value(data, 'detail'), Number(data.get('cost')), media), '상품을 등록했어요.')
         } catch (error) {
           notify({ error: error.message })
@@ -171,7 +172,7 @@ export function Catalog({ account, notify }) {
         <Label title="상품명"><input name="name" required maxLength={60} className={field} /></Label>
         <Label title="상품 설명"><input name="detail" required maxLength={220} className={field} placeholder="예시 · 미공개 사진 3장" /></Label>
         <Label title="가격 (코인)"><input name="cost" type="number" required min={1} max={10000} className={field} /></Label>
-        <Label title="구매 콘텐츠 이미지 (선택 · 280 KB 이하)"><input name="media" type="file" accept="image/png,image/jpeg,image/webp" className={field} /></Label>
+        <Label title="구매 콘텐츠 사진·영상 (선택 · 280 KB 이하)"><input name="media" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm" className={field} /></Label>
         <Button type="submit">상품 등록</Button>
       </form>
     </Modal>}
@@ -200,23 +201,21 @@ export function Catalog({ account, notify }) {
 
 export function Earnings({ account }) {
   const state = useApp()
-  const items = state.transactions.filter((t) => account.role === 'admin' || t.owner === account.id)
+  const items = state.transactions.filter((t) => t.owner === account.id)
   const month = new Intl.DateTimeFormat('sv-SE', { year: 'numeric', month: '2-digit', timeZone: 'Asia/Seoul' })
   const [period, setPeriod] = useState(month.format(Date.now()))
   const filtered = items.filter((t) => !period || month.format(t.at) === period)
   const revenue = filtered.filter((t) => t.type === 'subscribe').reduce((sum, t) => sum + t.won, 0)
   const used = filtered.filter((t) => ['product', 'roulette'].includes(t.type)).reduce((sum, t) => sum + t.coins, 0)
-  const charged = filtered.filter((t) => t.type === 'topup').reduce((sum, t) => sum + t.won, 0)
   return <>
-    <PageTitle label="TRANSACTIONS" title={account.role === 'admin' ? '거래 · 정산' : '수익 내역'} subtitle="데모 거래 원장 · 수수료, 환불, 송금 정책은 협의 중입니다.">
+    <PageTitle label="TRANSACTIONS" title="수익 내역" subtitle="데모 거래 원장 · 수수료, 환불, 송금 정책은 협의 중입니다.">
       <Label title="조회 월"><input type="month" className={field} value={period} onChange={(event) => setPeriod(event.target.value)} /></Label>
     </PageTitle>
-    <div className={`mb-5 grid gap-3 sm:grid-cols-2 ${account.role === 'admin' ? 'lg:grid-cols-3' : ''}`}>
+    <div className="mb-5 grid gap-3 sm:grid-cols-2">
       <Stat label="구독 결제 합계" value={krw(revenue)} icon={CircleDollarSign} />
       <Stat label="크리에이터 코인 소비" value={number(used) + ' 코인'} icon={Sparkles} />
-      {account.role === 'admin' && <Stat label="코인 충전 결제 합계" value={krw(charged)} icon={CircleDollarSign} />}
     </div>
-    <Ledger items={filtered} showParties={account.role === 'admin'} />
+    <Ledger items={filtered} />
   </>
 }
 
@@ -225,7 +224,7 @@ export function AdminHome({ go }) {
   const pending = Object.values(state.creators).filter((c) => c.status === 'pending').length
   const reported = state.posts.filter((p) => p.reports.length > 0 && !p.hidden).length
   return <>
-    <PageTitle label="OPERATIONS" title="운영 개요" subtitle="입점, 계정, 신고와 거래를 한 곳에서 관리하세요." />
+    <PageTitle label="OPERATIONS" title="운영 개요" subtitle="심사 요청, 계정, 신고와 거래를 한 곳에서 관리하세요." />
     <div className="grid gap-3 sm:grid-cols-3">
       <Stat label="검토 대기" value={pending + '건'} icon={ClipboardList} />
       <Stat label="공개 크리에이터" value={Object.keys(state.creators).filter((id) => isPublic(state, id)).length + '명'} icon={UserRoundCheck} />
@@ -233,8 +232,8 @@ export function AdminHome({ go }) {
     </div>
     <section className={`${panel} mt-5 p-5`}>
       <h2 className="font-black">오늘의 운영</h2>
-      <p className="mt-2 text-sm text-dim">새로운 입점 신청과 고객 신고를 확인하세요.</p>
-      <div className="mt-4 flex flex-wrap gap-2"><Button onClick={() => go('review')}>입점 신청 보기</Button><Button tone="subtle" onClick={() => go('moderate')}>콘텐츠 관리</Button></div>
+      <p className="mt-2 text-sm text-dim">심사 요청과 고객 신고를 확인하세요.</p>
+      <div className="mt-4 flex flex-wrap gap-2"><Button onClick={() => go('review')}>심사 요청 보기</Button><Button tone="subtle" onClick={() => go('home')}>전체 피드 보기</Button><Button tone="subtle" onClick={() => go('moderate')}>콘텐츠 관리</Button></div>
     </section>
   </>
 }
@@ -243,16 +242,17 @@ export function Review({ notify }) {
   const state = useApp()
   const [target, setTarget] = useState(null)
   const applicants = Object.values(state.creators).filter((c) => c.method)
+    .sort((a, b) => Number(b.status === 'pending') - Number(a.status === 'pending'))
   return <>
-    <PageTitle label="APPLICATIONS" title="입점 심사" subtitle="신청 정보를 확인한 뒤 검색 공개 여부를 결정하세요." />
-    {!applicants.length ? <Empty icon={BadgeCheck} title="아직 접수된 신청이 없어요" description="인플루언서로 데모 가입 후 입점을 신청하면 이곳에 표시됩니다." /> :
+    <PageTitle label="APPLICATIONS" title="심사 요청 목록" subtitle="크리에이터의 신청 정보를 확인한 뒤 검색 공개 여부를 결정하세요." />
+    {!applicants.length ? <Empty icon={BadgeCheck} title="아직 접수된 심사 요청이 없어요" description="크리에이터가 심사를 요청하면 이곳에 표시됩니다." /> :
       <div className="grid gap-3">{applicants.map((c) => <article className={`${panel} p-5`} key={c.id}>
         <div className="mb-3 flex items-center gap-3"><Avatar person={c} account={state.accounts[c.id]} className="size-10" /><div className="min-w-0 flex-1"><h2 className="truncate font-black">{c.name}</h2><p className="text-xs text-dim">@{c.handle} · {c.method === 'link' ? '링크 접수' : '직접 입력'}</p></div><Badge>{statusText[c.status]}</Badge></div>
         {c.instagram && <a className="text-sm break-all text-mint underline" href={c.instagram} target="_blank" rel="noreferrer">Instagram 프로필 확인</a>}
         {c.email && <p className="text-sm break-all text-dim">{c.email} · {c.bio}</p>}
         {c.reason && <p className="mt-2 text-sm text-dim">{c.reason}</p>}
         {c.status === 'pending' && <div className="mt-4 flex gap-2">
-          <Button onClick={() => notify(state.review(c.id, 'approved'), '입점을 승인했어요.')}>승인</Button>
+          <Button onClick={() => notify(state.review(c.id, 'approved'), '신청을 승인했어요.')}>승인</Button>
           <Button tone="danger" onClick={() => setTarget(c)}>반려</Button>
         </div>}
       </article>)}</div>}

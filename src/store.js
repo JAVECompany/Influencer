@@ -16,7 +16,11 @@ export const isPublic = (state, id) =>
   state.creators[id]?.status === 'approved' && !state.accounts[id]?.disabled
 
 export const hasSubscription = (state, customer, creator) =>
-  !state.accounts[customer]?.disabled && isPublic(state, creator) && (state.subscriptions[customer] ?? []).includes(creator)
+  state.accounts[customer]?.role === 'customer' && !state.accounts[customer].disabled
+  && isPublic(state, creator) && (state.subscriptions[customer] ?? []).includes(creator)
+
+export const subscriberCount = (state, creator) => (state.creators[creator]?.fans ?? 0)
+  + Object.keys(state.subscriptions).filter((customer) => hasSubscription(state, customer, creator)).length
 
 export const canRead = (state, post) => {
   const a = actor(state)
@@ -31,6 +35,10 @@ const approved = (state) => {
 }
 
 const txn = (type, owner, customer, changes) => ({ id: uid(), type, owner, customer, at: Date.now(), ...changes })
+const mergeFixtures = (stored, fixtures) => {
+  const ids = new Set(stored.map((entry) => entry.id))
+  return [...stored, ...fixtures.filter((entry) => !ids.has(entry.id))]
+}
 const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
 const validInstagram = (value) => {
   try {
@@ -147,6 +155,30 @@ export const useApp = create(persist((set, get) => ({
     return ok
   },
 
+  configureSettlement(coinWon, feeBps) {
+    const state = get()
+    if (actor(state)?.role !== 'admin') return fail('관리자만 정산 기준을 설정할 수 있습니다.')
+    if (!amount(coinWon, 1, 10000) || !amount(feeBps, 0, 10000)) return fail('코인 단가와 0~100% 수수료를 확인해 주세요.')
+    set({ settlement: { ...state.settlement, coinWon, feeBps } })
+    return ok
+  },
+
+  overrideSettlementCoins(periodKey, id, coins) {
+    const state = get()
+    if (actor(state)?.role !== 'admin' || !state.creators[id] || !/^\d{4}-\d{2}-\d{2}\/\d{4}-\d{2}-\d{2}$/.test(periodKey)) {
+      return fail('정산 기간과 크리에이터를 확인해 주세요.')
+    }
+    if (coins !== null && !amount(coins, 0, 10_000_000)) return fail('0~10,000,000 사이의 정수 코인을 입력해 주세요.')
+    const overrides = { ...state.settlement.overrides }
+    const manual = { ...overrides[periodKey] }
+    if (coins === null) delete manual[id]
+    else manual[id] = coins
+    if (Object.keys(manual).length) overrides[periodKey] = manual
+    else delete overrides[periodKey]
+    set({ settlement: { ...state.settlement, overrides } })
+    return ok
+  },
+
   toggleAccount(id) {
     const state = get()
     const a = actor(state)
@@ -237,8 +269,9 @@ export const useApp = create(persist((set, get) => ({
     const state = get()
     const a = approved(state)
     if (!a || !name.trim() || !detail.trim() || !amount(cost, 1, 10000)) return fail('상품 정보와 1~10,000 코인 가격을 입력해 주세요.')
-    if (media && (media.length > 400_000 || !/^data:image\/(png|jpeg|webp);base64,/.test(media))) return fail('지원하는 이미지 파일을 선택해 주세요.')
-    set({ products: [...state.products, { id: uid(), owner: a.id, name: name.trim().slice(0, 60), detail: detail.trim().slice(0, 220), cost, media, art: state.creators[a.id].art }] })
+    if (media && (media.length > 400_000 || !/^data:(image\/(png|jpeg|webp)|video\/(mp4|webm));base64,/.test(media))) return fail('지원하는 사진 또는 영상 파일을 선택해 주세요.')
+    const kind = media.startsWith('data:video/') ? 'video' : 'image'
+    set({ products: [...state.products, { id: uid(), owner: a.id, name: name.trim().slice(0, 60), detail: detail.trim().slice(0, 220), cost, media, kind, art: state.creators[a.id].art }] })
     return ok
   },
 
@@ -302,6 +335,16 @@ export const useApp = create(persist((set, get) => ({
   },
 }), {
   name: 'bamgyeol-demo-v1',
-  partialize: ({ accounts, creators, posts, subscriptions, balances, transactions, products, roulettes, messages, session }) =>
-    ({ accounts, creators, posts, subscriptions, balances, transactions, products, roulettes, messages, session }),
+  version: 1,
+  migrate: (stored) => ({
+    ...stored,
+    creators: Object.fromEntries(Object.entries({ ...initialData.creators, ...stored.creators }).map(([id, creator]) => [
+      id, { ...initialData.creators[id], ...creator },
+    ])),
+    posts: mergeFixtures(stored.posts ?? [], initialData.posts.filter((post) => post.owner.startsWith('demo-creator-'))),
+    transactions: mergeFixtures(stored.transactions ?? [], initialData.transactions).sort((a, b) => b.at - a.at),
+    settlement: initialData.settlement,
+  }),
+  partialize: ({ accounts, creators, posts, subscriptions, balances, transactions, products, roulettes, messages, session, settlement }) =>
+    ({ accounts, creators, posts, subscriptions, balances, transactions, products, roulettes, messages, session, settlement }),
 }))

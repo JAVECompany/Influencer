@@ -4,7 +4,9 @@ import { ArrowRight, CheckCircle2, CircleAlert, ClipboardCheck, Coins, Home as H
 import { demos, number, roles } from './data'
 import { actor, useApp } from './store'
 import { Brand, Button, Feedback, field, Label, panel, Scene, Avatar } from './ui'
-import { CreatorDetail, Explore, Home, Store } from './customer'
+import { CreatorDetail, Home, Store } from './customer'
+import { Explore } from './explore'
+import { AdminSettlement } from './admin-settlement'
 import { Chat, Profile } from './shared'
 import { AdminHome, Application, Catalog, Earnings, Moderate, Review, Studio } from './operator'
 import './index.css'
@@ -12,10 +14,10 @@ import './index.css'
 const navItems = {
   customer: [['home', '홈', HomeIcon], ['search', '검색', Search], ['chat', '채팅', MessageCircle], ['store', '스토어', ShoppingBag], ['profile', '프로필', UserRound]],
   influencer: [['studio', '스튜디오', LayoutDashboard], ['chat', '채팅', MessageCircle], ['catalog', '상품', ShoppingBag], ['earnings', '수익', Wallet], ['profile', '프로필', UserRound]],
-  admin: [['ops', '운영', LayoutDashboard], ['review', '심사', ClipboardCheck], ['moderate', '관리', Shield], ['earnings', '정산', Wallet], ['profile', '프로필', UserRound]],
+  admin: [['ops', '운영', LayoutDashboard], ['home', '홈', HomeIcon], ['review', '심사', ClipboardCheck], ['moderate', '관리', Shield], ['settlement', '정산', Wallet], ['profile', '프로필', UserRound]],
 }
 const applicationNav = [['apply', '입점', ClipboardCheck], ['profile', '프로필', UserRound]]
-const pages = { home: Home, search: Explore, chat: Chat, store: Store, profile: Profile, studio: Studio, catalog: Catalog, earnings: Earnings, ops: AdminHome, review: Review, moderate: Moderate, apply: Application }
+const pages = { home: Home, search: Explore, chat: Chat, store: Store, profile: Profile, studio: Studio, catalog: Catalog, earnings: Earnings, settlement: AdminSettlement, ops: AdminHome, review: Review, moderate: Moderate, apply: Application }
 
 function Auth({ notify }) {
   const state = useApp()
@@ -113,7 +115,7 @@ function Workspace({ account, notify }) {
         </div>
       </header>
       <main className="mx-auto w-full max-w-[1130px] px-4 pt-6 pb-[calc(7rem+env(safe-area-inset-bottom))] sm:px-7 sm:pt-8 lg:px-10 lg:pb-12">
-        {detail && account.role === 'customer'
+        {detail && ['customer', 'admin'].includes(account.role)
           ? <CreatorDetail key={detail} id={detail} account={account} back={() => { setDetail(null); scrollTop() }} {...{ openCreator, openChat, notify }} />
           : <Page key={current + (chat ?? '')} {...{ account, openCreator, openChat, go, notify }} initial={chat} />}
       </main>

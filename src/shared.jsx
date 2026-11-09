@@ -6,7 +6,9 @@ import { Avatar, Badge, Button, Empty, field, fileData, Label, Modal, PageTitle,
 
 const txnNames = { subscribe: '구독 시작', unsubscribe: '구독 해지', topup: '코인 충전', product: '상품 구매', roulette: '룰렛 참여' }
 
-export function Ledger({ title = '거래 내역', items, showParties = false }) {
+const settlementDate = new Intl.DateTimeFormat('ko-KR', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Seoul' })
+
+export function Ledger({ title = '거래 내역', items, showParties = false, absoluteDates = false }) {
   const state = useApp()
   return <section className={`${panel} overflow-hidden`}>
     <h2 className="flex items-center gap-2 px-5 py-4 font-black"><ReceiptText size={17} className="text-mint" /> {title}</h2>
@@ -14,7 +16,7 @@ export function Ledger({ title = '거래 내역', items, showParties = false }) 
     {items.map((t) => <div key={t.id} className="flex items-center justify-between gap-4 border-t border-edge px-5 py-3.5">
       <div className="min-w-0">
         <p className="text-sm font-bold break-words">{txnNames[t.type]}{t.reward && ' · ' + t.reward}</p>
-        <p className="mt-1 text-xs break-words text-dim">{[showParties && state.accounts[t.customer]?.name, state.creators[t.owner]?.name, relativeTime(t.at)].filter(Boolean).join(' · ')}</p>
+        <p className="mt-1 text-xs break-words text-dim">{[showParties && (state.accounts[t.customer]?.name ?? t.customer), state.creators[t.owner]?.name, absoluteDates ? settlementDate.format(t.at) : relativeTime(t.at)].filter(Boolean).join(' · ')}</p>
       </div>
       <p className="shrink-0 text-right text-sm font-bold text-mint">{t.coins ? (t.type === 'topup' ? '+' : '−') + number(t.coins) + ' 코인' : t.won ? krw(t.won) : '—'}</p>
     </div>)}

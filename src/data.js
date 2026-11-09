@@ -1,3 +1,5 @@
+import { addedRoster, mockApplicants, mockPosts, mockTransactions } from './demo-data'
+
 export const roles = {
   admin: '관리자',
   influencer: '인플루언서',
@@ -21,6 +23,14 @@ const roster = [
   ['jian', '지안', 'jian', '커피, 음악, 그리고 나만의 시간.', 520, 4900, 7],
   ['sol', '솔', 'sol', '조금 느리게 바라본 일상.', 1100, 5900, 8],
 ]
+const originalPortraits = [0, 70, 1, 2, 71, 72, 3, 4, 5]
+const approvedRoster = [
+  ...roster.map(([id, name, handle, bio, fans, price, art], i) => ({
+    id, name, handle, bio, fans, price, art, status: 'approved', instagram: '', email: '', reason: '',
+    portrait: originalPortraits[i], gender: originalPortraits[i] < 70 ? 'female' : 'male',
+  })),
+  ...addedRoster,
+]
 
 export const palettes = [
   ['#557e83', '#152735', '#d3a18d', '#162022'],
@@ -42,9 +52,7 @@ export const initialData = {
   accounts: Object.fromEntries(demos.map((demo) => [
     demo.id, { ...demo, password: demo.id, avatar: '', notifications: true, payment: '', disabled: false },
   ])),
-  creators: Object.fromEntries(roster.map(([id, name, handle, bio, fans, price, art]) => [
-    id, { id, name, handle, bio, fans, price, art, status: 'approved', instagram: '', email: '', reason: '' },
-  ])),
+  creators: Object.fromEntries([...approvedRoster, ...mockApplicants].map((creator) => [creator.id, creator])),
   posts: [
     content('p1', 'influencer123', 'post', '도시가 잠든 뒤', '밤이 깊을수록 보이는 것들이 있어요. 오늘 산책에서 남긴 장면을 여러분과 공유해요.', 0, 18),
     content('p2', 'doha', 'post', '작업실의 마지막 불빛', '오늘 녹음을 마치고 남긴 한 장면입니다. 이번 주에는 새 트랙을 들려드릴게요.', 1, 87),
@@ -53,13 +61,15 @@ export const initialData = {
     content('live1', 'influencer123', 'live', '서린의 밤 산책', '오늘의 라이브 편성을 둘러보세요.', 0, 8),
     content('story1', 'doha', 'story', '작업실 스냅', '녹음하기 전, 오늘의 첫 번째 장면.', 1, 33),
     content('story2', 'yuna', 'story', '여행 사진 한 장', '해가 지기 직전의 바닷가.', 2, 58),
+    ...mockPosts(Date.now()),
   ],
   subscriptions: { user123: ['influencer123', 'doha', 'yuna'] },
   balances: { user123: 120 },
-  transactions: [],
+  transactions: mockTransactions(Date.now(), approvedRoster),
+  settlement: { coinWon: 50, feeBps: 0, overrides: {} },
   products: [
     { id: 'goods1', owner: 'influencer123', name: '야간 산책 필름', detail: '미공개 사진 3장', cost: 30, art: 0 },
-    { id: 'goods2', owner: 'influencer123', name: '짧은 영상 편지', detail: '구독자에게 전하는 30초 인사', cost: 45, art: 1 },
+    { id: 'goods2', owner: 'influencer123', name: '짧은 영상 편지', detail: '구독자에게 전하는 30초 인사', cost: 45, art: 1, kind: 'video' },
   ],
   roulettes: {
     influencer123: { cost: 20, rewards: [{ name: '비공개 사진', chance: 30 }, { name: '다음 기회에', chance: 70 }] },

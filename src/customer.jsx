@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { ArrowRight, Coins, Compass, Flag, Heart, LockKeyhole, MessageCircle, Radio, Search, ShieldCheck, ShoppingBag, Sparkles, UsersRound } from 'lucide-react'
+import { ArrowRight, Coins, Compass, Flag, Heart, LockKeyhole, MessageCircle, Radio, ShieldCheck, ShoppingBag, Sparkles, UsersRound } from 'lucide-react'
 import { kindNames, krw, number, packs, relativeTime } from './data'
-import { canRead, hasSubscription, isPublic, useApp } from './store'
+import { canRead, hasSubscription, isPublic, subscriberCount, useApp } from './store'
 import { Avatar, Back, Badge, Button, Empty, field, Modal, PageTitle, panel, Protected, Scene } from './ui'
 import { Ledger } from './shared'
+import { ProductMedia, ProductThumbnail } from './product-media'
 
 const byRecent = (a, b) => b.at - a.at
 const visibleStory = (post) => post.kind !== 'story' || Date.now() - post.at < 86_400_000
@@ -30,7 +31,8 @@ export function ContentPreview({ post, account, onClose }) {
 function PostCard({ post, account, openCreator, openChat, notify }) {
   const state = useApp()
   const creator = state.creators[post.owner]
-  if (!canRead(state, post)) return null
+  if (!creator || !canRead(state, post)) return null
+  const staff = account.role === 'admin'
   const liked = post.likes.includes(account.id)
   const reported = post.reports.includes(account.id)
   return <article className={`${panel} overflow-hidden`}>
@@ -39,7 +41,7 @@ function PostCard({ post, account, openCreator, openChat, notify }) {
         <Avatar person={creator} account={state.accounts[creator.id]} className="size-10" />
         <span className="min-w-0"><span className="block truncate text-sm font-black">{creator.name}</span><span className="text-xs text-dim">@{creator.handle} · {relativeTime(post.at)}</span></span>
       </button>
-      <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#1b3036] px-3 py-1.5 text-[10px] font-bold text-mint"><LockKeyhole size={12} />구독자 전용</span>
+      <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#1b3036] px-3 py-1.5 text-[10px] font-bold text-mint"><LockKeyhole size={12} />{staff ? (post.hidden ? '숨김 · 검수 중' : '관리자 검수') : '구독자 전용'}</span>
     </header>
     <Protected viewer={account.id}>
       <ContentMedia post={post} />
@@ -48,12 +50,15 @@ function PostCard({ post, account, openCreator, openChat, notify }) {
         <p className="mt-1.5 text-sm leading-relaxed break-words text-dim">{post.body}</p>
       </div>
     </Protected>
-    <footer className="flex items-center gap-1 px-3 py-2">
+    {staff ? <footer className="flex items-center justify-between gap-2 px-4 py-2">
+      <span className="text-xs text-dim">신고 {post.reports.length}건</span>
+      <Button tone="subtle" onClick={() => notify(state.managePost(post.id, 'hide'), post.hidden ? '콘텐츠를 다시 공개했어요.' : '콘텐츠를 숨겼어요.')}>{post.hidden ? '다시 공개' : '숨김'}</Button>
+    </footer> : <footer className="flex items-center gap-1 px-3 py-2">
       <button type="button" aria-label="좋아요" aria-pressed={liked} className={iconAction} onClick={() => state.managePost(post.id, 'like')}><Heart size={20} fill={liked ? '#ee7a9f' : 'none'} color={liked ? '#ee7a9f' : 'currentColor'} /></button>
       {post.likes.length > 0 && <span className="text-xs text-dim">{post.likes.length}</span>}
       <button type="button" aria-label="채팅" className={iconAction} onClick={() => openChat(creator.id)}><MessageCircle size={19} /></button>
       <button type="button" aria-label={reported ? '신고 완료' : '게시글 신고'} disabled={reported} className={`ml-auto ${iconAction}`} onClick={() => notify(state.managePost(post.id, 'report'), '운영팀 검토 목록에 등록했어요.')}><Flag size={17} /></button>
-    </footer>
+    </footer>}
   </article>
 }
 
@@ -80,24 +85,40 @@ function StoryRail({ stories, onOpen, creators, accounts }) {
 export function Home({ account, openCreator, openChat, go, notify }) {
   const state = useApp()
   const [preview, setPreview] = useState(null)
-  const feed = state.posts.filter((p) => p.kind === 'post' && canRead(state, p)).sort(byRecent)
-  const stories = state.posts.filter((p) => p.kind !== 'post' && canRead(state, p) && visibleStory(p))
+  const [owner, setOwner] = useState('')
+  const [limit, setLimit] = useState(8)
+  const staff = account.role === 'admin'
+  const readable = state.posts.filter((p) => state.creators[p.owner] && (!owner || p.owner === owner) && canRead(state, p))
+  const feed = readable.filter((p) => p.kind === 'post').sort(byRecent)
+  const stories = readable.filter((p) => p.kind !== 'post' && (staff || visibleStory(p)))
     .sort((a, b) => Number(b.kind === 'live') - Number(a.kind === 'live') || byRecent(a, b))
   const spotlight = Object.values(state.creators).filter((c) => isPublic(state, c.id) && !hasSubscription(state, account.id, c.id))
     .sort((a, b) => b.fans - a.fans).slice(0, 4)
+  const reviewCreators = staff ? Object.values(state.creators).filter((c) => c.status === 'approved').sort((a, b) => a.name.localeCompare(b.name, 'ko')) : []
   return <>
-    <PageTitle label="YOUR ORBIT" title="나의 피드" subtitle="구독 중인 크리에이터의 새로운 이야기를 만나보세요." />
+    <PageTitle label={staff ? 'CONTENT REVIEW' : 'YOUR ORBIT'} title={staff ? '전체 크리에이터 피드' : '나의 피드'}
+      subtitle={staff ? '고객 홈 형식으로 게시글·스토리·라이브를 검수합니다. 이 열람은 구독자 수나 매출에 반영되지 않습니다.' : '구독 중인 크리에이터의 새로운 이야기를 만나보세요.'} />
+    {staff && <div className={`${panel} mb-5 flex flex-wrap items-end gap-2 p-3`}>
+      <label className="min-w-40 flex-1 text-xs font-bold text-dim">검수할 크리에이터
+        <select className={`${field} mt-1`} value={owner} onChange={(event) => { setOwner(event.target.value); setLimit(8) }}>
+          <option value="">모든 크리에이터</option>
+          {reviewCreators.map((c) => <option key={c.id} value={c.id}>{c.name} · @{c.handle}</option>)}
+        </select>
+      </label>
+      <Button tone="subtle" disabled={!owner} onClick={() => openCreator(owner)}>프로필·상품 검수</Button>
+    </div>}
     <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_265px]">
       <div className="min-w-0">
         <StoryRail stories={stories} onOpen={setPreview} creators={state.creators} accounts={state.accounts} />
         <h2 className="mb-3 flex items-center justify-between text-sm font-black">최근 게시글 <span className="text-[11px] font-medium tracking-wide text-dim">최신순</span></h2>
         <div className="grid gap-5">
-          {feed.map((post) => <PostCard key={post.id} {...{ post, account, openCreator, openChat, notify }} />)}
-          {!feed.length && <Empty icon={Compass} title="아직 피드가 비어 있어요" description="관심 있는 크리에이터를 구독하면 새 게시글이 여기에 표시돼요."><Button onClick={() => go('search')}>크리에이터 찾기 <ArrowRight size={16} /></Button></Empty>}
+          {feed.slice(0, limit).map((post) => <PostCard key={post.id} {...{ post, account, openCreator, openChat, notify }} />)}
+          {limit < feed.length && <Button tone="subtle" onClick={() => setLimit(limit + 8)}>게시글 더 보기 · {limit}/{feed.length}</Button>}
+          {!feed.length && <Empty icon={Compass} title="아직 피드가 비어 있어요" description={staff ? '선택한 크리에이터의 게시글이 없어요.' : '관심 있는 크리에이터를 구독하면 새 게시글이 여기에 표시돼요.'}>{!staff && <Button onClick={() => go('search')}>크리에이터 찾기 <ArrowRight size={16} /></Button>}</Empty>}
         </div>
       </div>
       <aside className="hidden gap-4 xl:grid">
-        <section className={`${panel} p-4`}>
+        {!staff && <section className={`${panel} p-4`}>
           <div className="mb-4 flex items-center gap-2"><Sparkles size={16} className="text-mint" /><h2 className="text-sm font-black">새로운 크리에이터</h2></div>
           {spotlight.map((c) => <button type="button" key={c.id} onClick={() => openCreator(c.id)} className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left hover:bg-white/5">
             <Avatar person={c} account={state.accounts[c.id]} className="size-9" />
@@ -105,55 +126,11 @@ export function Home({ account, openCreator, openChat, go, notify }) {
             <ArrowRight size={15} className="text-dim" />
           </button>)}
           <Button tone="plain" className="mt-2 w-full justify-between" onClick={() => go('search')}>전체 탐색 <ArrowRight size={16} /></Button>
-        </section>
+        </section>}
         <div className="flex items-start gap-3 px-2 py-3 text-xs leading-relaxed text-dim"><ShieldCheck size={17} className="shrink-0 text-mint" /><span>구독 전용 콘텐츠에는 이용자별 워터마크가 표시됩니다.</span></div>
       </aside>
     </div>
     {preview && <ContentPreview post={state.posts.find((p) => p.id === preview)} account={account} onClose={() => setPreview(null)} />}
-  </>
-}
-
-const constellation = [
-  ['49%', '46%'], ['75%', '30%'], ['25%', '28%'], ['72%', '76%'], ['25%', '72%'],
-  ['49%', '87%'], ['53%', '13%'], ['87%', '53%'], ['13%', '49%'],
-]
-
-function CreatorBubble({ creator, account, onClick, largest, style }) {
-  const size = Math.round(42 + Math.sqrt(creator.fans / Math.max(1, largest)) * 36)
-  return <button type="button" onClick={onClick} style={{ ...style, '--bubble': size + 'px' }}
-    className="group flex flex-col items-center gap-1.5 rounded-full text-center transition-transform duration-200 hover:z-10 hover:scale-110 motion-reduce:transition-none">
-    <Avatar person={creator} account={account} className="size-[calc(var(--bubble)*.78)] border-2 border-white/15 shadow-lg transition group-hover:border-mint sm:size-(--bubble)" />
-    <span className="max-w-[5.2rem] truncate text-[11px] font-bold sm:text-xs">{creator.name}</span>
-  </button>
-}
-
-export function Explore({ openCreator }) {
-  const state = useApp()
-  const [query, setQuery] = useState('')
-  const term = query.trim().replace(/^@/, '').toLowerCase()
-  const creators = Object.values(state.creators).filter((c) => isPublic(state, c.id)).sort((a, b) => b.fans - a.fans)
-  const matches = creators.filter((c) => c.name.toLowerCase().includes(term) || c.handle.toLowerCase().includes(term))
-  const largest = creators[0]?.fans ?? 0
-  const bubble = (creator, position) => <CreatorBubble key={creator.id} creator={creator} account={state.accounts[creator.id]}
-    largest={largest} onClick={() => openCreator(creator.id)} style={position} />
-  return <>
-    <PageTitle label="DISCOVER" title="크리에이터 탐색" subtitle="새로운 이야기를 만나고 내 궤도를 넓혀 보세요." />
-    <label className={`${panel} mb-5 flex items-center gap-3 px-4`}>
-      <Search size={19} className="text-dim" />
-      <input value={query} onChange={(event) => setQuery(event.target.value)} aria-label="닉네임 또는 핸들 검색" placeholder="닉네임 또는 @핸들 검색" className="w-full bg-transparent py-3.5 text-sm outline-none placeholder:text-dim" />
-    </label>
-    {!matches.length ? <Empty icon={Search} title="검색 결과가 없어요" description="다른 닉네임이나 핸들로 검색해 보세요." /> :
-      term ? <div className={`${panel} flex flex-wrap justify-center gap-7 p-6`}>{matches.map((c) => bubble(c))}</div> :
-        <div className="overflow-hidden rounded-[28px] border border-edge bg-[radial-gradient(ellipse_at_50%_45%,#203943_0%,#101b28_44%,#0d1520_78%)]">
-          <p className="px-5 pt-4 text-[10px] font-bold tracking-[.16em] text-mint/85">CREATOR CONSTELLATION</p>
-          <div data-constellation className="relative mx-auto h-[385px] max-w-[630px] sm:h-[475px]">
-            <span className="pointer-events-none absolute inset-[12%_10%] rotate-[-10deg] rounded-[50%] border border-mint/8" />
-            <span className="pointer-events-none absolute inset-[20%_18%] rotate-[14deg] rounded-[50%] border border-mint/10" />
-            {matches.slice(0, 9).map((creator, index) => <div key={creator.id} className="absolute -translate-x-1/2 -translate-y-1/2"
-              style={{ left: constellation[index][0], top: constellation[index][1] }}>{bubble(creator)}</div>)}
-          </div>
-          {matches.length > 9 && <div className="flex flex-wrap justify-center gap-6 px-4 pb-8">{matches.slice(9).map((c) => bubble(c))}</div>}
-        </div>}
   </>
 }
 
@@ -162,11 +139,12 @@ export function CreatorDetail({ id, account, back, openCreator, openChat, notify
   const [preview, setPreview] = useState(null)
   const [offer, setOffer] = useState(null)
   const creator = state.creators[id]
-  if (!isPublic(state, id)) return <><Back onClick={back} /><Empty title="프로필을 열 수 없어요" /></>
-  const active = hasSubscription(state, account.id, id)
-  const posts = state.posts.filter((p) => p.owner === id && canRead(state, p) && visibleStory(p)).sort(byRecent)
+  const staff = account.role === 'admin'
+  if (!creator || (!staff && !isPublic(state, id))) return <><Back onClick={back} /><Empty title="프로필을 열 수 없어요" /></>
+  const active = staff || hasSubscription(state, account.id, id)
+  const posts = state.posts.filter((p) => p.owner === id && canRead(state, p) && (staff || visibleStory(p))).sort(byRecent)
   const purchases = new Set(state.transactions.filter((t) => t.customer === account.id && t.type === 'product').map((t) => t.productId))
-  const products = state.products.filter((p) => p.owner === id && (!p.archived || purchases.has(p.id)))
+  const products = state.products.filter((p) => p.owner === id && (staff || !p.archived || purchases.has(p.id)))
   const roulette = state.roulettes[id]
   return <>
     <Back onClick={back} />
@@ -175,12 +153,12 @@ export function CreatorDetail({ id, account, back, openCreator, openChat, notify
       <div className="px-5 pb-5 sm:px-7">
         <div className="-mt-9 mb-3 flex items-end justify-between gap-2">
           <Avatar person={creator} account={state.accounts[id]} className="size-[76px] border-4 border-panel" />
-          {active ? <Badge>구독 중</Badge> : <Button onClick={() => setOffer({ type: 'subscribe', name: creator.name })}>{krw(creator.price)} / 월 구독</Button>}
+          {active ? <Badge>{staff ? '관리자 검수' : '구독 중'}</Badge> : <Button onClick={() => setOffer({ type: 'subscribe', name: creator.name })}>{krw(creator.price)} / 월 구독</Button>}
         </div>
         <h1 className="text-2xl font-black">{creator.name}</h1>
         <p className="mt-1 text-sm text-dim">@{creator.handle}</p>
         <p className="mt-3 text-sm break-words">{creator.bio}</p>
-        <p className="mt-3 flex items-center gap-1.5 text-xs text-dim"><UsersRound size={14} />구독자 {number(creator.fans + Object.keys(state.subscriptions).filter((customer) => hasSubscription(state, customer, id)).length)}명</p>
+        <p className="mt-3 flex items-center gap-1.5 text-xs text-dim"><UsersRound size={14} />구독자 {number(subscriberCount(state, id))}명</p>
       </div>
     </header>
     {active ? <div className="grid gap-5">
@@ -189,14 +167,15 @@ export function CreatorDetail({ id, account, back, openCreator, openChat, notify
         <div className="grid gap-2">
           {products.map((p) => {
             const bought = purchases.has(p.id)
-            return <div key={p.id} className="flex items-center justify-between gap-3 rounded-xl bg-night p-3">
+            return <div key={p.id} className="grid items-center gap-3 rounded-xl bg-night p-3 sm:grid-cols-[100px_minmax(0,1fr)_auto]">
+              <ProductThumbnail product={p} className="aspect-video w-full sm:w-[100px]" />
               <div className="min-w-0"><p className="text-sm font-bold break-words">{p.name}</p><p className="mt-1 text-xs break-words text-dim">{p.detail}</p></div>
-              <Button tone="subtle" className="shrink-0" onClick={() => setOffer({ ...p, type: bought ? 'owned' : 'product' })}>{bought ? '구매 콘텐츠 열기' : number(p.cost) + ' 코인'}</Button>
+              <Button tone="subtle" className="justify-self-start sm:justify-self-end" onClick={() => setOffer({ ...p, type: staff || bought ? 'owned' : 'product' })}>{staff ? '원본 검수' : bought ? '구매 콘텐츠 열기' : number(p.cost) + ' 코인'}</Button>
             </div>
           })}
           {roulette && <div className="flex items-center justify-between gap-3 rounded-xl bg-night p-3">
             <div><p className="text-sm font-bold">크리에이터 룰렛</p><p className="mt-1 text-xs text-dim">확률을 확인한 후 참여할 수 있어요.</p></div>
-            <Button tone="subtle" className="shrink-0" onClick={() => setOffer({ ...roulette, type: 'roulette', name: '크리에이터 룰렛' })}>{number(roulette.cost)} 코인</Button>
+            <Button tone="subtle" className="shrink-0" onClick={() => setOffer({ ...roulette, type: staff ? 'review-roulette' : 'roulette', name: '크리에이터 룰렛' })}>{staff ? '확률 검수' : number(roulette.cost) + ' 코인'}</Button>
           </div>}
         </div>
       </section>}
@@ -207,20 +186,21 @@ export function CreatorDetail({ id, account, back, openCreator, openChat, notify
     </div> : <Empty icon={LockKeyhole} title="구독자 전용 콘텐츠" description="구독하면 모든 게시글, 스토리, 라이브 미리보기와 크리에이터 상점이 열려요." />}
     {preview && <ContentPreview post={state.posts.find((p) => p.id === preview)} account={account} onClose={() => setPreview(null)} />}
     {offer?.type === 'owned' && <Modal title={offer.name} onClose={() => setOffer(null)}>
-      <ContentMedia post={{ ...offer, title: offer.name }} />
+      <ProductMedia product={offer} />
       <p className="mt-3 text-sm text-dim">{offer.detail}</p>
     </Modal>}
     {offer && offer.type !== 'owned' && <Modal title={offer.name} onClose={() => setOffer(null)}>
+      {offer.type === 'product' && <ProductThumbnail product={offer} className="mb-4 aspect-video w-full" />}
       <p className="mb-4 text-sm leading-relaxed text-dim">{offer.type === 'subscribe'
         ? krw(creator.price) + ' / 월 · 모의 구독을 시작할까요?'
-        : number(offer.cost) + ' 코인 · 보유 ' + number(state.balances[account.id] ?? 0) + ' 코인'}</p>
+        : number(offer.cost) + ' 코인' + (staff ? ' / 1회' : ' · 보유 ' + number(state.balances[account.id] ?? 0) + ' 코인')}</p>
       {offer.rewards && <ul className="mb-4 space-y-1 rounded-xl bg-night p-4">{offer.rewards.map((reward, index) => <li key={index} className="flex justify-between gap-3 text-sm"><span>{reward.name}</span><span className="text-mint">{reward.chance}%</span></li>)}</ul>}
-      <Button className="w-full" onClick={() => {
+      {!staff && <Button className="w-full" onClick={() => {
         const result = offer.type === 'subscribe' ? state.subscribe(id) : state.spend(id, offer.type, offer.id)
         const success = { subscribe: '구독을 시작했어요.', product: '구매한 콘텐츠를 열 수 있어요.', roulette: '룰렛 결과 · ' + result.reward }
         notify(result, success[offer.type])
         if (!result.error) setOffer(null)
-      }}>{offer.type === 'roulette' ? '코인으로 돌리기' : '확인'}</Button>
+      }}>{offer.type === 'roulette' ? '코인으로 돌리기' : '확인'}</Button>}
     </Modal>}
   </>
 }

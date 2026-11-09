@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useId, useRef, useState } from 'react'
 import { ArrowLeft, CircleHelp, LockKeyhole, X } from 'lucide-react'
 import { palettes } from './data'
+import { portraitStyle } from './demo-data'
 
 export const panel = 'rounded-2xl border border-edge bg-panel'
 export const Feedback = createContext(null)
@@ -80,6 +81,8 @@ export function Avatar({ person, account, className = '' }) {
   const gradient = useId()
   const image = account?.avatar || person?.avatar
   if (image) return <img src={image} alt="" className={`aspect-square shrink-0 rounded-full object-cover ${className}`} />
+  const portrait = portraitStyle(person?.portrait)
+  if (portrait) return <span aria-hidden="true" style={portrait} className={`block aspect-square shrink-0 rounded-full bg-[#30443d] bg-no-repeat ${className}`} />
   if (person?.art === undefined) return <span aria-hidden="true" className={`grid aspect-square shrink-0 place-items-center rounded-full bg-[#193938] font-black text-mint ${className}`}>{(account?.name || person?.name || '밤').slice(0, 1)}</span>
   const variation = person.art % 3
   return <svg aria-hidden="true" className={`aspect-square shrink-0 rounded-full ${className}`} viewBox="0 0 120 120">
@@ -163,10 +166,12 @@ export function Protected({ viewer, children, className = '' }) {
   </div>
 }
 
-export function fileData(file) {
+export function fileData(file, allowVideo = false) {
   if (!file) return Promise.resolve('')
-  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 280_000) {
-    return Promise.reject(new Error('PNG, JPG 또는 WEBP 이미지를 280 KB 이하로 선택해 주세요.'))
+  const image = ['image/png', 'image/jpeg', 'image/webp'].includes(file.type)
+  const video = allowVideo && ['video/mp4', 'video/webm'].includes(file.type)
+  if ((!image && !video) || file.size > 280_000) {
+    return Promise.reject(new Error(allowVideo ? '지원하는 사진 또는 MP4·WebM 영상을 280 KB 이하로 선택해 주세요.' : 'PNG, JPG 또는 WEBP 이미지를 280 KB 이하로 선택해 주세요.'))
   }
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
