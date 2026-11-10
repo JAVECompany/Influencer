@@ -1,7 +1,7 @@
 import Avatar from '../../../shared/components/ui/media/Avatar'
 import Modal from '../../../shared/components/ui/dialogs/Modal'
-import type { Account } from '../../../shared/types/account'
-import type { Content } from '../../../shared/types/content'
+import type { IAccount } from '../../../shared/types/account'
+import type { IContent } from '../../../shared/types/content'
 import { formatNumber } from '../../../shared/utils/format/format'
 
 export default function ContentAudienceDialog({
@@ -9,8 +9,8 @@ export default function ContentAudienceDialog({
   viewers,
   onClose,
 }: {
-  post: Content
-  viewers: Account[]
+  post: IContent
+  viewers: IAccount[]
   onClose: () => void
 }) {
   return (

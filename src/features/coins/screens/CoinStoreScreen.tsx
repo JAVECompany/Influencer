@@ -5,11 +5,11 @@ import Modal from '../../../shared/components/ui/dialogs/Modal'
 import PageTitle from '../../../shared/components/ui/layout/PageTitle'
 import { coinPacks } from '../../../shared/constants/coinPacks'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { PageProps } from '../../../shared/types/navigation'
+import type { IPageProps } from '../../../shared/types/navigation'
 import { formatKrw, formatNumber } from '../../../shared/utils/format/format'
 import { useCoinStore } from '../hooks/useCoinStore'
 
-export default function CoinStoreScreen({ account, notify }: Pick<PageProps, 'account' | 'notify'>) {
+export default function CoinStoreScreen({ account, notify }: Pick<IPageProps, 'account' | 'notify'>) {
   const { balance, transactions, pack, setPack, close, topUp } = useCoinStore({ account, notify })
   return (
     <>

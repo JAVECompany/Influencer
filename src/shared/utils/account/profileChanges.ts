@@ -1,16 +1,16 @@
-import type { Account, ProfileChanges } from '../../types/account'
-import type { Failure } from '../../types/actionResult'
-import type { AppData } from '../../types/demoState'
+import type { IAccount, ProfileChangesType } from '../../types/account'
+import type { FailureType } from '../../types/actionResult'
+import type { IAppData } from '../../types/demoState'
 import { fail } from '../actions/actionResults'
 import { isPasswordLengthValid } from '../auth/credentials'
 import { isNameTaken } from './accountName'
 
 export function prepareProfileChanges(
-  state: AppData,
-  account: Account,
-  changes: ProfileChanges
-): Omit<ProfileChanges, 'current'> | Failure {
-  const update: Omit<ProfileChanges, 'current'> = {}
+  state: IAppData,
+  account: IAccount,
+  changes: ProfileChangesType
+): Omit<ProfileChangesType, 'current'> | FailureType {
+  const update: Omit<ProfileChangesType, 'current'> = {}
   if (typeof changes.name === 'string') {
     const name = changes.name.trim()
     if (!name || name.length > 20 || isNameTaken(state, name, account.id)) {

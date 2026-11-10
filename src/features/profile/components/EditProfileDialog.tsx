@@ -3,8 +3,8 @@ import Button from '../../../shared/components/ui/actions/Button'
 import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import Modal from '../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../shared/styles/controlStyles'
-import type { Account, ProfileChanges } from '../../../shared/types/account'
-import type { Notify } from '../../../shared/types/actionResult'
+import type { IAccount, ProfileChangesType } from '../../../shared/types/account'
+import type { NotifyType } from '../../../shared/types/actionResult'
 import { readMediaFile } from '../../../shared/utils/media/readMediaFile'
 
 export default function EditProfileDialog({
@@ -13,9 +13,9 @@ export default function EditProfileDialog({
   notify,
   onClose,
 }: {
-  account: Account
-  save: (changes: ProfileChanges, message: string) => void
-  notify: Notify
+  account: IAccount
+  save: (changes: ProfileChangesType, message: string) => void
+  notify: NotifyType
   onClose: () => void
 }) {
   const [name, setName] = useState(account.name)

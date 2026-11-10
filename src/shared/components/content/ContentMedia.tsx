@@ -1,7 +1,7 @@
-import type { Content } from '../../types/content'
+import type { IContent } from '../../types/content'
 import DemoScene from '../ui/media/DemoScene'
 
-export default function ContentMedia({ post }: { post: Content }) {
+export default function ContentMedia({ post }: { post: IContent }) {
   return post.media ? (
     <img src={post.media} alt={post.title} draggable={false} className="aspect-video w-full object-cover" />
   ) : (

@@ -1,3 +1,3 @@
-import type { Content } from '../../types/content'
+import type { IContent } from '../../types/content'
 
-export const byRecent = (a: Content, b: Content) => b.at - a.at
+export const compareByNewest = (a: IContent, b: IContent) => b.at - a.at

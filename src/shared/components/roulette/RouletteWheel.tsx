@@ -1,12 +1,12 @@
 import type { RefObject } from 'react'
 import { rouletteSegmentColors } from '../../constants/roulette'
-import type { WheelSegment } from '../../utils/roulette/roulette'
+import type { IWheelSegment } from '../../utils/roulette/roulette'
 
 const center = 144
 
 const rim = 130
 
-const at = (angle: number, radius: number) => {
+const getWheelPoint = (angle: number, radius: number) => {
   const radians = (angle * Math.PI) / 180
   return [center + radius * Math.sin(radians), center - radius * Math.cos(radians)]
 }
@@ -15,7 +15,7 @@ export default function RouletteWheel({
   segments,
   disc,
 }: {
-  segments: WheelSegment[]
+  segments: IWheelSegment[]
   disc: RefObject<HTMLDivElement | null>
 }) {
   return (
@@ -33,7 +33,7 @@ export default function RouletteWheel({
           {segments.map(({ name, start, end }, i) => {
             const width = end - start
             const middle = (start + end) / 2
-            const [x, y] = at(middle, rim * 0.6)
+            const [x, y] = getWheelPoint(middle, rim * 0.6)
             const tilt = middle > 180 ? middle + 90 : middle - 90
             const characters = Array.from(name)
             const label = characters.length > 14 ? characters.slice(0, 13).join('') + '…' : name
@@ -44,11 +44,11 @@ export default function RouletteWheel({
             )
             const path =
               'M144 144L' +
-              at(start, rim).join(' ') +
+              getWheelPoint(start, rim).join(' ') +
               'A130 130 0 ' +
               Number(width > 180) +
               ' 1 ' +
-              at(end, rim).join(' ') +
+              getWheelPoint(end, rim).join(' ') +
               'Z'
             return (
               <g key={i}>

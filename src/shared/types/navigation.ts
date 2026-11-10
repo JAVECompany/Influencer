@@ -1,7 +1,7 @@
-import type { Account } from './account'
-import type { Notify } from './actionResult'
+import type { IAccount } from './account'
+import type { NotifyType } from './actionResult'
 
-export type PageKey =
+export type PageKeyType =
   | 'home'
   | 'search'
   | 'chat'
@@ -16,13 +16,13 @@ export type PageKey =
   | 'moderate'
   | 'apply'
 
-export interface PageProps {
-  account: Account
-  notify: Notify
-  go: (id: PageKey) => void
+export interface IPageProps {
+  account: IAccount
+  notify: NotifyType
+  go: (id: PageKeyType) => void
   openCreator: (id: string) => void
   openChat: (id: string) => void
   initial: string | null
 }
 
-export type OperatorProps = Pick<PageProps, 'account' | 'notify'>
+export type OperatorPropsType = Pick<IPageProps, 'account' | 'notify'>

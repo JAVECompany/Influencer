@@ -1,7 +1,7 @@
 import Avatar from '../../../../shared/components/ui/media/Avatar'
 import Button from '../../../../shared/components/ui/actions/Button'
 import { roles } from '../../../../shared/constants/roles'
-import type { Account, Creator } from '../../../../shared/types/account'
+import type { IAccount, ICreator } from '../../../../shared/types/account'
 
 export default function ModerationAccountRow({
   account,
@@ -9,8 +9,8 @@ export default function ModerationAccountRow({
   disabled,
   onToggle,
 }: {
-  account?: Account
-  creator?: Creator
+  account?: IAccount
+  creator?: ICreator
   disabled: boolean
   onToggle: () => void
 }) {

@@ -2,7 +2,7 @@ import type { CSSProperties, MouseEventHandler } from 'react'
 import { Check } from 'lucide-react'
 import Avatar from '../../../shared/components/ui/media/Avatar'
 import { formatNumber } from '../../../shared/utils/format/format'
-import type { ExploreItem } from '../types/creatorDiscovery'
+import type { IExploreItem } from '../types/creatorDiscovery'
 
 export default function CreatorBubble({
   item,
@@ -10,7 +10,7 @@ export default function CreatorBubble({
   onClick,
   style,
 }: {
-  item: ExploreItem
+  item: IExploreItem
   size: number
   onClick: MouseEventHandler<HTMLButtonElement>
   style?: CSSProperties

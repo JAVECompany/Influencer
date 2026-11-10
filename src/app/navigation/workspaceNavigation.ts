@@ -24,12 +24,12 @@ import CreatorStudioScreen from '../../features/creator-studio/screens/CreatorSt
 import DiscoverScreen from '../../features/discover/screens/DiscoverScreen'
 import HomeScreen from '../../features/home/screens/HomeScreen'
 import ProfileScreen from '../../features/profile/screens/ProfileScreen'
-import type { Role } from '../../shared/types/account'
-import type { PageKey, PageProps } from '../../shared/types/navigation'
+import type { RoleType } from '../../shared/types/account'
+import type { PageKeyType, IPageProps } from '../../shared/types/navigation'
 
-type NavItem = [PageKey, string, LucideIcon]
+type NavItemType = [PageKeyType, string, LucideIcon]
 
-export const navItems: Record<Role, NavItem[]> = {
+export const navItems: Record<RoleType, NavItemType[]> = {
   customer: [
     ['home', '홈', HomeIcon],
     ['search', '검색', Search],
@@ -54,12 +54,12 @@ export const navItems: Record<Role, NavItem[]> = {
   ],
 }
 
-export const applicationNav: NavItem[] = [
+export const applicationNav: NavItemType[] = [
   ['apply', '입점', ClipboardCheck],
   ['profile', '프로필', UserRound],
 ]
 
-export const pages: Record<PageKey, ComponentType<PageProps>> = {
+export const pages: Record<PageKeyType, ComponentType<IPageProps>> = {
   home: HomeScreen,
   search: DiscoverScreen,
   chat: ChatScreen,

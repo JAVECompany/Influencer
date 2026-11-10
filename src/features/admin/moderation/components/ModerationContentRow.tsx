@@ -1,7 +1,7 @@
 import Button from '../../../../shared/components/ui/actions/Button'
 import { contentKindLabels } from '../../../../shared/constants/contentKinds'
-import type { Content } from '../../../../shared/types/content'
-import type { PageProps } from '../../../../shared/types/navigation'
+import type { IContent } from '../../../../shared/types/content'
+import type { IPageProps } from '../../../../shared/types/navigation'
 
 export default function ModerationContentRow({
   post,
@@ -10,11 +10,11 @@ export default function ModerationContentRow({
   onPreview,
   onToggle,
 }: {
-  post: Content
+  post: IContent
   ownerName: string
-  openCreator: PageProps['openCreator']
+  openCreator: IPageProps['openCreator']
   onPreview: (id: string) => void
-  onToggle: (post: Content) => void
+  onToggle: (post: IContent) => void
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 p-4">

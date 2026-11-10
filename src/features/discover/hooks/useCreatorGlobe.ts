@@ -1,17 +1,17 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent, PointerEvent } from 'react'
-import type { Angles, ExploreItem } from '../types/creatorDiscovery'
-import { globeCards } from '../utils/globeLayout'
+import type { AnglesType, IExploreItem } from '../types/creatorDiscovery'
+import { layoutGlobeCards } from '../utils/globeLayout'
 
 const startingAngles = { yaw: 0, pitch: 0 }
 
 const angleStep = 0.008
 
-type DragGesture = { id: number; x: number; y: number; angles: Angles }
+type DragGestureType = { id: number; x: number; y: number; angles: AnglesType }
 
-export function useCreatorGlobe(items: ExploreItem[], peak: number) {
+export function useCreatorGlobe(items: IExploreItem[], peak: number) {
   const viewport = useRef<HTMLDivElement>(null)
-  const gesture = useRef<DragGesture | null>(null)
+  const gesture = useRef<DragGestureType | null>(null)
   const ignoreClick = useRef(false)
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 })
   const [angles, setAngles] = useState(startingAngles)
@@ -29,8 +29,8 @@ export function useCreatorGlobe(items: ExploreItem[], peak: number) {
     return () => observer.disconnect()
   }, [])
 
-  const visible = globeCards(items, width, height, angles, peak)
-  const move = (dx: number, dy: number, origin: Angles) => ({
+  const visible = layoutGlobeCards(items, width, height, angles, peak)
+  const move = (dx: number, dy: number, origin: AnglesType) => ({
     yaw: (origin.yaw + dx) % (2 * Math.PI),
     pitch: (origin.pitch + dy) % (2 * Math.PI),
   })

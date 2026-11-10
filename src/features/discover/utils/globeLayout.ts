@@ -1,29 +1,37 @@
 import { formatNumber } from '../../../shared/utils/format/format'
-import type { Angles, Box, ExploreItem } from '../types/creatorDiscovery'
+import type { AnglesType, BoxType, IExploreItem } from '../types/creatorDiscovery'
 
-type GlobeCard = { item: ExploreItem; size: number; left: number; top: number; width: number; depth: number }
-type GlobePoint = { item: ExploreItem; x: number; y: number; z: number }
+type GlobeCardType = {
+  item: IExploreItem
+  size: number
+  left: number
+  top: number
+  width: number
+  depth: number
+}
+type GlobePointType = { item: IExploreItem; x: number; y: number; z: number }
 
 const goldenAngle = Math.PI * (3 - Math.sqrt(5))
 
-export const circleSize = (count: number, peak: number, compact: boolean) =>
+export const calculateCircleSize = (count: number, peak: number, compact: boolean) =>
   Math.round((29 + 61 * (count / peak) ** 0.57) * (compact ? 0.76 : 1))
 
-const cardWidth = (size: number, count: number) => Math.max(44, size + 4, formatNumber(count).length * 6 + 14)
-const cardHeight = (size: number) => Math.max(44, size + 18)
+const calculateCardWidth = (size: number, count: number) =>
+  Math.max(44, size + 4, formatNumber(count).length * 6 + 14)
+const calculateCardHeight = (size: number) => Math.max(44, size + 18)
 
-function globePoints(
-  items: ExploreItem[],
+function buildGlobePoints(
+  items: IExploreItem[],
   radiusX: number,
   radiusY: number,
   peak: number,
   compact: boolean
-): GlobePoint[] {
+): GlobePointType[] {
   const subscribed = items.filter((item) => item.subscribed)
-  const sizes = subscribed.map(({ count }) => circleSize(count, peak, compact))
+  const sizes = subscribed.map(({ count }) => calculateCircleSize(count, peak, compact))
   const columnWidth =
-    Math.max(44, ...subscribed.map(({ count }, index) => cardWidth(sizes[index], count))) + 2
-  const rowHeight = Math.max(44, ...sizes.map(cardHeight)) + 4
+    Math.max(44, ...subscribed.map(({ count }, index) => calculateCardWidth(sizes[index], count))) + 2
+  const rowHeight = Math.max(44, ...sizes.map(calculateCardHeight)) + 4
   const columns = Math.max(1, Math.floor((radiusX * 1.25) / columnWidth))
   const rows = Math.max(1, Math.floor((radiusY * 1.25) / rowHeight))
   const centered = subscribed.slice(0, columns * rows)
@@ -46,11 +54,11 @@ function globePoints(
   return [...centerPoints, ...orbitPoints]
 }
 
-export function globeCards(
-  items: ExploreItem[],
+export function layoutGlobeCards(
+  items: IExploreItem[],
   width: number,
   height: number,
-  angles: Angles,
+  angles: AnglesType,
   peak: number
 ) {
   if (!width || !height) {
@@ -60,13 +68,13 @@ export function globeCards(
   const compact = width < 560
   const radiusX = width * (compact ? 0.57 : 0.51)
   const radiusY = height * 0.49
-  const occupied: Box[] = []
-  const visible: GlobeCard[] = []
+  const occupied: BoxType[] = []
+  const visible: GlobeCardType[] = []
   const sinYaw = Math.sin(angles.yaw)
   const cosYaw = Math.cos(angles.yaw)
   const sinPitch = Math.sin(angles.pitch)
   const cosPitch = Math.cos(angles.pitch)
-  for (const { item, x, y, z } of globePoints(items, radiusX, radiusY, peak, compact)) {
+  for (const { item, x, y, z } of buildGlobePoints(items, radiusX, radiusY, peak, compact)) {
     const rotX = cosYaw * x + sinYaw * z
     const depth = -sinYaw * x + cosYaw * z
     const rotY = cosPitch * y - sinPitch * depth
@@ -75,12 +83,12 @@ export function globeCards(
       continue
     }
 
-    const size = Math.round(circleSize(item.count, peak, compact) * (0.64 + 0.36 * rotZ))
+    const size = Math.round(calculateCircleSize(item.count, peak, compact) * (0.64 + 0.36 * rotZ))
     const left = width / 2 + radiusX * rotX
     const top = height / 2 + radiusY * rotY
-    const w = cardWidth(size, item.count)
-    const h = cardHeight(size)
-    const box: Box = [left - w / 2, top - h / 2 - 2, left + w / 2, top + h / 2]
+    const w = calculateCardWidth(size, item.count)
+    const h = calculateCardHeight(size)
+    const box: BoxType = [left - w / 2, top - h / 2 - 2, left + w / 2, top + h / 2]
     if (box[0] < 5 || box[1] < 6 || box[2] > width - 5 || box[3] > height - 6) {
       continue
     }

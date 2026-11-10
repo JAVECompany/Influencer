@@ -1,14 +1,14 @@
 import { defaultRouletteRewards } from '../../constants/roulette'
 import { initialData } from '../../data/initialData'
-import type { SessionData } from '../../types/demoState'
+import type { ISessionData } from '../../types/demoState'
 
 const mergeFixtures = <Entry extends { id: string }>(stored: Entry[], fixtures: Entry[]) => {
   const ids = new Set(stored.map((entry) => entry.id))
   return [...stored, ...fixtures.filter((entry) => !ids.has(entry.id))]
 }
 
-export const migrateDemoState = (persisted: unknown, version: number): SessionData => {
-  const stored = persisted as Partial<SessionData> | undefined
+export const migrateDemoState = (persisted: unknown, version: number): ISessionData => {
+  const stored = persisted as Partial<ISessionData> | undefined
   const state = {
     ...initialData,
     session: null,

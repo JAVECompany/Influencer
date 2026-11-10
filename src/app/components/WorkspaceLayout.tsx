@@ -3,15 +3,15 @@ import CreatorDetailScreen from '../../features/creator-detail/screens/CreatorDe
 import { useAuthStore } from '../../shared/store/auth/auth'
 import { useCreatorStore } from '../../shared/store/creator/creator'
 import { useWalletStore } from '../../shared/store/wallet/wallet'
-import type { PageKey, PageProps } from '../../shared/types/navigation'
+import type { PageKeyType, IPageProps } from '../../shared/types/navigation'
 import { applicationNav, navItems, pages } from '../navigation/workspaceNavigation'
 import WorkspaceHeader from './WorkspaceHeader'
 import WorkspaceSidebar from './WorkspaceSidebar'
 
-export default function WorkspaceLayout({ account, notify }: Pick<PageProps, 'account' | 'notify'>) {
-  const creator = useCreatorStore((state) => state.creators[account.id])
-  const balance = useWalletStore((state) => state.balances[account.id] ?? 0)
-  const signOut = useAuthStore((state) => state.signOut)
+export default function WorkspaceLayout({ account, notify }: Pick<IPageProps, 'account' | 'notify'>) {
+  const creator = useCreatorStore((s) => s.creators[account.id])
+  const balance = useWalletStore((s) => s.balances[account.id] ?? 0)
+  const signOut = useAuthStore((s) => s.signOut)
   const nav =
     account.role === 'influencer' && creator?.status !== 'approved' ? applicationNav : navItems[account.role]
   const [tab, setTab] = useState(nav[0][0])
@@ -20,7 +20,7 @@ export default function WorkspaceLayout({ account, notify }: Pick<PageProps, 'ac
   const current = nav.some(([id]) => id === tab) ? tab : nav[0][0]
   const Page = pages[current]
   const scrollTop = () => window.scrollTo({ top: 0, behavior: 'instant' })
-  const go = (id: PageKey) => {
+  const go = (id: PageKeyType) => {
     setTab(id)
     setDetail(null)
     setChat(null)

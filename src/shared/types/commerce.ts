@@ -1,9 +1,9 @@
-type MediaKind = 'image' | 'video'
+type MediaKindType = 'image' | 'video'
 
-export type ProductFulfillment = 'digital' | 'shipping'
-export type ProductReviewStatus = 'pending' | 'approved' | 'rejected'
+export type ProductFulfillmentType = 'digital' | 'shipping'
+export type ProductReviewStatusType = 'pending' | 'approved' | 'rejected'
 
-export interface Product {
+export interface IProduct {
   id: string
   owner: string
   name: string
@@ -11,21 +11,21 @@ export interface Product {
   cost: number
   art: number
   media?: string
-  kind?: MediaKind
-  fulfillment?: ProductFulfillment
-  reviewStatus: ProductReviewStatus
+  kind?: MediaKindType
+  fulfillment?: ProductFulfillmentType
+  reviewStatus: ProductReviewStatusType
   archived?: boolean
 }
 
-export interface ProductSubmission {
+export interface IProductSubmission {
   name: string
   detail: string
   cost: number
   media: string
-  fulfillment: ProductFulfillment
+  fulfillment: ProductFulfillmentType
 }
 
-export interface ShippingAddress {
+export interface IShippingAddress {
   recipient: string
   phone: string
   postalCode: string
@@ -33,20 +33,20 @@ export interface ShippingAddress {
   addressDetail: string
 }
 
-export interface Reward {
+export interface IReward {
   name: string
   chance: number
 }
 
-export interface Roulette {
+export interface IRoulette {
   cost: number
   topPrizeCost?: number | null
-  rewards: Reward[]
+  rewards: IReward[]
 }
 
 export type TransactionType = 'subscribe' | 'unsubscribe' | 'topup' | 'product' | 'roulette'
 
-export interface Transaction {
+export interface ITransaction {
   id: string
   type: TransactionType
   owner: string | null
@@ -57,10 +57,10 @@ export interface Transaction {
   productId?: string
   reward?: string
   guaranteed?: boolean
-  shipping?: ShippingAddress & { shippedAt?: number }
+  shipping?: IShippingAddress & { shippedAt?: number }
 }
 
-export interface SettlementConfig {
+export interface ISettlementConfig {
   coinWon: number
   feeBps: number
   overrides: Record<string, Record<string, number>>

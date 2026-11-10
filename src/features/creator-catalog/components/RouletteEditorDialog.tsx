@@ -3,7 +3,7 @@ import Button from '../../../shared/components/ui/actions/Button'
 import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import Modal from '../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../shared/styles/controlStyles'
-import type { Roulette } from '../../../shared/types/commerce'
+import type { IRoulette } from '../../../shared/types/commerce'
 import { useRouletteDraft } from '../hooks/useRouletteDraft'
 import RouletteRewardFields from './RouletteRewardFields'
 
@@ -12,9 +12,9 @@ export default function RouletteEditorDialog({
   onClose,
   onSave,
 }: {
-  roulette?: Roulette
+  roulette?: IRoulette
   onClose: () => void
-  onSave: (settings: Roulette) => void
+  onSave: (settings: IRoulette) => void
 }) {
   const {
     cost,

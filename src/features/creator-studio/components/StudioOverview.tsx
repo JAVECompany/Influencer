@@ -2,7 +2,7 @@ import { CircleDollarSign, Layers3, UsersRound } from 'lucide-react'
 import Button from '../../../shared/components/ui/actions/Button'
 import StatCard from '../../../shared/components/ui/display/StatCard'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { Creator } from '../../../shared/types/account'
+import type { ICreator } from '../../../shared/types/account'
 import { formatKrw, formatNumber } from '../../../shared/utils/format/format'
 
 export default function StudioOverview({
@@ -11,7 +11,7 @@ export default function StudioOverview({
   postCount,
   onEdit,
 }: {
-  creator: Creator
+  creator: ICreator
   subscribers: number
   postCount: number
   onEdit: () => void

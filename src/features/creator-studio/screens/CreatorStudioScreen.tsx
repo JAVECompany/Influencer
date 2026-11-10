@@ -3,7 +3,7 @@ import ContentPreviewDialog from '../../../shared/components/content/ContentPrev
 import Button from '../../../shared/components/ui/actions/Button'
 import ConfirmActionDialog from '../../../shared/components/ui/dialogs/ConfirmActionDialog'
 import PageTitle from '../../../shared/components/ui/layout/PageTitle'
-import type { OperatorProps } from '../../../shared/types/navigation'
+import type { OperatorPropsType } from '../../../shared/types/navigation'
 import ContentAudienceDialog from '../components/ContentAudienceDialog'
 import CreatorSettingsDialog from '../components/CreatorSettingsDialog'
 import PublishContentDialog from '../components/PublishContentDialog'
@@ -11,7 +11,7 @@ import StudioContentList from '../components/StudioContentList'
 import StudioOverview from '../components/StudioOverview'
 import { useCreatorStudio } from '../hooks/useCreatorStudio'
 
-export default function CreatorStudioScreen({ account, notify }: OperatorProps) {
+export default function CreatorStudioScreen({ account, notify }: OperatorPropsType) {
   const {
     dialog,
     setDialog,

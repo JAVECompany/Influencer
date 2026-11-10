@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { isPhysicalProduct } from '../../utils/products/productAvailability'
-import type { Product } from '../../types/commerce'
+import type { IProduct } from '../../types/commerce'
 import ProductThumbnail from './ProductThumbnail'
 
 export default function ProductCard({
@@ -8,7 +8,7 @@ export default function ProductCard({
   locked = false,
   children,
 }: {
-  product: Product
+  product: IProduct
   locked?: boolean
   children: ReactNode
 }) {

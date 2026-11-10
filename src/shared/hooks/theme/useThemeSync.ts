@@ -2,7 +2,7 @@ import { useLayoutEffect } from 'react'
 import { useThemeStore } from '../../store/theme/theme'
 
 export function useThemeSync() {
-  const theme = useThemeStore((state) => state.theme)
+  const theme = useThemeStore((s) => s.theme)
 
   useLayoutEffect(() => {
     const system = window.matchMedia('(prefers-color-scheme: dark)')

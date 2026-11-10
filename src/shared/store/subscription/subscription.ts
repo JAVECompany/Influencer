@@ -1,40 +1,40 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import type { ActionResult } from '../../types/actionResult'
-import type { SessionData } from '../../types/demoState'
+import type { ActionResultType } from '../../types/actionResult'
+import type { ISessionData } from '../../types/demoState'
 import { fail, ok } from '../../utils/actions/actionResults'
-import { actor } from '../../utils/auth/session'
+import { getActiveAccount } from '../../utils/auth/session'
 import { isPublic } from '../../utils/creator/creatorAccess'
-import { subscriptionsForCustomer } from '../../utils/subscription/subscriptionAccess'
+import { getCustomerSubscriptions } from '../../utils/subscription/subscriptionAccess'
 import { createTransaction } from '../../utils/transactions/createTransaction'
 import { getDemoState, registerDemoStore, updateDemoState } from '../persistence/demo'
 import { writeEntry } from '../utils'
 
-export interface SubscriptionField {
-  subscriptions: SessionData['subscriptions']
+export interface ISubscriptionField {
+  subscriptions: ISessionData['subscriptions']
 }
 
-interface SubscriptionState extends SubscriptionField {
-  subscribe: (id: string) => ActionResult
-  unsubscribe: (id: string) => ActionResult
+interface ISubscriptionState extends ISubscriptionField {
+  subscribeToCreator: (id: string) => ActionResultType
+  unsubscribeFromCreator: (id: string) => ActionResultType
 }
 
-const initialState: SubscriptionField = {
+const initialState: ISubscriptionField = {
   subscriptions: getDemoState().subscriptions,
 }
 
-export const useSubscriptionStore = create<SubscriptionState>()(
+export const useSubscriptionStore = create<ISubscriptionState>()(
   immer(() => ({
     ...initialState,
 
-    subscribe(id) {
+    subscribeToCreator(id) {
       const state = getDemoState()
-      const a = actor(state)
+      const a = getActiveAccount(state)
       if (a?.role !== 'customer' || !isPublic(state, id)) {
         return fail('구독할 수 없는 계정입니다.')
       }
 
-      const list = subscriptionsForCustomer(state, a.id)
+      const list = getCustomerSubscriptions(state, a.id)
       if (list.includes(id)) {
         return fail('이미 구독 중입니다.')
       }
@@ -47,14 +47,14 @@ export const useSubscriptionStore = create<SubscriptionState>()(
       return ok
     },
 
-    unsubscribe(id) {
+    unsubscribeFromCreator(id) {
       const state = getDemoState()
-      const a = actor(state)
+      const a = getActiveAccount(state)
       if (a?.role !== 'customer') {
         return fail('구독 내역을 찾을 수 없습니다.')
       }
 
-      const list = subscriptionsForCustomer(state, a.id)
+      const list = getCustomerSubscriptions(state, a.id)
       if (!list.includes(id)) {
         return fail('구독 내역을 찾을 수 없습니다.')
       }

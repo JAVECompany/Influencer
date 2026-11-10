@@ -1,34 +1,34 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import type { ActionResult } from '../../types/actionResult'
-import type { PostAction, PublishInput } from '../../types/content'
-import type { SessionData } from '../../types/demoState'
+import type { ActionResultType } from '../../types/actionResult'
+import type { PostActionType, PublishInputType } from '../../types/content'
+import type { ISessionData } from '../../types/demoState'
 import { fail, ok } from '../../utils/actions/actionResults'
-import { actor } from '../../utils/auth/session'
+import { getActiveAccount } from '../../utils/auth/session'
 import { canRead, isStoryAvailable, tracksAudience } from '../../utils/content/contentAccess'
 import { prepareContent } from '../../utils/content/contentSubmission'
 import { getApprovedCreatorAccount } from '../../utils/creator/creatorAccess'
 import { getDemoState, registerDemoStore } from '../persistence/demo'
 
-export interface ContentField {
-  posts: SessionData['posts']
+export interface IContentField {
+  posts: ISessionData['posts']
 }
 
-interface ContentState extends ContentField {
-  publish: (input: PublishInput) => ActionResult
+interface IContentState extends IContentField {
+  publishContent: (input: PublishInputType) => ActionResultType
   recordAudience: (id: string) => void
-  managePost: (id: string, action: PostAction) => ActionResult
+  managePost: (id: string, action: PostActionType) => ActionResultType
 }
 
-const initialState: ContentField = {
+const initialState: IContentField = {
   posts: getDemoState().posts,
 }
 
-export const useContentStore = create<ContentState>()(
+export const useContentStore = create<IContentState>()(
   immer((set) => ({
     ...initialState,
 
-    publish(input) {
+    publishContent(input) {
       const state = getDemoState()
       const a = getApprovedCreatorAccount(state)
       if (!a) {
@@ -48,7 +48,7 @@ export const useContentStore = create<ContentState>()(
 
     recordAudience(id) {
       const state = getDemoState()
-      const account = actor(state)
+      const account = getActiveAccount(state)
       if (account?.role !== 'customer') {
         return
       }
@@ -72,7 +72,7 @@ export const useContentStore = create<ContentState>()(
 
     managePost(id, action) {
       const state = getDemoState()
-      const a = actor(state)
+      const a = getActiveAccount(state)
       const index = state.posts.findIndex((item) => item.id === id)
       const post = state.posts[index]
       if (!post || !a) {

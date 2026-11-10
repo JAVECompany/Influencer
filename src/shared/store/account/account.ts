@@ -1,22 +1,23 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import type { ProfileChanges } from '../../types/account'
-import type { ActionResult } from '../../types/actionResult'
-import type { SessionData } from '../../types/demoState'
+import type { ProfileChangesType } from '../../types/account'
+import type { ActionResultType } from '../../types/actionResult'
+import type { ISessionData } from '../../types/demoState'
 import { prepareProfileChanges } from '../../utils/account/profileChanges'
 import { fail, ok } from '../../utils/actions/actionResults'
-import { actor } from '../../utils/auth/session'
+import { getActiveAccount } from '../../utils/auth/session'
 import { getDemoState, registerDemoStore, updateDemoState } from '../persistence/demo'
-import {createSetDataImmer, Setter} from "../zustandTypes";
+import { createSetDataImmer } from '../zustandTypes'
+import type { SetterType } from '../zustandTypes'
 
 interface IAccountField {
-  accounts: SessionData['accounts']
+  accounts: ISessionData['accounts']
 }
 
 interface IAccountState extends IAccountField {
-  profile: (changes: ProfileChanges) => ActionResult
-  toggleAccount: (id: string) => ActionResult
-  setData: Setter<IAccountField>
+  setData: SetterType<IAccountField>
+  updateProfile: (changes: ProfileChangesType) => ActionResultType
+  toggleAccount: (id: string) => ActionResultType
 }
 
 const initialState: IAccountField = {
@@ -29,21 +30,21 @@ export const useAccountStore = create<IAccountState>()(
 
     setData: createSetDataImmer<IAccountField>(set),
 
-    profile(changes) {
+    updateProfile(changes) {
       const state = getDemoState()
-      const a = actor(state)
-      if (!a) {
+      const account = getActiveAccount(state)
+      if (!account) {
         return fail('로그인이 필요합니다.')
       }
 
-      const update = prepareProfileChanges(state, a, changes)
+      const update = prepareProfileChanges(state, account, changes)
       if ('error' in update) {
         return update
       }
 
       updateDemoState((draft) => {
-        Object.assign(draft.accounts[a.id], update)
-        const creator = draft.creators[a.id]
+        Object.assign(draft.accounts[account.id], update)
+        const creator = draft.creators[account.id]
         if (creator && update.name) {
           creator.name = update.name
         }
@@ -54,7 +55,7 @@ export const useAccountStore = create<IAccountState>()(
     toggleAccount(id) {
       const state = getDemoState()
       const target = state.accounts[id]
-      if (actor(state)?.role !== 'admin' || target?.role === 'admin') {
+      if (getActiveAccount(state)?.role !== 'admin' || target?.role === 'admin') {
         return fail('계정 상태를 변경할 수 없습니다.')
       }
       if (target) {

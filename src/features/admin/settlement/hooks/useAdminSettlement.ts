@@ -4,16 +4,16 @@ import { useAccountStore } from '../../../../shared/store/account/account'
 import { useCreatorStore } from '../../../../shared/store/creator/creator'
 import { useSettlementStore } from '../../../../shared/store/settlement/settlement'
 import { useWalletStore } from '../../../../shared/store/wallet/wallet'
-import type { PageProps } from '../../../../shared/types/navigation'
-import type { SettlementRow } from '../types/settlementReport'
-import { dateInKorea, settlementPeriod, summarizeSettlement } from '../utils/settlement'
-import type { PeriodMode } from '../utils/settlement'
+import type { IPageProps } from '../../../../shared/types/navigation'
+import type { SettlementRowType } from '../types/settlementReport'
+import { formatDateInKorea, getSettlementPeriod, summarizeSettlement } from '../utils/settlement'
+import type { PeriodModeType } from '../utils/settlement'
 
-export function useAdminSettlement(notify: PageProps['notify']) {
-  const accounts = useAccountStore((state) => state.accounts)
-  const creators = useCreatorStore((state) => state.creators)
-  const settlement = useSettlementStore((state) => state.settlement)
-  const transactions = useWalletStore((state) => state.transactions)
+export function useAdminSettlement(notify: IPageProps['notify']) {
+  const accounts = useAccountStore((s) => s.accounts)
+  const creators = useCreatorStore((s) => s.creators)
+  const settlement = useSettlementStore((s) => s.settlement)
+  const transactions = useWalletStore((s) => s.transactions)
   const state = { accounts, creators, settlement, transactions }
   const { configureSettlement, overrideSettlementCoins } = useSettlementStore(
     useShallow(({ configureSettlement, overrideSettlementCoins }) => ({
@@ -21,16 +21,16 @@ export function useAdminSettlement(notify: PageProps['notify']) {
       overrideSettlementCoins,
     }))
   )
-  const [mode, setMode] = useState<PeriodMode>('month')
+  const [mode, setMode] = useState<PeriodModeType>('month')
   const [start, setStart] = useState('')
   const [end, setEnd] = useState('')
   const [query, setQuery] = useState('')
-  const [edit, setEdit] = useState<SettlementRow | null>(null)
+  const [edit, setEdit] = useState<SettlementRowType | null>(null)
   const [historyLimit, setHistoryLimit] = useState(12)
   const now = Date.now()
-  const today = dateInKorea(now)
-  const month = settlementPeriod('month', '', '', now)
-  const period = settlementPeriod(mode, start, end, now)
+  const today = formatDateInKorea(now)
+  const month = getSettlementPeriod('month', '', '', now)
+  const period = getSettlementPeriod(mode, start, end, now)
   if (!month) {
     return null
   }
@@ -59,7 +59,7 @@ export function useAdminSettlement(notify: PageProps['notify']) {
     }
   }
 
-  const changeMode = (next: PeriodMode) => {
+  const changeMode = (next: PeriodModeType) => {
     setMode(next)
     setHistoryLimit(12)
   }

@@ -1,12 +1,12 @@
-import type { Transaction, TransactionType } from '../../types/commerce'
+import type { ITransaction, TransactionType } from '../../types/commerce'
 
-type TransactionChanges = Partial<
-  Pick<Transaction, 'won' | 'coins' | 'productId' | 'reward' | 'guaranteed' | 'shipping'>
+type TransactionChangesType = Partial<
+  Pick<ITransaction, 'won' | 'coins' | 'productId' | 'reward' | 'guaranteed' | 'shipping'>
 >
 
 export const createTransaction = (
   type: TransactionType,
   owner: string | null,
   customer: string,
-  changes: TransactionChanges
-): Transaction => ({ id: crypto.randomUUID(), type, owner, customer, at: Date.now(), ...changes })
+  changes: TransactionChangesType
+): ITransaction => ({ id: crypto.randomUUID(), type, owner, customer, at: Date.now(), ...changes })

@@ -1,9 +1,9 @@
 import { Move, RotateCcw } from 'lucide-react'
 import Button from '../../../shared/components/ui/actions/Button'
-import type { PageProps } from '../../../shared/types/navigation'
+import type { IPageProps } from '../../../shared/types/navigation'
 import { formatNumber } from '../../../shared/utils/format/format'
 import { useCreatorGlobe } from '../hooks/useCreatorGlobe'
-import type { ExploreItem } from '../types/creatorDiscovery'
+import type { IExploreItem } from '../types/creatorDiscovery'
 import CreatorBubble from './CreatorBubble'
 
 export default function CreatorGlobe({
@@ -11,9 +11,9 @@ export default function CreatorGlobe({
   peak,
   openCreator,
 }: {
-  items: ExploreItem[]
+  items: IExploreItem[]
   peak: number
-  openCreator: PageProps['openCreator']
+  openCreator: IPageProps['openCreator']
 }) {
   const {
     viewport,

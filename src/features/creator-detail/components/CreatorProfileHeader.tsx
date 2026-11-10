@@ -3,7 +3,7 @@ import Avatar from '../../../shared/components/ui/media/Avatar'
 import Badge from '../../../shared/components/ui/display/Badge'
 import Button from '../../../shared/components/ui/actions/Button'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { Account, Creator } from '../../../shared/types/account'
+import type { IAccount, ICreator } from '../../../shared/types/account'
 import { formatKrw, formatNumber } from '../../../shared/utils/format/format'
 
 export default function CreatorProfileHeader({
@@ -14,8 +14,8 @@ export default function CreatorProfileHeader({
   subscribers,
   onSubscribe,
 }: {
-  creator: Creator
-  account?: Account
+  creator: ICreator
+  account?: IAccount
   active: boolean
   staff: boolean
   subscribers: number

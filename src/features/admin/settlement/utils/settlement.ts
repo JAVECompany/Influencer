@@ -1,5 +1,5 @@
-import type { Transaction } from '../../../../shared/types/commerce'
-import type { AppData } from '../../../../shared/types/demoState'
+import type { ITransaction } from '../../../../shared/types/commerce'
+import type { IAppData } from '../../../../shared/types/demoState'
 
 const DAY = 86_400_000
 
@@ -14,33 +14,33 @@ export const periodOptions = [
   ['custom', '직접 선택'],
 ] as const
 
-export type PeriodMode = (typeof periodOptions)[number][0]
+export type PeriodModeType = (typeof periodOptions)[number][0]
 
-interface SettlementPeriod {
+interface ISettlementPeriod {
   start: string
   end: string
   key: string
 }
 
-export const dateInKorea = (time: number) => new Date(time + KST).toISOString().slice(0, 10)
+export const formatDateInKorea = (time: number) => new Date(time + KST).toISOString().slice(0, 10)
 
-const firstOfMonth = (date: Date, monthsBack: number) =>
+const getMonthStart = (date: Date, monthsBack: number) =>
   new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() - monthsBack, 1)).toISOString().slice(0, 10)
 
-export function settlementPeriod(
-  mode: PeriodMode,
+export function getSettlementPeriod(
+  mode: PeriodModeType,
   customStart: string,
   customEnd: string,
   now = Date.now()
-): SettlementPeriod | null {
-  const today = dateInKorea(now)
+): ISettlementPeriod | null {
+  const today = formatDateInKorea(now)
   const month = new Date(now + KST)
   const starts = {
     day: today,
-    week: dateInKorea(now - 6 * DAY),
-    month: firstOfMonth(month, 0),
-    half: firstOfMonth(month, 5),
-    year: firstOfMonth(month, 11),
+    week: formatDateInKorea(now - 6 * DAY),
+    month: getMonthStart(month, 0),
+    half: getMonthStart(month, 5),
+    year: getMonthStart(month, 11),
   }
   const start = mode === 'custom' ? customStart : starts[mode]
   const end =
@@ -56,17 +56,17 @@ export function settlementPeriod(
   return { start, end, key: start + '/' + end }
 }
 
-function coinSplit(coins: number, coinWon: number, feeBps: number) {
+function calculateCoinSplit(coins: number, coinWon: number, feeBps: number) {
   const gross = coins * coinWon
   const fee = Math.round((gross * feeBps) / 10_000)
   return { gross, fee, net: gross - fee }
 }
 
 export function summarizeSettlement(
-  state: Pick<AppData, 'accounts' | 'creators' | 'settlement' | 'transactions'>,
-  period: SettlementPeriod
+  state: Pick<IAppData, 'accounts' | 'creators' | 'settlement' | 'transactions'>,
+  period: ISettlementPeriod
 ) {
-  const items: Transaction[] = []
+  const items: ITransaction[] = []
   const totals = new Map<string, { coins: number; subs: number }>()
   const monthly = new Map<string, number>()
   const { coinWon, feeBps, overrides } = state.settlement
@@ -76,7 +76,7 @@ export function summarizeSettlement(
       continue
     }
 
-    const date = dateInKorea(transaction.at)
+    const date = formatDateInKorea(transaction.at)
     if (date < period.start || date > period.end) {
       continue
     }
@@ -107,7 +107,7 @@ export function summarizeSettlement(
       const { coins = 0, subs = 0 } = totals.get(creator.id) ?? {}
       const adjusted = manual[creator.id]
       const appliedCoins = adjusted ?? coins
-      const split = coinSplit(appliedCoins, coinWon, feeBps)
+      const split = calculateCoinSplit(appliedCoins, coinWon, feeBps)
       return {
         creator,
         coins,

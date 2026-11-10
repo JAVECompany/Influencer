@@ -7,12 +7,12 @@ import { useAccountStore } from '../../../../shared/store/account/account'
 import { useContentStore } from '../../../../shared/store/content/content'
 import { useCreatorStore } from '../../../../shared/store/creator/creator'
 import { panel } from '../../../../shared/styles/controlStyles'
-import type { PageProps } from '../../../../shared/types/navigation'
+import type { IPageProps } from '../../../../shared/types/navigation'
 
-export default function AdminDashboardScreen({ go }: Pick<PageProps, 'go'>) {
-  const accounts = useAccountStore((state) => state.accounts)
-  const creators = useCreatorStore((state) => state.creators)
-  const posts = useContentStore((state) => state.posts)
+export default function AdminDashboardScreen({ go }: Pick<IPageProps, 'go'>) {
+  const accounts = useAccountStore((s) => s.accounts)
+  const creators = useCreatorStore((s) => s.creators)
+  const posts = useContentStore((s) => s.posts)
   const pending = Object.values(creators).filter((c) => c.status === 'pending').length
   const reported = posts.filter((p) => p.reports.length > 0 && !p.hidden).length
   return (

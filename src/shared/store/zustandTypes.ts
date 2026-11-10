@@ -1,9 +1,9 @@
 import { setData } from './utils'
 
-export type Setter<T> = <K extends keyof T>(key: K, value: T[K]) => void
-export type KeysSetter = (value: any, ...keys: string[]) => void
+export type SetterType<T> = <K extends keyof T>(key: K, value: T[K]) => void
+export type KeysSetterType = (value: any, ...keys: string[]) => void
 
-export function createSetDataImmer<T>(set: (fn: (state: T) => void) => void): Setter<T> {
+export function createSetDataImmer<T>(set: (fn: (state: T) => void) => void): SetterType<T> {
   return <K extends keyof T>(key: K, value: T[K]) => {
     set((state) => {
       state[key] = value
@@ -11,7 +11,7 @@ export function createSetDataImmer<T>(set: (fn: (state: T) => void) => void): Se
   }
 }
 
-export function createSetDataKeysImmer<T>(set: (fn: (state: T) => void) => void): KeysSetter {
+export function createSetDataKeysImmer<T>(set: (fn: (state: T) => void) => void): KeysSetterType {
   return (value: any, ...keys: string[]) => {
     set((draft) => {
       setData(draft as Record<string, any>, { payload: { keys, value } })
@@ -28,13 +28,13 @@ export function createSetData<T>(set: (fn: (state: T) => T) => void) {
   }
 }
 
-export type FormSetter<T> = <K1 extends keyof T, K2 extends keyof NonNullable<T[K1]>>(
+export type FormSetterType<T> = <K1 extends keyof T, K2 extends keyof NonNullable<T[K1]>>(
   key1: K1,
   key2: K2,
   value: NonNullable<T[K1]>[K2]
 ) => void
 
-export function createSetFormDataImmer<T>(set: (fn: (state: T) => void) => void): FormSetter<T> {
+export function createSetFormDataImmer<T>(set: (fn: (state: T) => void) => void): FormSetterType<T> {
   return (key1, key2, value) => {
     set((state) => {
       const target = state[key1]
@@ -49,7 +49,7 @@ export function createSetFormDataImmer<T>(set: (fn: (state: T) => void) => void)
   }
 }
 
-export function createSetFormData<T>(set: (fn: (state: T) => T) => void): FormSetter<T> {
+export function createSetFormData<T>(set: (fn: (state: T) => T) => void): FormSetterType<T> {
   return (key1, key2, value) => {
     set((state) => ({
       ...state,

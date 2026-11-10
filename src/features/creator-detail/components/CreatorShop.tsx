@@ -3,9 +3,9 @@ import ProductCard from '../../../shared/components/products/ProductCard'
 import Button from '../../../shared/components/ui/actions/Button'
 import { isPhysicalProduct } from '../../../shared/utils/products/productAvailability'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { Product, Roulette } from '../../../shared/types/commerce'
+import type { IProduct, IRoulette } from '../../../shared/types/commerce'
 import { formatNumber } from '../../../shared/utils/format/format'
-import type { ShopOffer } from '../types/shopOffer'
+import type { ShopOfferType } from '../types/shopOffer'
 
 export default function CreatorShop({
   products,
@@ -14,11 +14,11 @@ export default function CreatorShop({
   staff,
   onOffer,
 }: {
-  products: Product[]
-  roulette?: Roulette
+  products: IProduct[]
+  roulette?: IRoulette
   purchases: Set<string | undefined>
   staff: boolean
-  onOffer: (offer: ShopOffer) => void
+  onOffer: (offer: ShopOfferType) => void
 }) {
   return (
     <section className={`${panel} p-5`}>

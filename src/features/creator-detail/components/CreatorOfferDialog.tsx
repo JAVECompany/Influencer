@@ -2,10 +2,10 @@ import ProductThumbnail from '../../../shared/components/products/ProductThumbna
 import Button from '../../../shared/components/ui/actions/Button'
 import Modal from '../../../shared/components/ui/dialogs/Modal'
 import { isPhysicalProduct } from '../../../shared/utils/products/productAvailability'
-import type { ShippingAddress } from '../../../shared/types/commerce'
+import type { IShippingAddress } from '../../../shared/types/commerce'
 import { formatKrw, formatNumber } from '../../../shared/utils/format/format'
 import { readFormValue } from '../../../shared/utils/forms/formData'
-import type { ShopOffer } from '../types/shopOffer'
+import type { ShopOfferType } from '../types/shopOffer'
 import ShippingAddressFields from './ShippingAddressFields'
 
 export default function CreatorOfferDialog({
@@ -15,10 +15,10 @@ export default function CreatorOfferDialog({
   onConfirm,
   onClose,
 }: {
-  offer: Extract<ShopOffer, { type: 'subscribe' | 'product' }>
+  offer: Extract<ShopOfferType, { type: 'subscribe' | 'product' }>
   price: number
   balance: number
-  onConfirm: (address?: ShippingAddress) => void
+  onConfirm: (address?: IShippingAddress) => void
   onClose: () => void
 }) {
   const physical = offer.type === 'product' && isPhysicalProduct(offer)

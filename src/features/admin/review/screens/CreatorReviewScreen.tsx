@@ -1,12 +1,12 @@
 import { BadgeCheck } from 'lucide-react'
 import EmptyState from '../../../../shared/components/ui/feedback/EmptyState'
 import PageTitle from '../../../../shared/components/ui/layout/PageTitle'
-import type { PageProps } from '../../../../shared/types/navigation'
+import type { IPageProps } from '../../../../shared/types/navigation'
 import CreatorReviewCard from '../components/CreatorReviewCard'
 import RejectApplicationDialog from '../components/RejectApplicationDialog'
 import { useCreatorReview } from '../hooks/useCreatorReview'
 
-export default function CreatorReviewScreen({ notify }: Pick<PageProps, 'notify'>) {
+export default function CreatorReviewScreen({ notify }: Pick<IPageProps, 'notify'>) {
   const { accounts, applicants, target, setTarget, approve, reject, closeDialog } = useCreatorReview(notify)
   return (
     <>

@@ -3,8 +3,8 @@ import Button from '../../../shared/components/ui/actions/Button'
 import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import Modal from '../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../shared/styles/controlStyles'
-import type { Notify } from '../../../shared/types/actionResult'
-import type { ContentKind, PublishInput } from '../../../shared/types/content'
+import type { NotifyType } from '../../../shared/types/actionResult'
+import type { ContentKindType, PublishInputType } from '../../../shared/types/content'
 import { readFormValue } from '../../../shared/utils/forms/formData'
 import { readMediaFile } from '../../../shared/utils/media/readMediaFile'
 
@@ -13,11 +13,11 @@ export default function PublishContentDialog({
   notify,
   onClose,
 }: {
-  onPublish: (input: PublishInput) => void
-  notify: Notify
+  onPublish: (input: PublishInputType) => void
+  notify: NotifyType
   onClose: () => void
 }) {
-  const [kind, setKind] = useState<ContentKind>('post')
+  const [kind, setKind] = useState<ContentKindType>('post')
   return (
     <Modal title="콘텐츠 등록" onClose={onClose}>
       <form

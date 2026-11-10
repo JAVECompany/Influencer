@@ -1,9 +1,9 @@
-export type ContentKind = 'post' | 'story' | 'live'
+export type ContentKindType = 'post' | 'story' | 'live'
 
-export interface Content {
+export interface IContent {
   id: string
   owner: string
-  kind: ContentKind
+  kind: ContentKindType
   title: string
   body: string
   art: number
@@ -15,6 +15,6 @@ export interface Content {
   viewers?: string[]
 }
 
-export type PublishInput = Pick<Content, 'title' | 'body' | 'kind' | 'media'>
+export type PublishInputType = Pick<IContent, 'title' | 'body' | 'kind' | 'media'>
 
-export type PostAction = 'remove' | 'hide' | 'like' | 'report'
+export type PostActionType = 'remove' | 'hide' | 'like' | 'report'

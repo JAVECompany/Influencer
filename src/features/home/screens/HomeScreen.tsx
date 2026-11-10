@@ -5,8 +5,8 @@ import StoryRail from '../../../shared/components/content/StoryRail'
 import Button from '../../../shared/components/ui/actions/Button'
 import EmptyState from '../../../shared/components/ui/feedback/EmptyState'
 import PageTitle from '../../../shared/components/ui/layout/PageTitle'
-import type { FeedProps } from '../../../shared/types/feed'
-import type { PageProps } from '../../../shared/types/navigation'
+import type { FeedPropsType } from '../../../shared/types/feed'
+import type { IPageProps } from '../../../shared/types/navigation'
 import FeedReviewFilter from '../components/FeedReviewFilter'
 import FeedSidebar from '../components/FeedSidebar'
 import { useHomeFeed } from '../hooks/useHomeFeed'
@@ -17,7 +17,7 @@ export default function HomeScreen({
   openChat,
   go,
   notify,
-}: FeedProps & Pick<PageProps, 'go'>) {
+}: FeedPropsType & Pick<IPageProps, 'go'>) {
   const {
     accounts,
     creators,

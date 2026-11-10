@@ -1,17 +1,17 @@
 import { useId } from 'react'
 import { avatarPalettes } from '../../../constants/avatarPalettes'
-import type { Account, Creator } from '../../../types/account'
-import { portraitStyle } from '../../../utils/media/portraitStyle'
+import type { IAccount, ICreator } from '../../../types/account'
+import { getPortraitStyle } from '../../../utils/media/portraitStyle'
 
-type AvatarPerson = Pick<Creator, 'name'> & Partial<Pick<Creator, 'art' | 'avatar' | 'portrait'>>
+type AvatarPersonType = Pick<ICreator, 'name'> & Partial<Pick<ICreator, 'art' | 'avatar' | 'portrait'>>
 
 export default function Avatar({
   person,
   account,
   className = '',
 }: {
-  person?: AvatarPerson
-  account?: Account
+  person?: AvatarPersonType
+  account?: IAccount
   className?: string
 }) {
   const color = avatarPalettes[(person?.art ?? 0) % avatarPalettes.length] ?? avatarPalettes[0]
@@ -23,7 +23,7 @@ export default function Avatar({
     )
   }
 
-  const portrait = portraitStyle(person?.portrait)
+  const portrait = getPortraitStyle(person?.portrait)
   if (portrait) {
     return (
       <span

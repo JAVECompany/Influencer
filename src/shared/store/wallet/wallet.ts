@@ -1,38 +1,43 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { coinPacks } from '../../constants/coinPacks'
-import type { ActionResult, SpendResult } from '../../types/actionResult'
-import type { ShippingAddress, SpendType } from '../../types/commerce'
-import type { SessionData } from '../../types/demoState'
+import type { ActionResultType, SpendResultType } from '../../types/actionResult'
+import type { IShippingAddress, SpendType } from '../../types/commerce'
+import type { ISessionData } from '../../types/demoState'
 import { fail, ok } from '../../utils/actions/actionResults'
-import { actor } from '../../utils/auth/session'
+import { getActiveAccount } from '../../utils/auth/session'
 import { createTransaction } from '../../utils/transactions/createTransaction'
 import { preparePurchase } from '../../utils/wallet/purchase'
 import { getDemoState, registerDemoStore } from '../persistence/demo'
 import { writeEntry } from '../utils'
 
-export interface WalletField {
-  balances: SessionData['balances']
-  transactions: SessionData['transactions']
+export interface IWalletField {
+  balances: ISessionData['balances']
+  transactions: ISessionData['transactions']
 }
 
-interface WalletState extends WalletField {
-  topUp: (coins: number) => ActionResult
-  spend: (creator: string, type: SpendType, productId?: string, address?: ShippingAddress) => SpendResult
+interface IWalletState extends IWalletField {
+  topUpCoins: (coins: number) => ActionResultType
+  spendCoins: (
+    creator: string,
+    type: SpendType,
+    productId?: string,
+    address?: IShippingAddress
+  ) => SpendResultType
 }
 
-const initialState: WalletField = {
+const initialState: IWalletField = {
   balances: getDemoState().balances,
   transactions: getDemoState().transactions,
 }
 
-export const useWalletStore = create<WalletState>()(
+export const useWalletStore = create<IWalletState>()(
   immer((set) => ({
     ...initialState,
 
-    topUp(coins) {
+    topUpCoins(coins) {
       const state = getDemoState()
-      const account = actor(state)
+      const account = getActiveAccount(state)
       const pack = coinPacks.find((item) => item.coins === coins)
       if (account?.role !== 'customer' || !pack) {
         return fail('충전할 수 없는 묶음입니다.')
@@ -47,7 +52,7 @@ export const useWalletStore = create<WalletState>()(
       return ok
     },
 
-    spend(creator, type, productId, address) {
+    spendCoins(creator, type, productId, address) {
       const purchase = preparePurchase(getDemoState(), creator, type, productId, address)
       if ('error' in purchase) {
         return purchase

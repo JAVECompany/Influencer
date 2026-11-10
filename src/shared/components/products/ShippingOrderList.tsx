@@ -1,14 +1,14 @@
 import { useProductStore } from '../../store/products/product'
 import { useWalletStore } from '../../store/wallet/wallet'
 import { panel } from '../../styles/controlStyles'
-import type { Account } from '../../types/account'
-import type { Notify } from '../../types/actionResult'
+import type { IAccount } from '../../types/account'
+import type { NotifyType } from '../../types/actionResult'
 import { formatNumber } from '../../utils/format/format'
 import Button from '../ui/actions/Button'
 
-export default function ShippingOrderList({ account, notify }: { account: Account; notify: Notify }) {
-  const transactions = useWalletStore((state) => state.transactions)
-  const markProductShipped = useProductStore((state) => state.markProductShipped)
+export default function ShippingOrderList({ account, notify }: { account: IAccount; notify: NotifyType }) {
+  const transactions = useWalletStore((s) => s.transactions)
+  const markProductShipped = useProductStore((s) => s.markProductShipped)
   const seller = account.role === 'influencer'
   const orders = transactions.filter(
     (order) =>

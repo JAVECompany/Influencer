@@ -4,11 +4,11 @@ import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import PageTitle from '../../../shared/components/ui/layout/PageTitle'
 import StatCard from '../../../shared/components/ui/display/StatCard'
 import { field } from '../../../shared/styles/controlStyles'
-import type { PageProps } from '../../../shared/types/navigation'
+import type { IPageProps } from '../../../shared/types/navigation'
 import { formatKrw, formatNumber } from '../../../shared/utils/format/format'
 import { useCreatorEarnings } from '../hooks/useCreatorEarnings'
 
-export default function CreatorEarningsScreen({ account }: Pick<PageProps, 'account'>) {
+export default function CreatorEarningsScreen({ account }: Pick<IPageProps, 'account'>) {
   const { period, setPeriod, filtered, revenue, used } = useCreatorEarnings(account.id)
   return (
     <>

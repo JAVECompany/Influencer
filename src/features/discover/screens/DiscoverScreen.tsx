@@ -2,13 +2,16 @@ import { Compass, Search } from 'lucide-react'
 import EmptyState from '../../../shared/components/ui/feedback/EmptyState'
 import PageTitle from '../../../shared/components/ui/layout/PageTitle'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { PageProps } from '../../../shared/types/navigation'
+import type { IPageProps } from '../../../shared/types/navigation'
 import CreatorBubble from '../components/CreatorBubble'
 import CreatorGlobe from '../components/CreatorGlobe'
 import { useDiscoverCreators } from '../hooks/useDiscoverCreators'
-import { circleSize } from '../utils/globeLayout'
+import { calculateCircleSize } from '../utils/globeLayout'
 
-export default function DiscoverScreen({ account, openCreator }: Pick<PageProps, 'account' | 'openCreator'>) {
+export default function DiscoverScreen({
+  account,
+  openCreator,
+}: Pick<IPageProps, 'account' | 'openCreator'>) {
   const { query, setQuery, term, items, matches, peak } = useDiscoverCreators(account)
   return (
     <>
@@ -35,7 +38,7 @@ export default function DiscoverScreen({ account, openCreator }: Pick<PageProps,
             <CreatorBubble
               key={item.creator.id}
               item={item}
-              size={circleSize(item.count, peak, true)}
+              size={calculateCircleSize(item.count, peak, true)}
               style={{ width: 91 }}
               onClick={() => openCreator(item.creator.id)}
             />

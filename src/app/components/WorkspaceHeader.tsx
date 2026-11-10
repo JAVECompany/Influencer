@@ -1,6 +1,6 @@
 import { Coins } from 'lucide-react'
 import BrandLogo from '../../shared/components/ui/branding/BrandLogo'
-import type { Account } from '../../shared/types/account'
+import type { IAccount } from '../../shared/types/account'
 import { formatNumber } from '../../shared/utils/format/format'
 
 export default function WorkspaceHeader({
@@ -10,7 +10,7 @@ export default function WorkspaceHeader({
   onHome,
   onStore,
 }: {
-  account: Account
+  account: IAccount
   title?: string
   balance: number
   onHome: () => void

@@ -2,8 +2,8 @@ import { CalendarDays } from 'lucide-react'
 import Button from '../../../../shared/components/ui/actions/Button'
 import FieldLabel from '../../../../shared/components/ui/forms/FieldLabel'
 import { field, panel } from '../../../../shared/styles/controlStyles'
-import { periodOptions, settlementPeriod } from '../utils/settlement'
-import type { PeriodMode } from '../utils/settlement'
+import { periodOptions, getSettlementPeriod } from '../utils/settlement'
+import type { PeriodModeType } from '../utils/settlement'
 
 export default function SettlementPeriodFilter({
   mode,
@@ -15,12 +15,12 @@ export default function SettlementPeriodFilter({
   onStartChange,
   onEndChange,
 }: {
-  mode: PeriodMode
+  mode: PeriodModeType
   start: string
   end: string
   today: string
-  period: ReturnType<typeof settlementPeriod>
-  onModeChange: (mode: PeriodMode) => void
+  period: ReturnType<typeof getSettlementPeriod>
+  onModeChange: (mode: PeriodModeType) => void
   onStartChange: (start: string) => void
   onEndChange: (end: string) => void
 }) {

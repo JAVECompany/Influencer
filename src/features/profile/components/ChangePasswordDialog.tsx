@@ -2,16 +2,16 @@ import Button from '../../../shared/components/ui/actions/Button'
 import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import Modal from '../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../shared/styles/controlStyles'
-import type { ProfileChanges } from '../../../shared/types/account'
-import type { Notify } from '../../../shared/types/actionResult'
+import type { ProfileChangesType } from '../../../shared/types/account'
+import type { NotifyType } from '../../../shared/types/actionResult'
 
 export default function ChangePasswordDialog({
   save,
   notify,
   onClose,
 }: {
-  save: (changes: ProfileChanges, message: string) => void
-  notify: Notify
+  save: (changes: ProfileChangesType, message: string) => void
+  notify: NotifyType
   onClose: () => void
 }) {
   return (

@@ -1,6 +1,6 @@
-import type { SessionData } from '../../types/demoState'
+import type { ISessionData } from '../../types/demoState'
 
-export const actor = (state: Pick<SessionData, 'accounts' | 'session'>) => {
+export const getActiveAccount = (state: Pick<ISessionData, 'accounts' | 'session'>) => {
   const account = state.session ? state.accounts[state.session] : undefined
   return account?.disabled ? undefined : account
 }

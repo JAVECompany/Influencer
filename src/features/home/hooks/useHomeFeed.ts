@@ -4,13 +4,13 @@ import { hasSubscription } from '../../../shared/utils/subscription/subscription
 import { isPublic } from '../../../shared/utils/creator/creatorAccess'
 import { useContentAccessData } from '../../../shared/hooks/content/useContentAccessData'
 import { useContentStore } from '../../../shared/store/content/content'
-import type { Account } from '../../../shared/types/account'
-import { byRecent } from '../../../shared/utils/content/contentOrder'
+import type { IAccount } from '../../../shared/types/account'
+import { compareByNewest } from '../../../shared/utils/content/contentOrder'
 
-export function useHomeFeed(account: Account) {
+export function useHomeFeed(account: IAccount) {
   const access = useContentAccessData()
   const { accounts, creators } = access
-  const posts = useContentStore((state) => state.posts)
+  const posts = useContentStore((s) => s.posts)
   const [preview, setPreview] = useState<string | null>(null)
   const [owner, setOwner] = useState('')
   const [limit, setLimit] = useState(8)
@@ -18,10 +18,10 @@ export function useHomeFeed(account: Account) {
   const readable = posts.filter(
     (p) => creators[p.owner] && (!owner || p.owner === owner) && canRead(access, p)
   )
-  const feed = readable.filter((p) => p.kind === 'post').sort(byRecent)
+  const feed = readable.filter((p) => p.kind === 'post').sort(compareByNewest)
   const stories = readable
     .filter((p) => p.kind !== 'post' && (staff || isStoryAvailable(p)))
-    .sort((a, b) => Number(b.kind === 'live') - Number(a.kind === 'live') || byRecent(a, b))
+    .sort((a, b) => Number(b.kind === 'live') - Number(a.kind === 'live') || compareByNewest(a, b))
   const spotlight = Object.values(creators)
     .filter((c) => isPublic(access, c.id) && !hasSubscription(access, account.id, c.id))
     .sort((a, b) => b.fans - a.fans)

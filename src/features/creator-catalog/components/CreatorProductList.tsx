@@ -3,7 +3,7 @@ import ProductCard from '../../../shared/components/products/ProductCard'
 import Button from '../../../shared/components/ui/actions/Button'
 import { productReviewLabels } from '../../../shared/constants/productReviewStatus'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { Product } from '../../../shared/types/commerce'
+import type { IProduct } from '../../../shared/types/commerce'
 import { formatNumber } from '../../../shared/utils/format/format'
 
 export default function CreatorProductList({
@@ -11,9 +11,9 @@ export default function CreatorProductList({
   onPreview,
   onArchive,
 }: {
-  products: Product[]
-  onPreview: (product: Product) => void
-  onArchive: (product: Product) => void
+  products: IProduct[]
+  onPreview: (product: IProduct) => void
+  onArchive: (product: IProduct) => void
 }) {
   return (
     <div className={`${panel} mb-4 p-5`}>

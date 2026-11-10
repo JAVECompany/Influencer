@@ -2,7 +2,7 @@ import Button from '../../../../shared/components/ui/actions/Button'
 import FieldLabel from '../../../../shared/components/ui/forms/FieldLabel'
 import Modal from '../../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../../shared/styles/controlStyles'
-import type { Creator } from '../../../../shared/types/account'
+import type { ICreator } from '../../../../shared/types/account'
 import { readFormValue } from '../../../../shared/utils/forms/formData'
 
 export default function RejectApplicationDialog({
@@ -10,7 +10,7 @@ export default function RejectApplicationDialog({
   onReject,
   onClose,
 }: {
-  creator: Creator
+  creator: ICreator
   onReject: (reason: string) => void
   onClose: () => void
 }) {

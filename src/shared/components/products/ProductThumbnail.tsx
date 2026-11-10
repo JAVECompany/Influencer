@@ -1,5 +1,5 @@
 import { ImageIcon, LockKeyhole, Video } from 'lucide-react'
-import type { Product } from '../../types/commerce'
+import type { IProduct } from '../../types/commerce'
 import { isProductVideo } from '../../utils/media/productMedia'
 import DemoScene from '../ui/media/DemoScene'
 
@@ -8,7 +8,7 @@ export default function ProductThumbnail({
   locked,
   className = '',
 }: {
-  product: Product
+  product: IProduct
   locked?: boolean
   className?: string
 }) {

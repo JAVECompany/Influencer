@@ -1,13 +1,13 @@
-import type { Failure } from '../../types/actionResult'
-import type { Product, ProductSubmission } from '../../types/commerce'
+import type { FailureType } from '../../types/actionResult'
+import type { IProduct, IProductSubmission } from '../../types/commerce'
 import { fail } from '../actions/actionResults'
 import { isAmountInRange } from '../validation/isAmountInRange'
 
 export function prepareProduct(
-  { name, detail, cost, media, fulfillment }: ProductSubmission,
+  { name, detail, cost, media, fulfillment }: IProductSubmission,
   owner: string,
   art: number
-): Product | Failure {
+): IProduct | FailureType {
   if (!name.trim() || !detail.trim() || !isAmountInRange(cost, 1, 10000)) {
     return fail('상품 정보와 1~10,000 코인 가격을 입력해 주세요.')
   }

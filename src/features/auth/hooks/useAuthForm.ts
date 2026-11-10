@@ -2,9 +2,9 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useAuthStore } from '../../../shared/store/auth/auth'
-import type { Notify } from '../../../shared/types/actionResult'
+import type { NotifyType } from '../../../shared/types/actionResult'
 
-export function useAuthForm(notify: Notify) {
+export function useAuthForm(notify: NotifyType) {
   const { signIn, signUp } = useAuthStore(useShallow(({ signIn, signUp }) => ({ signIn, signUp })))
   const [signup, setSignup] = useState(false)
   const [id, setId] = useState('')

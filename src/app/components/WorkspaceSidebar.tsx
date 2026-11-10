@@ -3,7 +3,7 @@ import { LogOut } from 'lucide-react'
 import Avatar from '../../shared/components/ui/media/Avatar'
 import BrandLogo from '../../shared/components/ui/branding/BrandLogo'
 import { roles } from '../../shared/constants/roles'
-import type { Account, Creator } from '../../shared/types/account'
+import type { IAccount, ICreator } from '../../shared/types/account'
 
 export default function WorkspaceSidebar({
   account,
@@ -12,8 +12,8 @@ export default function WorkspaceSidebar({
   onHome,
   onSignOut,
 }: {
-  account: Account
-  creator?: Creator
+  account: IAccount
+  creator?: ICreator
   navButtons: ReactNode
   onHome: () => void
   onSignOut: () => void

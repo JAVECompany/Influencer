@@ -1,33 +1,33 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import type { ActionResult } from '../../types/actionResult'
-import type { SessionData } from '../../types/demoState'
+import type { ActionResultType } from '../../types/actionResult'
+import type { ISessionData } from '../../types/demoState'
 import { fail, ok } from '../../utils/actions/actionResults'
-import { actor } from '../../utils/auth/session'
+import { getActiveAccount } from '../../utils/auth/session'
 import { isAmountInRange } from '../../utils/validation/isAmountInRange'
 import { getDemoState, registerDemoStore } from '../persistence/demo'
 import { writeEntry } from '../utils'
 
-export interface SettlementField {
-  settlement: SessionData['settlement']
+export interface ISettlementField {
+  settlement: ISessionData['settlement']
 }
 
-interface SettlementState extends SettlementField {
-  configureSettlement: (coinWon: number, feeBps: number) => ActionResult
-  overrideSettlementCoins: (periodKey: string, id: string, coins: number | null) => ActionResult
+interface ISettlementState extends ISettlementField {
+  configureSettlement: (coinWon: number, feeBps: number) => ActionResultType
+  overrideSettlementCoins: (periodKey: string, id: string, coins: number | null) => ActionResultType
 }
 
-const initialState: SettlementField = {
+const initialState: ISettlementField = {
   settlement: getDemoState().settlement,
 }
 
-export const useSettlementStore = create<SettlementState>()(
+export const useSettlementStore = create<ISettlementState>()(
   immer((set) => ({
     ...initialState,
 
     configureSettlement(coinWon, feeBps) {
       const state = getDemoState()
-      if (actor(state)?.role !== 'admin') {
+      if (getActiveAccount(state)?.role !== 'admin') {
         return fail('관리자만 정산 기준을 설정할 수 있습니다.')
       }
       if (!isAmountInRange(coinWon, 1, 10000) || !isAmountInRange(feeBps, 0, 10000)) {
@@ -44,7 +44,7 @@ export const useSettlementStore = create<SettlementState>()(
     overrideSettlementCoins(periodKey, id, coins) {
       const state = getDemoState()
       if (
-        actor(state)?.role !== 'admin' ||
+        getActiveAccount(state)?.role !== 'admin' ||
         !state.creators[id] ||
         !/^\d{4}-\d{2}-\d{2}\/\d{4}-\d{2}-\d{2}$/.test(periodKey)
       ) {

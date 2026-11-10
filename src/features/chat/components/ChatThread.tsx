@@ -2,7 +2,7 @@ import type { RefObject } from 'react'
 import { Send } from 'lucide-react'
 import Button from '../../../shared/components/ui/actions/Button'
 import { field, panel } from '../../../shared/styles/controlStyles'
-import type { Message } from '../../../shared/types/chat'
+import type { IMessage } from '../../../shared/types/chat'
 
 export default function ChatThread({
   name,
@@ -16,7 +16,7 @@ export default function ChatThread({
 }: {
   name: string
   accountId: string
-  messages: Message[]
+  messages: IMessage[]
   log: RefObject<HTMLDivElement | null>
   text: string
   onChange: (value: string) => void

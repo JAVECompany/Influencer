@@ -1,11 +1,11 @@
 import { Eye, Trash2, UsersRound } from 'lucide-react'
 import Button from '../../../shared/components/ui/actions/Button'
 import { contentKindLabels } from '../../../shared/constants/contentKinds'
-import { audienceForCreator, tracksAudience } from '../../../shared/utils/content/contentAccess'
+import { getCreatorAudience, tracksAudience } from '../../../shared/utils/content/contentAccess'
 import { useAccountStore } from '../../../shared/store/account/account'
 import { useAuthStore } from '../../../shared/store/auth/auth'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { Content } from '../../../shared/types/content'
+import type { IContent } from '../../../shared/types/content'
 import { formatNumber, formatRelativeTime } from '../../../shared/utils/format/format'
 
 export default function StudioContentList({
@@ -14,13 +14,13 @@ export default function StudioContentList({
   onPreview,
   onDelete,
 }: {
-  posts: Content[]
+  posts: IContent[]
   onAudience: (id: string) => void
   onPreview: (id: string) => void
-  onDelete: (post: Content) => void
+  onDelete: (post: IContent) => void
 }) {
-  const accounts = useAccountStore((state) => state.accounts)
-  const session = useAuthStore((state) => state.session)
+  const accounts = useAccountStore((s) => s.accounts)
+  const session = useAuthStore((s) => s.session)
   const state = { accounts, session }
   return (
     <section className={`${panel} divide-y divide-line`}>
@@ -41,7 +41,7 @@ export default function StudioContentList({
               {tracksAudience(p) && (
                 <Button tone="subtle" onClick={() => onAudience(p.id)}>
                   <UsersRound size={16} aria-hidden="true" />
-                  {label} {formatNumber(audienceForCreator(state, p).length)}명
+                  {label} {formatNumber(getCreatorAudience(state, p).length)}명
                 </Button>
               )}
               <Button tone="plain" aria-label={p.title + ' 미리보기'} onClick={() => onPreview(p.id)}>

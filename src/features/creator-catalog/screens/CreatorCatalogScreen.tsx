@@ -6,14 +6,14 @@ import Button from '../../../shared/components/ui/actions/Button'
 import ConfirmActionDialog from '../../../shared/components/ui/dialogs/ConfirmActionDialog'
 import Modal from '../../../shared/components/ui/dialogs/Modal'
 import PageTitle from '../../../shared/components/ui/layout/PageTitle'
-import type { OperatorProps } from '../../../shared/types/navigation'
+import type { OperatorPropsType } from '../../../shared/types/navigation'
 import CreateProductDialog from '../components/CreateProductDialog'
 import CreatorProductList from '../components/CreatorProductList'
 import CreatorRouletteSettings from '../components/CreatorRouletteSettings'
 import RouletteEditorDialog from '../components/RouletteEditorDialog'
 import { useCreatorCatalog } from '../hooks/useCreatorCatalog'
 
-export default function CreatorCatalogScreen({ account, notify }: OperatorProps) {
+export default function CreatorCatalogScreen({ account, notify }: OperatorPropsType) {
   const {
     dialog,
     setDialog,

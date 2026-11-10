@@ -1,14 +1,14 @@
-import type { Reward } from '../../types/commerce'
+import type { IReward } from '../../types/commerce'
 
-export interface WheelSegment {
+export interface IWheelSegment {
   name: string
   start: number
   end: number
 }
 
-const degrees = (angle: number) => ((angle % 360) + 360) % 360
+const normalizeAngle = (angle: number) => ((angle % 360) + 360) % 360
 
-export function drawRewardIndex(rewards: Reward[], random = Math.random()) {
+export function drawRewardIndex(rewards: IReward[], random = Math.random()) {
   let remaining = random * 100
   const index = rewards.findIndex(({ chance }) => {
     remaining -= chance
@@ -17,7 +17,7 @@ export function drawRewardIndex(rewards: Reward[], random = Math.random()) {
   return index < 0 ? rewards.length - 1 : index
 }
 
-export function wheelSegments(rewards: Reward[]): WheelSegment[] {
+export function calculateWheelSegments(rewards: IReward[]): IWheelSegment[] {
   let cumulativeChance = 0
   return rewards.map(({ name, chance }) => {
     const start = (cumulativeChance / 100) * 360
@@ -26,9 +26,9 @@ export function wheelSegments(rewards: Reward[]): WheelSegment[] {
   })
 }
 
-export function stopRotation(rotation: number, { start, end }: WheelSegment, position = Math.random()) {
+export function stopRotation(rotation: number, { start, end }: IWheelSegment, position = Math.random()) {
   const width = end - start
   const margin = Math.min(1.5, width * 0.2)
   const landing = start + margin + position * (width - margin * 2)
-  return rotation + 360 * 5 + degrees(-landing - rotation)
+  return rotation + 360 * 5 + normalizeAngle(-landing - rotation)
 }

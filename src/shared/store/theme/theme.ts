@@ -2,37 +2,33 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { isThemePreference } from '../../constants/theme/themePreferences'
-import type { ThemePreference } from '../../constants/theme/themePreferences'
+import type { ThemePreferenceType } from '../../constants/theme/themePreferences'
 import { createSetDataImmer } from '../zustandTypes'
 
-export interface ThemeField {
-  theme: ThemePreference
+export interface IThemeField {
+  theme: ThemePreferenceType
 }
 
-interface ThemeState extends ThemeField {
-  setTheme: (theme: ThemePreference) => void
+interface IThemeState extends IThemeField {
+  setTheme: (theme: ThemePreferenceType) => void
 }
 
-const initialState: ThemeField = {
+const initialState: IThemeField = {
   theme: 'system',
 }
 
-export const useThemeStore = create<ThemeState>()(
+export const useThemeStore = create<IThemeState>()(
   persist(
-    immer((set) => {
-      const setData = createSetDataImmer<ThemeField>(set)
+    immer((set) => ({
+      ...initialState,
 
-      return {
-        ...initialState,
-
-        setTheme: (theme) => setData('theme', theme),
-      }
-    }),
+      setTheme: (theme) => createSetDataImmer<IThemeField>(set)('theme', theme),
+    })),
     {
       name: 'bamgyeol-theme-v1',
       partialize: ({ theme }) => ({ theme }),
       merge: (persisted, current) => {
-        const theme = (persisted as Partial<ThemeField> | undefined)?.theme
+        const theme = (persisted as Partial<IThemeField> | undefined)?.theme
         return isThemePreference(theme) ? { ...current, theme } : current
       },
     }

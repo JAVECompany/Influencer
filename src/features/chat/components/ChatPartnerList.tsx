@@ -1,18 +1,18 @@
 import Avatar from '../../../shared/components/ui/media/Avatar'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { Account, Creator } from '../../../shared/types/account'
+import type { IAccount, ICreator } from '../../../shared/types/account'
 
 export default function ChatPartnerList({
   ids,
   thread,
-  other,
+  getChatPartner,
   accounts,
   onSelect,
 }: {
   ids: string[]
   thread: string | null
-  other: (id: string) => Account | Creator | undefined
-  accounts: Record<string, Account>
+  getChatPartner: (id: string) => IAccount | ICreator | undefined
+  accounts: Record<string, IAccount>
   onSelect: (id: string) => void
 }) {
   return (
@@ -30,8 +30,8 @@ export default function ChatPartnerList({
             thread === id ? 'bg-accent-soft text-accent' : 'hover:bg-foreground/5'
           }`}
         >
-          <Avatar person={other(id)} account={accounts[id]} className="size-9" />
-          <span className="truncate">{other(id)?.name ?? id}</span>
+          <Avatar person={getChatPartner(id)} account={accounts[id]} className="size-9" />
+          <span className="truncate">{getChatPartner(id)?.name ?? id}</span>
         </button>
       ))}
     </section>

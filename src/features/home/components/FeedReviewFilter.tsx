@@ -1,6 +1,6 @@
 import Button from '../../../shared/components/ui/actions/Button'
 import { field, panel } from '../../../shared/styles/controlStyles'
-import type { Creator } from '../../../shared/types/account'
+import type { ICreator } from '../../../shared/types/account'
 
 export default function FeedReviewFilter({
   owner,
@@ -9,7 +9,7 @@ export default function FeedReviewFilter({
   openCreator,
 }: {
   owner: string
-  creators: Creator[]
+  creators: ICreator[]
   onOwnerChange: (id: string) => void
   openCreator: (id: string) => void
 }) {

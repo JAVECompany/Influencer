@@ -8,16 +8,16 @@ export function writeEntry<Value>(record: Record<string, Value>, key: string, va
   return record
 }
 
-export type SetDataPayload = {
+export type SetDataPayloadType = {
   keys: Array<string>
   value: any
 }
-export type SetDataAtKeys = (value: any, ...keys: string[]) => void
-type PayloadAction<T> = {
+export type SetDataAtKeysType = (value: any, ...keys: string[]) => void
+type PayloadActionType<T> = {
   payload: T
 }
 
-export function setData(state: Record<string, any>, { payload }: PayloadAction<SetDataPayload>) {
+export function setData(state: Record<string, any>, { payload }: PayloadActionType<SetDataPayloadType>) {
   const { keys, value } = payload
 
   let target = state

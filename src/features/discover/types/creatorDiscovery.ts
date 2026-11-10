@@ -1,12 +1,12 @@
-import type { Account, Creator } from '../../../shared/types/account'
+import type { IAccount, ICreator } from '../../../shared/types/account'
 
-export interface ExploreItem {
-  creator: Creator
-  account?: Account
+export interface IExploreItem {
+  creator: ICreator
+  account?: IAccount
   count: number
   subscribed: boolean
 }
 
-export type Angles = { yaw: number; pitch: number }
+export type AnglesType = { yaw: number; pitch: number }
 
-export type Box = [number, number, number, number]
+export type BoxType = [number, number, number, number]

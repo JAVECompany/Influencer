@@ -1,30 +1,30 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import type { ActionResult } from '../../types/actionResult'
-import type { ProductReviewStatus, ProductSubmission } from '../../types/commerce'
-import type { SessionData } from '../../types/demoState'
+import type { ActionResultType } from '../../types/actionResult'
+import type { ProductReviewStatusType, IProductSubmission } from '../../types/commerce'
+import type { ISessionData } from '../../types/demoState'
 import { fail, ok } from '../../utils/actions/actionResults'
-import { actor } from '../../utils/auth/session'
+import { getActiveAccount } from '../../utils/auth/session'
 import { getApprovedCreatorAccount } from '../../utils/creator/creatorAccess'
 import { prepareProduct } from '../../utils/products/productSubmission'
 import { getDemoState, registerDemoStore, updateDemoState } from '../persistence/demo'
 
-export interface ProductField {
-  products: SessionData['products']
+export interface IProductField {
+  products: ISessionData['products']
 }
 
-interface ProductState extends ProductField {
-  addProduct: (submission: ProductSubmission) => ActionResult
-  removeProduct: (id: string) => ActionResult
-  reviewProduct: (id: string, decision: Exclude<ProductReviewStatus, 'pending'>) => ActionResult
-  markProductShipped: (transactionId: string) => ActionResult
+interface IProductState extends IProductField {
+  addProduct: (submission: IProductSubmission) => ActionResultType
+  removeProduct: (id: string) => ActionResultType
+  reviewProduct: (id: string, decision: Exclude<ProductReviewStatusType, 'pending'>) => ActionResultType
+  markProductShipped: (transactionId: string) => ActionResultType
 }
 
-const initialState: ProductField = {
+const initialState: IProductField = {
   products: getDemoState().products,
 }
 
-export const useProductStore = create<ProductState>()(
+export const useProductStore = create<IProductState>()(
   immer((set) => ({
     ...initialState,
 
@@ -51,7 +51,7 @@ export const useProductStore = create<ProductState>()(
       const index = state.products.findIndex((p) => p.id === id)
       const product = state.products[index]
       if (
-        actor(state)?.role !== 'admin' ||
+        getActiveAccount(state)?.role !== 'admin' ||
         !product ||
         product.archived ||
         product.reviewStatus === 'rejected' ||
@@ -68,7 +68,7 @@ export const useProductStore = create<ProductState>()(
 
     markProductShipped(transactionId) {
       const state = getDemoState()
-      const seller = actor(state)
+      const seller = getActiveAccount(state)
       const index = state.transactions.findIndex((t) => t.id === transactionId && t.owner === seller?.id)
       const order = state.transactions[index]
       if (

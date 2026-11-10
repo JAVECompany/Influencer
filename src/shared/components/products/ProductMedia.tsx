@@ -1,11 +1,11 @@
 import { useContext, useEffect, useRef } from 'react'
 import { ContentPrivacyContext } from '../../contexts/contentPrivacyContext'
-import type { Product } from '../../types/commerce'
+import type { IProduct } from '../../types/commerce'
 import { isProductVideo } from '../../utils/media/productMedia'
 import DemoScene from '../ui/media/DemoScene'
 import ProtectedContent from '../ui/privacy/ProtectedContent'
 
-export default function ProductMedia({ product }: { product: Product }) {
+export default function ProductMedia({ product }: { product: IProduct }) {
   const mask = useContext(ContentPrivacyContext)
   const video = useRef<HTMLVideoElement>(null)
   useEffect(() => {

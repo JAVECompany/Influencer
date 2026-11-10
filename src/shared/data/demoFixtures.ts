@@ -1,6 +1,6 @@
-import type { Creator } from '../types/account'
-import type { Transaction } from '../types/commerce'
-import type { Content, ContentKind } from '../types/content'
+import type { ICreator } from '../types/account'
+import type { ITransaction } from '../types/commerce'
+import type { IContent, ContentKindType } from '../types/content'
 
 const women =
   '은서 지유 수아 예린 서아 채원 유진 소민 혜원 예나 서연 민서 하윤 다은 나린 유라 지아 가은 채영 은지 수현 소연 다현 세아 윤서 지민 지수 하은 연우 나현 아린 유빈 유리 다인 은채 서희 서정 보라 소정 여름 봄이 가을 겨울 은별 나래 아라 별하 라희 하린 태리 채린 예빈 이서 연서 시은 현아 규리 채은 재이 로아 희주 선아 세린 은하'.split(
@@ -20,7 +20,7 @@ const themes = [
   ['천천히 보는 풍경', '지난 주말 가장 오래 기억에 남은 순간입니다.'],
 ]
 
-export const addedRoster = [...women, ...men].map((name, i): Creator => {
+export const addedRoster = [...women, ...men].map((name, i): ICreator => {
   const serial = String(i + 1).padStart(3, '0')
   const female = i < women.length
   const rank = (i * 37) % (women.length + men.length)
@@ -74,16 +74,16 @@ const applicationFixtures = [
     method: 'direct',
     email: 'haon@example.test',
   },
-] satisfies Pick<Creator, 'id' | 'name' | 'handle' | 'bio' | 'method' | 'instagram' | 'email'>[]
+] satisfies Pick<ICreator, 'id' | 'name' | 'handle' | 'bio' | 'method' | 'instagram' | 'email'>[]
 
 export const mockApplicants = applicationFixtures.map(
-  (creator, i): Creator => ({ price: 5900, fans: 0, reason: '', art: i + 1, status: 'pending', ...creator })
+  (creator, i): ICreator => ({ price: 5900, fans: 0, reason: '', art: i + 1, status: 'pending', ...creator })
 )
 
-export function mockPosts(now: number): Content[] {
+export function mockPosts(now: number): IContent[] {
   return addedRoster.flatMap((creator, i) => {
     const [title, body] = themes[i % themes.length]
-    const entry = (kind: ContentKind, minutes: number): Content => ({
+    const createPost = (kind: ContentKindType, minutes: number): IContent => ({
       id: creator.id + '-' + kind,
       owner: creator.id,
       kind,
@@ -95,15 +95,15 @@ export function mockPosts(now: number): Content[] {
       likes: [],
       reports: [],
     })
-    const items = [entry('post', 90 + i * 41)]
+    const items = [createPost('post', 90 + i * 41)]
     if (i % 13 === 0) {
-      items.push(entry(i % 2 ? 'story' : 'live', 20 + i))
+      items.push(createPost(i % 2 ? 'story' : 'live', 20 + i))
     }
     return items
   })
 }
 
-export function mockTransactions(now: number, roster: Creator[]): Transaction[] {
+export function mockTransactions(now: number, roster: ICreator[]): ITransaction[] {
   const time = new Date(now + 9 * 3_600_000)
   const year = time.getUTCFullYear()
   const month = time.getUTCMonth()
@@ -119,7 +119,7 @@ export function mockTransactions(now: number, roster: Creator[]): Transaction[] 
       roster.flatMap((creator, i) => {
         const id = 'demo-ledger-' + period + '-' + i
         const data = { customer: 'demo-fan-' + (i + 1), owner: creator.id, at }
-        const items: Transaction[] = [
+        const items: ITransaction[] = [
           { ...data, id, type: i % 2 ? 'roulette' : 'product', coins: 25 + ((period * 31 + i * 17) % 230) },
         ]
         if (i < 9 || (i + period) % 3 !== 0) {

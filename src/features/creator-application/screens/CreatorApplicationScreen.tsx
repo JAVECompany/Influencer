@@ -2,11 +2,11 @@ import Badge from '../../../shared/components/ui/display/Badge'
 import PageTitle from '../../../shared/components/ui/layout/PageTitle'
 import { creatorReviewStatus } from '../../../shared/constants/creatorReviewStatus'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { OperatorProps } from '../../../shared/types/navigation'
+import type { OperatorPropsType } from '../../../shared/types/navigation'
 import CreatorApplicationForm from '../components/CreatorApplicationForm'
 import { useCreatorApplication } from '../hooks/useCreatorApplication'
 
-export default function CreatorApplicationScreen({ account, notify }: OperatorProps) {
+export default function CreatorApplicationScreen({ account, notify }: OperatorPropsType) {
   const { creator, method, setMethod, submit } = useCreatorApplication({ account, notify })
   return (
     <>

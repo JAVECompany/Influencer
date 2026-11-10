@@ -1,1 +1,1 @@
-export type DraftReward = { name: string; chance: string }
+export type DraftRewardType = { name: string; chance: string }

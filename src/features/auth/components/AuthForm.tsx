@@ -5,10 +5,10 @@ import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import { roles } from '../../../shared/constants/roles'
 import { demoAccounts } from '../../../shared/data/demoAccounts'
 import { field, panel } from '../../../shared/styles/controlStyles'
-import type { PageProps } from '../../../shared/types/navigation'
+import type { IPageProps } from '../../../shared/types/navigation'
 import { useAuthForm } from '../hooks/useAuthForm'
 
-export default function AuthForm({ notify }: Pick<PageProps, 'notify'>) {
+export default function AuthForm({ notify }: Pick<IPageProps, 'notify'>) {
   const {
     signup,
     id,

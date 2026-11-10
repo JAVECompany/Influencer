@@ -3,8 +3,8 @@ import { contentKindLabels } from '../../constants/contentKinds'
 import { useContentAccessData } from '../../hooks/content/useContentAccessData'
 import { canRead, isStoryAvailable, tracksAudience } from '../../utils/content/contentAccess'
 import { useContentStore } from '../../store/content/content'
-import type { Account } from '../../types/account'
-import type { Content } from '../../types/content'
+import type { IAccount } from '../../types/account'
+import type { IContent } from '../../types/content'
 import Badge from '../ui/display/Badge'
 import Modal from '../ui/dialogs/Modal'
 import ProtectedContent from '../ui/privacy/ProtectedContent'
@@ -15,12 +15,12 @@ export default function ContentPreviewDialog({
   account,
   onClose,
 }: {
-  post?: Content
-  account: Account
+  post?: IContent
+  account: IAccount
   onClose: () => void
 }) {
   const access = useContentAccessData()
-  const recordAudience = useContentStore((state) => state.recordAudience)
+  const recordAudience = useContentStore((s) => s.recordAudience)
   const canOpen = Boolean(
     post && canRead(access, post) && (account.role !== 'customer' || isStoryAvailable(post))
   )

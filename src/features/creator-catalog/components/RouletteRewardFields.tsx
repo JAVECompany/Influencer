@@ -1,15 +1,15 @@
 import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import { field } from '../../../shared/styles/controlStyles'
-import type { DraftReward } from '../types/rouletteDraft'
+import type { DraftRewardType } from '../types/rouletteDraft'
 
 export default function RouletteRewardFields({
   row,
   index,
   onChange,
 }: {
-  row: DraftReward
+  row: DraftRewardType
   index: number
-  onChange: (changes: Partial<DraftReward>) => void
+  onChange: (changes: Partial<DraftRewardType>) => void
 }) {
   return (
     <fieldset className="grid grid-cols-[minmax(0,1fr)_6rem] gap-2 rounded-xl bg-canvas p-3">

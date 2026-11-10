@@ -1,37 +1,37 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import type { ApplicationInput } from '../../types/account'
-import type { ActionResult } from '../../types/actionResult'
-import type { SessionData } from '../../types/demoState'
+import type { IApplicationInput } from '../../types/account'
+import type { ActionResultType } from '../../types/actionResult'
+import type { ISessionData } from '../../types/demoState'
 import { fail, ok } from '../../utils/actions/actionResults'
-import { actor } from '../../utils/auth/session'
+import { getActiveAccount } from '../../utils/auth/session'
 import { getApprovedCreatorAccount } from '../../utils/creator/creatorAccess'
 import { prepareApplication } from '../../utils/creator/creatorApplication'
 import { isAmountInRange } from '../../utils/validation/isAmountInRange'
 import { getDemoState, registerDemoStore } from '../persistence/demo'
 import { writeEntry } from '../utils'
 
-export interface CreatorField {
-  creators: SessionData['creators']
+export interface ICreatorField {
+  creators: ISessionData['creators']
 }
 
-interface CreatorState extends CreatorField {
-  apply: (input: ApplicationInput) => ActionResult
-  review: (id: string, status: 'approved' | 'rejected', reason?: string) => ActionResult
-  editCreator: (price: number, bio: string) => ActionResult
+interface ICreatorState extends ICreatorField {
+  applyForCreator: (input: IApplicationInput) => ActionResultType
+  reviewCreatorApplication: (id: string, status: 'approved' | 'rejected', reason?: string) => ActionResultType
+  editCreator: (price: number, bio: string) => ActionResultType
 }
 
-const initialState: CreatorField = {
+const initialState: ICreatorField = {
   creators: getDemoState().creators,
 }
 
-export const useCreatorStore = create<CreatorState>()(
+export const useCreatorStore = create<ICreatorState>()(
   immer((set) => ({
     ...initialState,
 
-    apply(input) {
+    applyForCreator(input) {
       const state = getDemoState()
-      const account = actor(state)
+      const account = getActiveAccount(state)
       const current = account && state.creators[account.id]
       if (account?.role !== 'influencer' || current?.status === 'approved' || current?.status === 'pending') {
         return fail('현재 입점 신청을 변경할 수 없습니다.')
@@ -48,11 +48,11 @@ export const useCreatorStore = create<CreatorState>()(
       return ok
     },
 
-    review(id, status, reason = '') {
+    reviewCreatorApplication(id, status, reason = '') {
       const state = getDemoState()
       const creator = state.creators[id]
       if (
-        actor(state)?.role !== 'admin' ||
+        getActiveAccount(state)?.role !== 'admin' ||
         creator?.status !== 'pending' ||
         !['approved', 'rejected'].includes(status)
       ) {

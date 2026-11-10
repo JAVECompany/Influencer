@@ -1,31 +1,31 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import type { ActionResult } from '../../types/actionResult'
-import type { SessionData } from '../../types/demoState'
+import type { ActionResultType } from '../../types/actionResult'
+import type { ISessionData } from '../../types/demoState'
 import { fail, ok } from '../../utils/actions/actionResults'
-import { actor } from '../../utils/auth/session'
+import { getActiveAccount } from '../../utils/auth/session'
 import { hasSubscription } from '../../utils/subscription/subscriptionAccess'
 import { getDemoState, registerDemoStore } from '../persistence/demo'
 
-export interface ChatField {
-  messages: SessionData['messages']
+export interface IChatField {
+  messages: ISessionData['messages']
 }
 
-interface ChatState extends ChatField {
-  sendMessage: (counterpart: string, text: string) => ActionResult
+interface IChatState extends IChatField {
+  sendMessage: (counterpart: string, text: string) => ActionResultType
 }
 
-const initialState: ChatField = {
+const initialState: IChatField = {
   messages: getDemoState().messages,
 }
 
-export const useChatStore = create<ChatState>()(
+export const useChatStore = create<IChatState>()(
   immer((set) => ({
     ...initialState,
 
     sendMessage(counterpart, text) {
       const state = getDemoState()
-      const a = actor(state)
+      const a = getActiveAccount(state)
       if (!a || !['customer', 'influencer'].includes(a.role) || !text.trim()) {
         return fail('메시지를 보낼 수 없습니다.')
       }

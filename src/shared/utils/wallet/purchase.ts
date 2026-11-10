@@ -1,22 +1,22 @@
-import type { Failure } from '../../types/actionResult'
-import type { ShippingAddress, SpendType, Transaction } from '../../types/commerce'
-import type { SessionData } from '../../types/demoState'
+import type { FailureType } from '../../types/actionResult'
+import type { IShippingAddress, SpendType, ITransaction } from '../../types/commerce'
+import type { ISessionData } from '../../types/demoState'
 import { fail } from '../actions/actionResults'
-import { actor } from '../auth/session'
+import { getActiveAccount } from '../auth/session'
 import { isPublic } from '../creator/creatorAccess'
 import { isPhysicalProduct, isProductForSale } from '../products/productAvailability'
 import { drawRewardIndex } from '../roulette/roulette'
 import { hasSubscription } from '../subscription/subscriptionAccess'
 import { createTransaction } from '../transactions/createTransaction'
 
-interface Purchase {
+interface IPurchase {
   balance: number
-  transaction: Transaction
+  transaction: ITransaction
   reward: string
   rewardIndex?: number
 }
 
-function normalizeShippingAddress(address: ShippingAddress) {
+function normalizeShippingAddress(address: IShippingAddress) {
   return {
     recipient: address.recipient.trim(),
     phone: address.phone.trim(),
@@ -26,7 +26,7 @@ function normalizeShippingAddress(address: ShippingAddress) {
   }
 }
 
-function validShippingAddress(address: ShippingAddress) {
+function isValidShippingAddress(address: IShippingAddress) {
   return (
     address.recipient.length > 0 &&
     address.recipient.length <= 50 &&
@@ -39,13 +39,13 @@ function validShippingAddress(address: ShippingAddress) {
 }
 
 export function preparePurchase(
-  state: SessionData,
+  state: ISessionData,
   creator: string,
   type: SpendType,
   productId?: string,
-  address?: ShippingAddress
-): Purchase | Failure {
-  const account = actor(state)
+  address?: IShippingAddress
+): IPurchase | FailureType {
+  const account = getActiveAccount(state)
   if (
     account?.role !== 'customer' ||
     !isPublic(state, creator) ||
@@ -71,7 +71,7 @@ export function preparePurchase(
 
   const physical = product && isPhysicalProduct(product)
   const shipping = physical && address ? normalizeShippingAddress(address) : undefined
-  if (physical && (!shipping || !validShippingAddress(shipping))) {
+  if (physical && (!shipping || !isValidShippingAddress(shipping))) {
     return fail('받는 분, 연락처, 5자리 우편번호와 주소를 확인해 주세요.')
   }
   if (balance < cost) {

@@ -3,8 +3,8 @@ import { useContentAccessData } from '../../hooks/content/useContentAccessData'
 import { canRead } from '../../utils/content/contentAccess'
 import { useContentStore } from '../../store/content/content'
 import { panel } from '../../styles/controlStyles'
-import type { Content } from '../../types/content'
-import type { FeedProps } from '../../types/feed'
+import type { IContent } from '../../types/content'
+import type { FeedPropsType } from '../../types/feed'
 import { formatRelativeTime } from '../../utils/format/format'
 import Avatar from '../ui/media/Avatar'
 import Button from '../ui/actions/Button'
@@ -20,9 +20,9 @@ export default function PostCard({
   openCreator,
   openChat,
   notify,
-}: FeedProps & { post: Content }) {
+}: FeedPropsType & { post: IContent }) {
   const access = useContentAccessData()
-  const managePost = useContentStore((state) => state.managePost)
+  const managePost = useContentStore((s) => s.managePost)
   const creator = access.creators[post.owner]
   if (!creator || !canRead(access, post)) {
     return null

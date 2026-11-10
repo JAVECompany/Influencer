@@ -1,3 +1,3 @@
-import type { PageProps } from './navigation'
+import type { IPageProps } from './navigation'
 
-export type FeedProps = Pick<PageProps, 'account' | 'openCreator' | 'openChat' | 'notify'>
+export type FeedPropsType = Pick<IPageProps, 'account' | 'openCreator' | 'openChat' | 'notify'>

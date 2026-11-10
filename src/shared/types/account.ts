@@ -1,12 +1,12 @@
-export type Role = 'admin' | 'influencer' | 'customer'
+export type RoleType = 'admin' | 'influencer' | 'customer'
 
-type ReviewStatus = 'pending' | 'approved' | 'rejected'
+type ReviewStatusType = 'pending' | 'approved' | 'rejected'
 
-export type ApplicationMethod = 'link' | 'direct'
+export type ApplicationMethodType = 'link' | 'direct'
 
-export interface Account {
+export interface IAccount {
   id: string
-  role: Role
+  role: RoleType
   name: string
   password: string
   avatar: string
@@ -15,7 +15,7 @@ export interface Account {
   disabled: boolean
 }
 
-export interface Creator {
+export interface ICreator {
   id: string
   name: string
   handle: string
@@ -23,18 +23,18 @@ export interface Creator {
   fans: number
   price: number
   art: number
-  status: ReviewStatus
+  status: ReviewStatusType
   reason: string
   disabled?: boolean
   instagram?: string
   email?: string
-  method?: ApplicationMethod
+  method?: ApplicationMethodType
   avatar?: string
   portrait?: number
   gender?: 'female' | 'male'
 }
 
-export interface SignUpInput {
+export interface ISignUpInput {
   id: string
   password: string
   name: string
@@ -43,8 +43,8 @@ export interface SignUpInput {
   role: string
 }
 
-export interface ApplicationInput {
-  method: ApplicationMethod
+export interface IApplicationInput {
+  method: ApplicationMethodType
   instagram: string
   name: string
   handle: string
@@ -52,6 +52,6 @@ export interface ApplicationInput {
   bio: string
 }
 
-export type ProfileChanges = Partial<
-  Pick<Account, 'name' | 'avatar' | 'notifications' | 'payment' | 'password'>
+export type ProfileChangesType = Partial<
+  Pick<IAccount, 'name' | 'avatar' | 'notifications' | 'payment' | 'password'>
 > & { current?: string }

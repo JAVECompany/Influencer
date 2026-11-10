@@ -1,7 +1,7 @@
 import { Sparkles } from 'lucide-react'
 import Button from '../../../shared/components/ui/actions/Button'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { Roulette } from '../../../shared/types/commerce'
+import type { IRoulette } from '../../../shared/types/commerce'
 import { formatNumber } from '../../../shared/utils/format/format'
 
 export default function CreatorRouletteSettings({
@@ -9,7 +9,7 @@ export default function CreatorRouletteSettings({
   onPreview,
   onEdit,
 }: {
-  roulette?: Roulette
+  roulette?: IRoulette
   onPreview: () => void
   onEdit: () => void
 }) {

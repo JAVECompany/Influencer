@@ -1,7 +1,7 @@
 import { defaultRouletteRewards } from '../constants/roulette'
-import type { Creator } from '../types/account'
-import type { Content, ContentKind } from '../types/content'
-import type { AppData } from '../types/demoState'
+import type { ICreator } from '../types/account'
+import type { IContent, ContentKindType } from '../types/content'
+import type { IAppData } from '../types/demoState'
 import { demoAccounts } from './demoAccounts'
 import { addedRoster, mockApplicants, mockPosts, mockTransactions } from './demoFixtures'
 
@@ -21,7 +21,7 @@ const originalPortraits = [0, 70, 1, 2, 71, 72, 3, 4, 5]
 
 const approvedRoster = [
   ...roster.map(
-    ([id, name, handle, bio, fans, price, art], i): Creator => ({
+    ([id, name, handle, bio, fans, price, art], i): ICreator => ({
       id,
       name,
       handle,
@@ -40,19 +40,30 @@ const approvedRoster = [
   ...addedRoster,
 ]
 
-const ago = (minutes: number) => Date.now() - minutes * 60_000
+const getTimeMinutesAgo = (minutes: number) => Date.now() - minutes * 60_000
 
-const content = (
+const createDemoContent = (
   id: string,
   owner: string,
-  kind: ContentKind,
+  kind: ContentKindType,
   title: string,
   body: string,
   art: number,
   minutes: number
-): Content => ({ id, owner, kind, title, body, art, at: ago(minutes), hidden: false, likes: [], reports: [] })
+): IContent => ({
+  id,
+  owner,
+  kind,
+  title,
+  body,
+  art,
+  at: getTimeMinutesAgo(minutes),
+  hidden: false,
+  likes: [],
+  reports: [],
+})
 
-export const initialData: AppData = {
+export const initialData: IAppData = {
   accounts: Object.fromEntries(
     demoAccounts.map((demo) => [
       demo.id,
@@ -63,7 +74,7 @@ export const initialData: AppData = {
     [...approvedRoster, ...mockApplicants].map((creator) => [creator.id, creator])
   ),
   posts: [
-    content(
+    createDemoContent(
       'p1',
       'influencer123',
       'post',
@@ -72,7 +83,7 @@ export const initialData: AppData = {
       0,
       18
     ),
-    content(
+    createDemoContent(
       'p2',
       'doha',
       'post',
@@ -81,11 +92,27 @@ export const initialData: AppData = {
       1,
       87
     ),
-    content('p3', 'yuna', 'post', '여름을 보내는 방법', '지난 여행에서 간직해 둔 풍경이에요.', 2, 280),
-    content('p4', 'noel', 'post', '이른 새벽의 공기', '아무도 없는 시간에 남긴 작은 기록.', 4, 320),
-    content('live1', 'influencer123', 'live', '서린의 밤 산책', '오늘의 라이브 편성을 둘러보세요.', 0, 8),
-    content('story1', 'doha', 'story', '작업실 스냅', '녹음하기 전, 오늘의 첫 번째 장면.', 1, 33),
-    content('story2', 'yuna', 'story', '여행 사진 한 장', '해가 지기 직전의 바닷가.', 2, 58),
+    createDemoContent(
+      'p3',
+      'yuna',
+      'post',
+      '여름을 보내는 방법',
+      '지난 여행에서 간직해 둔 풍경이에요.',
+      2,
+      280
+    ),
+    createDemoContent('p4', 'noel', 'post', '이른 새벽의 공기', '아무도 없는 시간에 남긴 작은 기록.', 4, 320),
+    createDemoContent(
+      'live1',
+      'influencer123',
+      'live',
+      '서린의 밤 산책',
+      '오늘의 라이브 편성을 둘러보세요.',
+      0,
+      8
+    ),
+    createDemoContent('story1', 'doha', 'story', '작업실 스냅', '녹음하기 전, 오늘의 첫 번째 장면.', 1, 33),
+    createDemoContent('story2', 'yuna', 'story', '여행 사진 한 장', '해가 지기 직전의 바닷가.', 2, 58),
     ...mockPosts(Date.now()),
   ],
   subscriptions: { user123: ['influencer123', 'doha', 'yuna'] },
@@ -127,7 +154,7 @@ export const initialData: AppData = {
       creator: 'influencer123',
       from: 'influencer123',
       text: '밤결에 오신 걸 환영해요! 오늘의 사진은 어떠셨나요?',
-      at: ago(16),
+      at: getTimeMinutesAgo(16),
     },
   ],
 }

@@ -1,13 +1,13 @@
 import { produce } from 'immer'
 import type { Draft } from 'immer'
 import { initialData } from '../../data/initialData'
-import type { SessionData } from '../../types/demoState'
+import type { ISessionData } from '../../types/demoState'
 import { migrateDemoState } from './migrate'
 
 const key = 'bamgyeol-demo-v1'
 const version = 3
-const defaults: SessionData = { ...initialData, session: null }
-const persistedFields = Object.keys(defaults) as Array<keyof SessionData>
+const defaults: ISessionData = { ...initialData, session: null }
+const persistedFields = Object.keys(defaults) as Array<keyof ISessionData>
 
 function getStorage() {
   try {
@@ -19,15 +19,15 @@ function getStorage() {
 
 const storage = getStorage()
 
-function saveDemoState(snapshot: SessionData) {
+function saveDemoState(snapshot: ISessionData) {
   if (storage) {
     const state = Object.fromEntries(persistedFields.map((field) => [field, snapshot[field]]))
     storage.setItem(key, JSON.stringify({ state, version }))
   }
 }
 
-function loadDemoState(): SessionData {
-  let state: SessionData
+function loadDemoState(): ISessionData {
+  let state: ISessionData
 
   try {
     const raw = storage?.getItem(key)
@@ -35,7 +35,7 @@ function loadDemoState(): SessionData {
       return defaults
     }
 
-    const saved = JSON.parse(raw) as { state?: Partial<SessionData>; version?: number }
+    const saved = JSON.parse(raw) as { state?: Partial<ISessionData>; version?: number }
     if (typeof saved.version !== 'number' || saved.version === version) {
       return { ...defaults, ...saved.state }
     }
@@ -55,20 +55,20 @@ function loadDemoState(): SessionData {
 }
 
 let snapshot = loadDemoState()
-const publishers: Array<(previous: SessionData, next: SessionData) => void> = []
+const publishers: Array<(previous: ISessionData, next: ISessionData) => void> = []
 
 export const getDemoState = () => snapshot
 
-type DemoStore<Fields> = {
+type DemoStoreType<Fields> = {
   setState: (fields: Partial<Fields>) => void
   subscribe: (listener: (next: Fields) => void) => () => void
 }
 
-export function registerDemoStore<Fields extends Partial<SessionData>>(
+export function registerDemoStore<Fields extends Partial<ISessionData>>(
   fields: Fields,
-  store: DemoStore<Fields>
+  store: DemoStoreType<Fields>
 ) {
-  const keys = Object.keys(fields) as Array<keyof Fields & keyof SessionData>
+  const keys = Object.keys(fields) as Array<keyof Fields & keyof ISessionData>
 
   publishers.push((previous, next) => {
     const changed = keys.filter((field) => previous[field] !== next[field])
@@ -89,7 +89,7 @@ export function registerDemoStore<Fields extends Partial<SessionData>>(
   })
 }
 
-export function updateDemoState(update: (draft: Draft<SessionData>) => void) {
+export function updateDemoState(update: (draft: Draft<ISessionData>) => void) {
   const previous = snapshot
   const next = produce(previous, update)
   if (previous === next) {

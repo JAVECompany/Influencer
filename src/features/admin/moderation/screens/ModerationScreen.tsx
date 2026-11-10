@@ -2,7 +2,7 @@ import ContentPreviewDialog from '../../../../shared/components/content/ContentP
 import Button from '../../../../shared/components/ui/actions/Button'
 import PageTitle from '../../../../shared/components/ui/layout/PageTitle'
 import { panel } from '../../../../shared/styles/controlStyles'
-import type { OperatorProps, PageProps } from '../../../../shared/types/navigation'
+import type { OperatorPropsType, IPageProps } from '../../../../shared/types/navigation'
 import ModerationAccountRow from '../components/ModerationAccountRow'
 import ModerationContentRow from '../components/ModerationContentRow'
 import ProductReviewPanel from '../components/ProductReviewPanel'
@@ -12,7 +12,7 @@ export default function ModerationScreen({
   account,
   notify,
   openCreator,
-}: OperatorProps & Pick<PageProps, 'openCreator'>) {
+}: OperatorPropsType & Pick<IPageProps, 'openCreator'>) {
   const {
     tab,
     setTab,

@@ -1,20 +1,20 @@
 import { Coins, Gift } from 'lucide-react'
 import { rouletteSegmentColors } from '../../constants/roulette'
 import { useRouletteSpin } from '../../hooks/roulette/useRouletteSpin'
-import type { SpendResult } from '../../types/actionResult'
-import type { Roulette } from '../../types/commerce'
+import type { SpendResultType } from '../../types/actionResult'
+import type { IRoulette } from '../../types/commerce'
 import { formatNumber } from '../../utils/format/format'
 import Badge from '../ui/display/Badge'
 import Button from '../ui/actions/Button'
 import Modal from '../ui/dialogs/Modal'
 import RouletteWheel from './RouletteWheel'
 
-interface RouletteWheelProps {
-  roulette: Roulette
+interface IRouletteWheelProps {
+  roulette: IRoulette
   onClose: () => void
   balance?: number
   mode?: 'customer' | 'preview' | 'review'
-  onPlay?: (guaranteed: boolean) => SpendResult
+  onPlay?: (guaranteed: boolean) => SpendResultType
 }
 
 export default function RouletteWheelDialog({
@@ -23,7 +23,7 @@ export default function RouletteWheelDialog({
   balance = 0,
   mode = 'customer',
   onPlay,
-}: RouletteWheelProps) {
+}: IRouletteWheelProps) {
   const { rewards, cost, topPrizeCost } = roulette
   const {
     disc,

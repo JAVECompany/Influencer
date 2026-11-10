@@ -1,18 +1,18 @@
 import Avatar from '../../../../shared/components/ui/media/Avatar'
 import Badge from '../../../../shared/components/ui/display/Badge'
 import Button from '../../../../shared/components/ui/actions/Button'
-import type { Account } from '../../../../shared/types/account'
+import type { IAccount } from '../../../../shared/types/account'
 import { formatKrw, formatNumber } from '../../../../shared/utils/format/format'
-import type { SettlementRow } from '../types/settlementReport'
+import type { SettlementRowType } from '../types/settlementReport'
 
 export default function SettlementCreatorRow({
   row,
   account,
   onEdit,
 }: {
-  row: SettlementRow
-  account?: Account
-  onEdit: (row: SettlementRow) => void
+  row: SettlementRowType
+  account?: IAccount
+  onEdit: (row: SettlementRowType) => void
 }) {
   return (
     <tr className="border-t border-line hover:bg-foreground/3 [&>td]:px-3 [&>td]:py-2.5">

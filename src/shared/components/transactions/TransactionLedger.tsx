@@ -2,7 +2,7 @@ import { ReceiptText } from 'lucide-react'
 import { useAccountStore } from '../../store/account/account'
 import { useCreatorStore } from '../../store/creator/creator'
 import { panel } from '../../styles/controlStyles'
-import type { Transaction, TransactionType } from '../../types/commerce'
+import type { ITransaction, TransactionType } from '../../types/commerce'
 import { formatKrw, formatNumber, formatRelativeTime } from '../../utils/format/format'
 
 const txnNames: Record<TransactionType, string> = {
@@ -26,12 +26,12 @@ export default function TransactionLedger({
   absoluteDates = false,
 }: {
   title?: string
-  items: Transaction[]
+  items: ITransaction[]
   showParties?: boolean
   absoluteDates?: boolean
 }) {
-  const accounts = useAccountStore((state) => state.accounts)
-  const creators = useCreatorStore((state) => state.creators)
+  const accounts = useAccountStore((s) => s.accounts)
+  const creators = useCreatorStore((s) => s.creators)
   return (
     <section className={`${panel} overflow-hidden`}>
       <h2 className="flex items-center gap-2 px-5 py-4 font-black">

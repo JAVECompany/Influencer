@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import type { SpendResult } from '../../types/actionResult'
-import type { Roulette } from '../../types/commerce'
-import { drawRewardIndex, stopRotation, wheelSegments } from '../../utils/roulette/roulette'
+import type { SpendResultType } from '../../types/actionResult'
+import type { IRoulette } from '../../types/commerce'
+import { drawRewardIndex, stopRotation, calculateWheelSegments } from '../../utils/roulette/roulette'
 
-type WheelResult = { reward: string; guaranteed: boolean }
+type WheelResultType = { reward: string; guaranteed: boolean }
 
 export function useRouletteSpin(
-  roulette: Roulette,
+  roulette: IRoulette,
   mode: 'customer' | 'preview' | 'review',
-  onPlay?: (guaranteed: boolean) => SpendResult
+  onPlay?: (guaranteed: boolean) => SpendResultType
 ) {
   const disc = useRef<HTMLDivElement>(null)
   const rotation = useRef(0)
@@ -16,10 +16,10 @@ export function useRouletteSpin(
   const busy = useRef(false)
   const [spinning, setSpinning] = useState(false)
   const [confirm, setConfirm] = useState(false)
-  const [result, setResult] = useState<WheelResult | null>(null)
+  const [result, setResult] = useState<WheelResultType | null>(null)
   const [error, setError] = useState('')
   const { rewards } = roulette
-  const segments = wheelSegments(rewards)
+  const segments = calculateWheelSegments(rewards)
   const preview = mode === 'preview'
   const review = mode === 'review'
 
@@ -39,7 +39,7 @@ export function useRouletteSpin(
 
     setResult(null)
     const sample = guaranteed ? 0 : preview ? drawRewardIndex(rewards) : 0
-    const draw: SpendResult | undefined = preview
+    const draw: SpendResultType | undefined = preview
       ? { success: true, rewardIndex: sample, reward: rewards[sample].name }
       : onPlay?.(guaranteed)
     if (!draw) {
@@ -58,16 +58,19 @@ export function useRouletteSpin(
     const segment = segments[draw.rewardIndex]
     const from = rotation.current
     const to = guaranteed ? stopRotation(from, segment, 0.5) : stopRotation(from, segment)
-    const transform = (angle: number) => 'rotate(' + angle + 'deg)'
+    const getWheelTransform = (angle: number) => 'rotate(' + angle + 'deg)'
     let animation: Animation | null = null
     if (!guaranteed && !matchMedia('(prefers-reduced-motion: reduce)').matches && wheel.animate) {
       busy.current = true
       setSpinning(true)
-      animation = wheel.animate([{ transform: transform(from) }, { transform: transform(to) }], {
-        duration: 4600,
-        easing: 'cubic-bezier(0.18, 0.62, 0.34, 1)',
-        fill: 'forwards',
-      })
+      animation = wheel.animate(
+        [{ transform: getWheelTransform(from) }, { transform: getWheelTransform(to) }],
+        {
+          duration: 4600,
+          easing: 'cubic-bezier(0.18, 0.62, 0.34, 1)',
+          fill: 'forwards',
+        }
+      )
       motion.current = animation
       try {
         await animation.finished
@@ -77,7 +80,7 @@ export function useRouletteSpin(
         }
       }
     }
-    wheel.style.transform = transform(to)
+    wheel.style.transform = getWheelTransform(to)
     rotation.current = to
     if (animation) {
       motion.current = null

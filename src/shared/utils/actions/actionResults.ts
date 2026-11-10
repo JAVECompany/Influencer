@@ -1,5 +1,5 @@
-import type { Failure, Success } from '../../types/actionResult'
+import type { FailureType, SuccessType } from '../../types/actionResult'
 
-export const fail = (error: string): Failure => ({ error })
+export const fail = (error: string): FailureType => ({ error })
 
-export const ok: Success = { success: true }
+export const ok: SuccessType = { success: true }

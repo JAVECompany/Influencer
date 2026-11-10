@@ -3,8 +3,8 @@ import Button from '../../../shared/components/ui/actions/Button'
 import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import Modal from '../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../shared/styles/controlStyles'
-import type { Notify } from '../../../shared/types/actionResult'
-import type { ProductFulfillment, ProductSubmission } from '../../../shared/types/commerce'
+import type { NotifyType } from '../../../shared/types/actionResult'
+import type { ProductFulfillmentType, IProductSubmission } from '../../../shared/types/commerce'
 import { readFormValue } from '../../../shared/utils/forms/formData'
 import { readMediaFile } from '../../../shared/utils/media/readMediaFile'
 
@@ -13,11 +13,11 @@ export default function CreateProductDialog({
   notify,
   onClose,
 }: {
-  onCreate: (submission: ProductSubmission) => void
-  notify: Notify
+  onCreate: (submission: IProductSubmission) => void
+  notify: NotifyType
   onClose: () => void
 }) {
-  const [fulfillment, setFulfillment] = useState<ProductFulfillment>('digital')
+  const [fulfillment, setFulfillment] = useState<ProductFulfillmentType>('digital')
   const [submitting, setSubmitting] = useState(false)
   const physical = fulfillment === 'shipping'
 

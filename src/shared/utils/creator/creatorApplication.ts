@@ -1,10 +1,10 @@
-import type { Account, ApplicationInput, Creator } from '../../types/account'
-import type { Failure } from '../../types/actionResult'
-import type { AppData } from '../../types/demoState'
+import type { IAccount, IApplicationInput, ICreator } from '../../types/account'
+import type { FailureType } from '../../types/actionResult'
+import type { IAppData } from '../../types/demoState'
 import { isNameTaken } from '../account/accountName'
 import { fail } from '../actions/actionResults'
 
-const validInstagram = (value: string) => {
+const isValidInstagramUrl = (value: string) => {
   try {
     const url = new URL(value)
     return (
@@ -21,11 +21,11 @@ const validInstagram = (value: string) => {
 }
 
 export function prepareApplication(
-  state: AppData,
-  account: Account,
-  { method, instagram, name, handle, email, bio }: ApplicationInput
-): Creator | Failure {
-  if (method === 'link' && !validInstagram(instagram)) {
+  state: IAppData,
+  account: IAccount,
+  { method, instagram, name, handle, email, bio }: IApplicationInput
+): ICreator | FailureType {
+  if (method === 'link' && !isValidInstagramUrl(instagram)) {
     return fail('https://www.instagram.com/사용자이름 형식으로 입력해 주세요.')
   }
 

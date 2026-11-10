@@ -2,7 +2,7 @@ import type { FormEventHandler } from 'react'
 import Button from '../../../shared/components/ui/actions/Button'
 import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import { field, panel } from '../../../shared/styles/controlStyles'
-import type { ApplicationMethod, Creator } from '../../../shared/types/account'
+import type { ApplicationMethodType, ICreator } from '../../../shared/types/account'
 
 export default function CreatorApplicationForm({
   creator,
@@ -11,10 +11,10 @@ export default function CreatorApplicationForm({
   onMethodChange,
   onSubmit,
 }: {
-  creator?: Creator
+  creator?: ICreator
   accountName: string
-  method: ApplicationMethod
-  onMethodChange: (method: ApplicationMethod) => void
+  method: ApplicationMethodType
+  onMethodChange: (method: ApplicationMethodType) => void
   onSubmit: FormEventHandler<HTMLFormElement>
 }) {
   return (

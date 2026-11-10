@@ -1,27 +1,27 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import type { ActionResult } from '../../types/actionResult'
-import type { Reward } from '../../types/commerce'
-import type { SessionData } from '../../types/demoState'
+import type { ActionResultType } from '../../types/actionResult'
+import type { IReward } from '../../types/commerce'
+import type { ISessionData } from '../../types/demoState'
 import { fail, ok } from '../../utils/actions/actionResults'
 import { getApprovedCreatorAccount } from '../../utils/creator/creatorAccess'
 import { prepareRoulette } from '../../utils/roulette/configuration'
 import { getDemoState, registerDemoStore } from '../persistence/demo'
 import { writeEntry } from '../utils'
 
-export interface RouletteField {
-  roulettes: SessionData['roulettes']
+export interface IRouletteField {
+  roulettes: ISessionData['roulettes']
 }
 
-interface RouletteState extends RouletteField {
-  saveRoulette: (cost: number, rewards: Reward[], topPrizeCost?: number | null) => ActionResult
+interface IRouletteState extends IRouletteField {
+  saveRoulette: (cost: number, rewards: IReward[], topPrizeCost?: number | null) => ActionResultType
 }
 
-const initialState: RouletteField = {
+const initialState: IRouletteField = {
   roulettes: getDemoState().roulettes,
 }
 
-export const useRouletteStore = create<RouletteState>()(
+export const useRouletteStore = create<IRouletteState>()(
   immer((set) => ({
     ...initialState,
 

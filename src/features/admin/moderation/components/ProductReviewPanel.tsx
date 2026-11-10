@@ -4,8 +4,8 @@ import Button from '../../../../shared/components/ui/actions/Button'
 import Modal from '../../../../shared/components/ui/dialogs/Modal'
 import { productReviewLabels } from '../../../../shared/constants/productReviewStatus'
 import { panel } from '../../../../shared/styles/controlStyles'
-import type { Creator } from '../../../../shared/types/account'
-import type { Product, ProductReviewStatus } from '../../../../shared/types/commerce'
+import type { ICreator } from '../../../../shared/types/account'
+import type { IProduct, ProductReviewStatusType } from '../../../../shared/types/commerce'
 import { formatNumber } from '../../../../shared/utils/format/format'
 
 export default function ProductReviewPanel({
@@ -15,11 +15,11 @@ export default function ProductReviewPanel({
   onPreview,
   onDecision,
 }: {
-  products: Product[]
-  creators: Record<string, Creator>
-  preview?: Product
+  products: IProduct[]
+  creators: Record<string, ICreator>
+  preview?: IProduct
   onPreview: (id: string | null) => void
-  onDecision: (product: Product, decision: Exclude<ProductReviewStatus, 'pending'>) => void
+  onDecision: (product: IProduct, decision: Exclude<ProductReviewStatusType, 'pending'>) => void
 }) {
   return (
     <section className={`${panel} grid gap-2 p-5`}>

@@ -7,7 +7,7 @@ import ConfirmActionDialog from '../../../shared/components/ui/dialogs/ConfirmAc
 import PageTitle from '../../../shared/components/ui/layout/PageTitle'
 import { roles } from '../../../shared/constants/roles'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { PageProps } from '../../../shared/types/navigation'
+import type { IPageProps } from '../../../shared/types/navigation'
 import ChangePasswordDialog from '../components/ChangePasswordDialog'
 import EditProfileDialog from '../components/EditProfileDialog'
 import PaymentSettingsDialog from '../components/PaymentSettingsDialog'
@@ -19,7 +19,7 @@ export default function ProfileScreen({
   account,
   notify,
   openCreator,
-}: Pick<PageProps, 'account' | 'notify' | 'openCreator'>) {
+}: Pick<IPageProps, 'account' | 'notify' | 'openCreator'>) {
   const {
     accounts,
     creator,

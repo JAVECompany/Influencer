@@ -1,6 +1,6 @@
 import { CalendarDays, Coins, Wallet } from 'lucide-react'
 import { formatKrw } from '../../../../shared/utils/format/format'
-import type { SettlementReport } from '../types/settlementReport'
+import type { SettlementReportType } from '../types/settlementReport'
 import SettlementTotalCard from './SettlementTotalCard'
 
 export default function SettlementSummary({
@@ -8,7 +8,7 @@ export default function SettlementSummary({
   total,
 }: {
   month: string
-  total: SettlementReport['total']
+  total: SettlementReportType['total']
 }) {
   return (
     <section className="mb-7" aria-labelledby="month-settlement">

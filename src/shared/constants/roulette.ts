@@ -1,6 +1,6 @@
-import type { Reward } from '../types/commerce'
+import type { IReward } from '../types/commerce'
 
-export const defaultRouletteRewards: Reward[] = [
+export const defaultRouletteRewards: IReward[] = [
   { name: '식사 데이트권', chance: 6 },
   { name: '영상 통화권', chance: 12 },
   { name: '원하는 포즈 사진', chance: 18 },

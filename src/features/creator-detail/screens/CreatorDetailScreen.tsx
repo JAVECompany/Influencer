@@ -7,7 +7,7 @@ import RouletteWheelDialog from '../../../shared/components/roulette/RouletteWhe
 import BackButton from '../../../shared/components/ui/actions/BackButton'
 import EmptyState from '../../../shared/components/ui/feedback/EmptyState'
 import Modal from '../../../shared/components/ui/dialogs/Modal'
-import type { FeedProps } from '../../../shared/types/feed'
+import type { FeedPropsType } from '../../../shared/types/feed'
 import CreatorOfferDialog from '../components/CreatorOfferDialog'
 import CreatorProfileHeader from '../components/CreatorProfileHeader'
 import CreatorShop from '../components/CreatorShop'
@@ -20,7 +20,7 @@ export default function CreatorDetailScreen({
   openCreator,
   openChat,
   notify,
-}: FeedProps & { id: string; back: () => void }) {
+}: FeedPropsType & { id: string; back: () => void }) {
   const detail = useCreatorDetail(id, account, notify)
   if (!detail) {
     return (

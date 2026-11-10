@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useWalletStore } from '../../../shared/store/wallet/wallet'
 
 export function useCreatorEarnings(creatorId: string) {
-  const transactions = useWalletStore((state) => state.transactions)
+  const transactions = useWalletStore((s) => s.transactions)
   const items = transactions.filter((t) => t.owner === creatorId)
   const month = new Intl.DateTimeFormat('sv-SE', {
     year: 'numeric',

@@ -3,8 +3,8 @@ import { isThemePreference, themeLabels } from '../../../shared/constants/theme/
 import { useThemeStore } from '../../../shared/store/theme/theme'
 
 export default function ThemeSetting() {
-  const theme = useThemeStore((state) => state.theme)
-  const setTheme = useThemeStore((state) => state.setTheme)
+  const theme = useThemeStore((s) => s.theme)
+  const setTheme = useThemeStore((s) => s.setTheme)
 
   return (
     <label className="flex min-w-0 items-center justify-between gap-3 px-5 py-3">

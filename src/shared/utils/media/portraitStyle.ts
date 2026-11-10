@@ -12,7 +12,7 @@ const atlases = [
   { path: '/portraits/men.jpg', width: 1374, height: 1145, columns: 6, centers: [114, 352, 587, 805, 1030] },
 ]
 
-export function portraitStyle(index?: number): CSSProperties | undefined {
+export function getPortraitStyle(index?: number): CSSProperties | undefined {
   if (index === undefined || !Number.isInteger(index) || index < 0 || index >= 100) {
     return undefined
   }

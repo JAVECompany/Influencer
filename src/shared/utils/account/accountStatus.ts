@@ -1,4 +1,4 @@
-import type { SessionData } from '../../types/demoState'
+import type { ISessionData } from '../../types/demoState'
 
-export const isAccountDisabled = (state: Pick<SessionData, 'accounts' | 'creators'>, id: string) =>
+export const isAccountDisabled = (state: Pick<ISessionData, 'accounts' | 'creators'>, id: string) =>
   state.accounts[id]?.disabled ?? state.creators[id]?.disabled ?? false

@@ -22,16 +22,18 @@
 
 - 공통 스토어와 페이지 전용 스토어 모두 `store/<도메인>/` 아래에 배치한다. 파일은 `auth/auth.ts`, `wallet/wallet.ts`처럼 저장할 상태의 이름으로 짓는다. 내보내는 스토어 훅에는 `useThemeStore`처럼 역할이 드러나는 이름을 사용한다.
 - `store/`는 상태, 상태 조회와 갱신, 스토어 전용 타입, 영속화 설정과 마이그레이션을 맡는다. 입력 검증, 권한·구매 가능 여부 판정, 배송지 정리, 룰렛 추첨, 레코드 생성은 사용 범위에 맞는 `utils/`에 둔다. UI 이벤트와 화면 흐름은 컴포넌트 또는 훅에서 처리한다.
-- 도메인 파일에 데이터 필드만 담은 `AuthField`, 이를 확장해 액션을 선언하는 `AuthState`, `AuthField` 타입의 `initialState`, 독립된 `useAuthStore`를 순서대로 정의한다. `create<AuthState>()(immer(...))`에서 `...initialState`를 먼저 펼치고 같은 깊이에 액션을 선언한다.
-- 서버 데이터를 조회하는 액션은 `fetch`로 시작한다. 스토어 내부에서는 React 훅 호출 없이 상태 조회와 갱신을 수행한다. 단일 필드나 중첩 필드를 바꿀 때는 `store/zustandTypes.ts`의 `createSetDataImmer` 계열을 우선 사용한다. `get()`으로 읽은 상태는 조회에만 사용한다.
+- 도메인 파일에 데이터 필드만 담은 `IAccountField`, 이를 확장해 액션을 선언하는 `IAccountState`, `IAccountField` 타입의 `initialState`, 독립된 `useAccountStore`를 순서대로 정의한다. Immer 초기화 함수는 `immer((set) => ({ ...initialState, ... }))` 형태로 객체를 바로 반환한다. 초기값을 먼저 펼치고 같은 깊이에 액션을 선언한다.
+- 액션 이름은 `updateProfile`, `toggleAccount`, `setData`처럼 동작을 드러내는 동사로 시작한다. 서버 데이터를 조회하는 액션은 `fetch`로 시작한다. 스토어 내부에서는 React 훅 호출 없이 상태 조회와 갱신을 수행한다. 단일 필드나 중첩 필드를 바꿀 때는 `store/zustandTypes.ts`의 `createSetDataImmer` 계열을 우선 사용한다. 범용 `setData`를 제공할 때는 필드 인터페이스로 쓸 수 있는 키를 제한한다. `get()`으로 읽은 상태는 조회에만 사용한다.
 - 한 도메인의 관련 필드를 함께 바꿀 때는 한 번의 `set((draft) => { … })`으로 갱신한다. 여러 도메인이 함께 바뀌는 데모 액션은 `store/persistence/demo.ts`의 `updateDemoState`에서 변경을 함께 준비하고, 각 스토어에 반영한 뒤 한 번 저장한다.
-- 컴포넌트와 훅은 해당 도메인 스토어에 항상 selector를 전달한다. 상태 하나나 액션 하나는 개별 selector로 고른다. 같은 스토어에서 둘 이상 고를 때는 상태끼리, 액션끼리 각각 `useShallow`로 묶는다. 상태와 액션을 한 `useShallow` 객체에 섞거나 `useStore()`로 전체 스토어를 구독하지 않는다.
+- 컴포넌트와 훅은 해당 도메인 스토어에 항상 selector를 전달한다. 하나의 필드는 `useAccountStore((s) => s.accounts)`, 하나의 액션은 `useAccountStore((s) => s.setData)`처럼 고른다. 같은 스토어에서 필드가 둘 이상이면 필드끼리, 액션이 둘 이상이면 액션끼리 각각 `useShallow`로 묶는다. 상태와 액션을 한 객체에 섞거나 `useStore()`로 전체 스토어를 구독하지 않는다.
 - `getState()`는 이벤트 콜백처럼 렌더링과 무관한 코드에서 최신값을 읽을 때만 사용한다. 화면에 반영할 값은 selector로 구독한다.
 - 브라우저 데모 데이터는 액션을 제외한 필드만 `bamgyeol-demo-v1`에 저장한다. 저장 코드와 마이그레이션은 `store/persistence/`에 둔다. 저장 구조를 바꾸는 작업에서는 버전과 마이그레이션을 검토한다.
 - 브라우저 테마 설정은 `shared/store/theme/theme.ts`에서 별도 저장한다. 기본값은 시스템 설정이며 사용자가 선택한 설정은 모든 역할에서 공유한다. 새 테마를 추가하면 선택 목록과 최초 화면에 적용하는 초기화 코드를 함께 갱신한다.
 
-## 코드 포맷
+## 이름과 코드 포맷
 
+- 프로젝트에서 선언하는 모든 인터페이스는 `IAccountField`처럼 `I`로 시작한다. 타입 별칭은 `ActionResultType`처럼 `Type`으로 끝난다. 외부에서 가져오는 타입과 제네릭 타입 매개변수는 각자의 이름을 사용한다.
+- 일반 함수와 함수 값을 담는 변수에는 `getActiveAccount`, `calculateWheelSegments`, `isProductForSale`처럼 동작이나 판정을 드러내는 이름을 사용한다. React 컴포넌트에는 PascalCase, 훅에는 `use` 접두어를 적용한다.
 - 코드를 추가하거나 수정할 때 저장소 루트의 [Prettier 설정](../.prettierrc.json)을 항상 적용한다. 수정 범위에 해당하는 파일에 포맷을 적용한다.
 - 들여쓰기는 공백 2칸을 사용한다. TypeScript 문자열은 작은따옴표, JSX 속성 문자열은 큰따옴표를 사용한다. 문장 끝의 세미콜론은 생략하고 파일 끝에 줄바꿈을 둔다.
 - 긴 JSX 속성 목록, 여러 줄 렌더링, 긴 구조 분해는 줄을 나눠 읽기 쉽게 배치한다. import는 외부 라이브러리와 로컬 모듈 순으로 배치하고 타입 전용 import에는 `import type`을 사용한다.

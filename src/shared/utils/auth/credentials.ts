@@ -1,12 +1,16 @@
-import type { Account, SignUpInput } from '../../types/account'
-import type { Failure } from '../../types/actionResult'
-import type { AppData } from '../../types/demoState'
+import type { IAccount, ISignUpInput } from '../../types/account'
+import type { FailureType } from '../../types/actionResult'
+import type { IAppData } from '../../types/demoState'
 import { isNameTaken } from '../account/accountName'
 import { fail } from '../actions/actionResults'
 
 export const isPasswordLengthValid = (password: string) => password.length >= 6 && password.length <= 72
 
-export function authenticate(accounts: AppData['accounts'], id: string, password: string): Account | Failure {
+export function authenticate(
+  accounts: IAppData['accounts'],
+  id: string,
+  password: string
+): IAccount | FailureType {
   const account = accounts[id.trim().toLowerCase()]
   if (!account || account.password !== password) {
     return fail('아이디와 비밀번호를 확인해 주세요.')
@@ -19,9 +23,9 @@ export function authenticate(accounts: AppData['accounts'], id: string, password
 }
 
 export function prepareSignUp(
-  state: AppData,
-  { id, password, name, terms, adult, role }: SignUpInput
-): Account | Failure {
+  state: IAppData,
+  { id, password, name, terms, adult, role }: ISignUpInput
+): IAccount | FailureType {
   const key = id.trim().toLowerCase()
   const nickname = name.trim()
   if (!terms || !adult) {

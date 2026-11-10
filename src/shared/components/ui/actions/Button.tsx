@@ -7,7 +7,7 @@ const buttonStyles = {
   danger: 'border border-danger/40 text-danger hover:bg-danger/10',
 }
 
-type ButtonProps = ComponentPropsWithoutRef<'button'> & { tone?: keyof typeof buttonStyles }
+type ButtonPropsType = ComponentPropsWithoutRef<'button'> & { tone?: keyof typeof buttonStyles }
 
 export default function Button({
   children,
@@ -15,7 +15,7 @@ export default function Button({
   className = '',
   type = 'button',
   ...props
-}: ButtonProps) {
+}: ButtonPropsType) {
   return (
     <button
       type={type}

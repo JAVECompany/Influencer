@@ -1,7 +1,7 @@
 import { CheckCircle2, CircleAlert } from 'lucide-react'
-import type { FeedbackMessage } from '../../../contexts/feedbackContext'
+import type { FeedbackMessageType } from '../../../contexts/feedbackContext'
 
-export default function FeedbackToast({ feedback }: { feedback: FeedbackMessage }) {
+export default function FeedbackToast({ feedback }: { feedback: FeedbackMessageType }) {
   const Icon = feedback.error ? CircleAlert : CheckCircle2
   return (
     <div

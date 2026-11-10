@@ -1,7 +1,7 @@
 import { field, panel } from '../../../../shared/styles/controlStyles'
-import type { Account } from '../../../../shared/types/account'
+import type { IAccount } from '../../../../shared/types/account'
 import { formatKrw, formatNumber } from '../../../../shared/utils/format/format'
-import type { SettlementReport, SettlementRow } from '../types/settlementReport'
+import type { SettlementReportType, SettlementRowType } from '../types/settlementReport'
 import SettlementCreatorRow from './SettlementCreatorRow'
 
 export default function SettlementCreatorTable({
@@ -12,12 +12,12 @@ export default function SettlementCreatorTable({
   onQueryChange,
   onEdit,
 }: {
-  rows: SettlementRow[]
-  total: SettlementReport['total']
-  accounts: Record<string, Account>
+  rows: SettlementRowType[]
+  total: SettlementReportType['total']
+  accounts: Record<string, IAccount>
   query: string
   onQueryChange: (query: string) => void
-  onEdit: (row: SettlementRow) => void
+  onEdit: (row: SettlementRowType) => void
 }) {
   return (
     <section className={`${panel} mb-5 overflow-hidden`}>

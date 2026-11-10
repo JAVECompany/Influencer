@@ -1,13 +1,13 @@
-import type { Content } from '../../types/content'
-import type { SessionData } from '../../types/demoState'
-import { actor } from '../auth/session'
+import type { IContent } from '../../types/content'
+import type { ISessionData } from '../../types/demoState'
+import { getActiveAccount } from '../auth/session'
 import { hasSubscription } from '../subscription/subscriptionAccess'
 
 export const canRead = (
-  state: Pick<SessionData, 'accounts' | 'creators' | 'session' | 'subscriptions'>,
-  post: Content | undefined
+  state: Pick<ISessionData, 'accounts' | 'creators' | 'session' | 'subscriptions'>,
+  post: IContent | undefined
 ) => {
-  const a = actor(state)
+  const a = getActiveAccount(state)
   if (!a || !post) {
     return false
   }
@@ -18,16 +18,16 @@ export const canRead = (
   return !post.hidden && a.role === 'customer' && hasSubscription(state, a.id, post.owner)
 }
 
-export const isStoryAvailable = (post: Content) => post.kind !== 'story' || Date.now() - post.at < 86_400_000
+export const isStoryAvailable = (post: IContent) => post.kind !== 'story' || Date.now() - post.at < 86_400_000
 
-export const tracksAudience = (post: Content | undefined): post is Content & { kind: 'story' | 'live' } =>
+export const tracksAudience = (post: IContent | undefined): post is IContent & { kind: 'story' | 'live' } =>
   post?.kind === 'story' || post?.kind === 'live'
 
-export function audienceForCreator(
-  state: Pick<SessionData, 'accounts' | 'session'>,
-  post: Content | undefined
+export function getCreatorAudience(
+  state: Pick<ISessionData, 'accounts' | 'session'>,
+  post: IContent | undefined
 ) {
-  const account = actor(state)
+  const account = getActiveAccount(state)
   if (account?.role !== 'influencer' || !tracksAudience(post) || post.owner !== account.id) {
     return []
   }

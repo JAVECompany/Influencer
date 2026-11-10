@@ -1,30 +1,30 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   hasSubscription,
-  subscriptionsForCustomer,
+  getCustomerSubscriptions,
 } from '../../../shared/utils/subscription/subscriptionAccess'
 import { useAccountStore } from '../../../shared/store/account/account'
 import { useChatStore } from '../../../shared/store/chat/chat'
 import { useCreatorStore } from '../../../shared/store/creator/creator'
 import { useSubscriptionStore } from '../../../shared/store/subscription/subscription'
-import type { PageProps } from '../../../shared/types/navigation'
+import type { IPageProps } from '../../../shared/types/navigation'
 
-export function useChat({ account, initial, notify }: Pick<PageProps, 'account' | 'initial' | 'notify'>) {
-  const accounts = useAccountStore((state) => state.accounts)
-  const creators = useCreatorStore((state) => state.creators)
-  const subscriptions = useSubscriptionStore((state) => state.subscriptions)
-  const allMessages = useChatStore((state) => state.messages)
+export function useChat({ account, initial, notify }: Pick<IPageProps, 'account' | 'initial' | 'notify'>) {
+  const accounts = useAccountStore((s) => s.accounts)
+  const creators = useCreatorStore((s) => s.creators)
+  const subscriptions = useSubscriptionStore((s) => s.subscriptions)
+  const allMessages = useChatStore((s) => s.messages)
   const state = { accounts, creators, subscriptions }
-  const sendChatMessage = useChatStore((state) => state.sendMessage)
+  const sendChatMessage = useChatStore((s) => s.sendMessage)
   const [selected, setSelected] = useState(initial ?? null)
   const [text, setText] = useState('')
   const customerView = account.role === 'customer'
   const ids = customerView
-    ? subscriptionsForCustomer(state, account.id).filter((id) => hasSubscription(state, account.id, id))
+    ? getCustomerSubscriptions(state, account.id).filter((id) => hasSubscription(state, account.id, id))
     : account.role === 'influencer'
     ? Object.keys(state.subscriptions).filter((id) => hasSubscription(state, id, account.id))
     : []
-  const other = (id: string) => (customerView ? state.creators[id] : state.accounts[id])
+  const getChatPartner = (id: string) => (customerView ? state.creators[id] : state.accounts[id])
   const thread = selected && ids.includes(selected) ? selected : null
   const messages = thread
     ? allMessages.filter((m) =>
@@ -61,7 +61,7 @@ export function useChat({ account, initial, notify }: Pick<PageProps, 'account' 
     accounts: state.accounts,
     customerView,
     ids,
-    other,
+    getChatPartner,
     thread,
     messages,
     log,

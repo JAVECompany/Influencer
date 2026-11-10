@@ -1,8 +1,8 @@
-import type { Product, Transaction } from '../../types/commerce'
+import type { IProduct, ITransaction } from '../../types/commerce'
 
-export const isPhysicalProduct = (product: Product) => product.fulfillment === 'shipping'
+export const isPhysicalProduct = (product: IProduct) => product.fulfillment === 'shipping'
 
-export function isProductForSale(product: Product, transactions: Transaction[]) {
+export function isProductForSale(product: IProduct, transactions: ITransaction[]) {
   return (
     !product.archived &&
     product.reviewStatus === 'approved' &&

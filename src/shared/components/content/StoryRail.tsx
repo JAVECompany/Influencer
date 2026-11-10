@@ -1,8 +1,8 @@
 import { Radio } from 'lucide-react'
 import { contentKindLabels } from '../../constants/contentKinds'
 import { panel } from '../../styles/controlStyles'
-import type { Account, Creator } from '../../types/account'
-import type { Content } from '../../types/content'
+import type { IAccount, ICreator } from '../../types/account'
+import type { IContent } from '../../types/content'
 import Avatar from '../ui/media/Avatar'
 
 export default function StoryRail({
@@ -11,10 +11,10 @@ export default function StoryRail({
   creators,
   accounts,
 }: {
-  stories: Content[]
+  stories: IContent[]
   onOpen: (id: string) => void
-  creators: Record<string, Creator>
-  accounts: Record<string, Account>
+  creators: Record<string, ICreator>
+  accounts: Record<string, IAccount>
 }) {
   return (
     <section className="mb-7" aria-labelledby="stories-heading">

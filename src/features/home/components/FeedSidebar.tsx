@@ -2,8 +2,8 @@ import { ArrowRight, ShieldCheck, Sparkles } from 'lucide-react'
 import Avatar from '../../../shared/components/ui/media/Avatar'
 import Button from '../../../shared/components/ui/actions/Button'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { Account, Creator } from '../../../shared/types/account'
-import type { PageProps } from '../../../shared/types/navigation'
+import type { IAccount, ICreator } from '../../../shared/types/account'
+import type { IPageProps } from '../../../shared/types/navigation'
 
 export default function FeedSidebar({
   staff,
@@ -11,10 +11,10 @@ export default function FeedSidebar({
   accounts,
   openCreator,
   go,
-}: Pick<PageProps, 'openCreator' | 'go'> & {
+}: Pick<IPageProps, 'openCreator' | 'go'> & {
   staff: boolean
-  spotlight: Creator[]
-  accounts: Record<string, Account>
+  spotlight: ICreator[]
+  accounts: Record<string, IAccount>
 }) {
   return (
     <aside className="hidden gap-4 xl:grid">

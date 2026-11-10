@@ -3,15 +3,15 @@ import Button from '../../../shared/components/ui/actions/Button'
 import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import Modal from '../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../shared/styles/controlStyles'
-import type { Account, ProfileChanges } from '../../../shared/types/account'
+import type { IAccount, ProfileChangesType } from '../../../shared/types/account'
 
 export default function PaymentSettingsDialog({
   account,
   save,
   onClose,
 }: {
-  account: Account
-  save: (changes: ProfileChanges, message: string) => void
+  account: IAccount
+  save: (changes: ProfileChangesType, message: string) => void
   onClose: () => void
 }) {
   const [payment, setPayment] = useState(account.payment)

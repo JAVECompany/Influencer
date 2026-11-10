@@ -9,7 +9,7 @@ export const themeLabels = {
   mocha: '모카',
 } as const
 
-export type ThemePreference = keyof typeof themeLabels
+export type ThemePreferenceType = keyof typeof themeLabels
 
-export const isThemePreference = (value: unknown): value is ThemePreference =>
+export const isThemePreference = (value: unknown): value is ThemePreferenceType =>
   typeof value === 'string' && Object.hasOwn(themeLabels, value)

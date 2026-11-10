@@ -1,7 +1,7 @@
 import TransactionLedger from '../../../../shared/components/transactions/TransactionLedger'
 import Button from '../../../../shared/components/ui/actions/Button'
 import PageTitle from '../../../../shared/components/ui/layout/PageTitle'
-import type { PageProps } from '../../../../shared/types/navigation'
+import type { IPageProps } from '../../../../shared/types/navigation'
 import SettlementConfigForm from '../components/SettlementConfigForm'
 import SettlementCreatorTable from '../components/SettlementCreatorTable'
 import SettlementMonthlyRevenue from '../components/SettlementMonthlyRevenue'
@@ -10,7 +10,7 @@ import SettlementPeriodFilter from '../components/SettlementPeriodFilter'
 import SettlementSummary from '../components/SettlementSummary'
 import { useAdminSettlement } from '../hooks/useAdminSettlement'
 
-export default function AdminSettlementScreen({ notify }: Pick<PageProps, 'notify'>) {
+export default function AdminSettlementScreen({ notify }: Pick<IPageProps, 'notify'>) {
   const settlement = useAdminSettlement(notify)
   if (!settlement) {
     return null

@@ -1,8 +1,8 @@
 import { panel } from '../../../../shared/styles/controlStyles'
 import { formatKrw } from '../../../../shared/utils/format/format'
-import type { SettlementReport } from '../types/settlementReport'
+import type { SettlementReportType } from '../types/settlementReport'
 
-export default function SettlementMonthlyRevenue({ monthly }: { monthly: SettlementReport['monthly'] }) {
+export default function SettlementMonthlyRevenue({ monthly }: { monthly: SettlementReportType['monthly'] }) {
   return (
     <section className={`${panel} mb-5 p-4 sm:p-5`}>
       <h2 className="font-black">월별 구독권 매출</h2>

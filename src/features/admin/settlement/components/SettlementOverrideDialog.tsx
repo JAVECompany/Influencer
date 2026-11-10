@@ -3,7 +3,7 @@ import FieldLabel from '../../../../shared/components/ui/forms/FieldLabel'
 import Modal from '../../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../../shared/styles/controlStyles'
 import { formatNumber } from '../../../../shared/utils/format/format'
-import type { SettlementRow } from '../types/settlementReport'
+import type { SettlementRowType } from '../types/settlementReport'
 
 export default function SettlementOverrideDialog({
   row,
@@ -12,7 +12,7 @@ export default function SettlementOverrideDialog({
   onSave,
   onClose,
 }: {
-  row: SettlementRow
+  row: SettlementRowType
   start: string
   end: string
   onSave: (coins: number | null) => void

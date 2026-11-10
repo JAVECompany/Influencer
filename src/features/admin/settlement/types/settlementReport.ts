@@ -1,4 +1,4 @@
 import type { summarizeSettlement } from '../utils/settlement'
 
-export type SettlementReport = ReturnType<typeof summarizeSettlement>
-export type SettlementRow = SettlementReport['rows'][number]
+export type SettlementReportType = ReturnType<typeof summarizeSettlement>
+export type SettlementRowType = SettlementReportType['rows'][number]

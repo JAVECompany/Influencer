@@ -3,7 +3,7 @@ import Badge from '../../../../shared/components/ui/display/Badge'
 import Button from '../../../../shared/components/ui/actions/Button'
 import { creatorReviewStatus } from '../../../../shared/constants/creatorReviewStatus'
 import { panel } from '../../../../shared/styles/controlStyles'
-import type { Account, Creator } from '../../../../shared/types/account'
+import type { IAccount, ICreator } from '../../../../shared/types/account'
 
 export default function CreatorReviewCard({
   creator,
@@ -11,10 +11,10 @@ export default function CreatorReviewCard({
   onApprove,
   onReject,
 }: {
-  creator: Creator
-  account?: Account
+  creator: ICreator
+  account?: IAccount
   onApprove: (id: string) => void
-  onReject: (creator: Creator) => void
+  onReject: (creator: ICreator) => void
 }) {
   return (
     <article className={`${panel} p-5`}>

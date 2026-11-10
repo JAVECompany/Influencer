@@ -1,7 +1,7 @@
 import { MessageCircle } from 'lucide-react'
 import EmptyState from '../../../shared/components/ui/feedback/EmptyState'
 import PageTitle from '../../../shared/components/ui/layout/PageTitle'
-import type { PageProps } from '../../../shared/types/navigation'
+import type { IPageProps } from '../../../shared/types/navigation'
 import ChatPartnerList from '../components/ChatPartnerList'
 import ChatThread from '../components/ChatThread'
 import { useChat } from '../hooks/useChat'
@@ -10,12 +10,12 @@ export default function ChatScreen({
   account,
   initial,
   notify,
-}: Pick<PageProps, 'account' | 'initial' | 'notify'>) {
+}: Pick<IPageProps, 'account' | 'initial' | 'notify'>) {
   const {
     accounts,
     customerView,
     ids,
-    other,
+    getChatPartner,
     thread,
     messages,
     log,
@@ -42,13 +42,13 @@ export default function ChatScreen({
           <ChatPartnerList
             ids={ids}
             thread={thread}
-            other={other}
+            getChatPartner={getChatPartner}
             accounts={accounts}
             onSelect={selectThread}
           />
           {thread ? (
             <ChatThread
-              name={other(thread)?.name ?? thread}
+              name={getChatPartner(thread)?.name ?? thread}
               accountId={account.id}
               messages={messages}
               log={log}

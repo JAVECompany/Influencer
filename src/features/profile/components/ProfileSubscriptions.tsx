@@ -1,18 +1,18 @@
 import Avatar from '../../../shared/components/ui/media/Avatar'
 import Button from '../../../shared/components/ui/actions/Button'
 import { panel } from '../../../shared/styles/controlStyles'
-import type { Account, Creator } from '../../../shared/types/account'
-import type { PageProps } from '../../../shared/types/navigation'
+import type { IAccount, ICreator } from '../../../shared/types/account'
+import type { IPageProps } from '../../../shared/types/navigation'
 
 export default function ProfileSubscriptions({
   subscriptions,
   accounts,
   openCreator,
   onUnsubscribe,
-}: Pick<PageProps, 'openCreator'> & {
-  subscriptions: Creator[]
-  accounts: Record<string, Account>
-  onUnsubscribe: (creator: Creator) => void
+}: Pick<IPageProps, 'openCreator'> & {
+  subscriptions: ICreator[]
+  accounts: Record<string, IAccount>
+  onUnsubscribe: (creator: ICreator) => void
 }) {
   return (
     <section className={`${panel} mb-5 p-5`}>
