@@ -1,6 +1,6 @@
 import TransactionLedger from '../../../../shared/components/transactions/TransactionLedger'
-import Button from '../../../../shared/components/ui/Button'
-import PageTitle from '../../../../shared/components/ui/PageTitle'
+import Button from '../../../../shared/components/ui/actions/Button'
+import PageTitle from '../../../../shared/components/ui/layout/PageTitle'
 import type { PageProps } from '../../../../shared/types/navigation'
 import SettlementConfigForm from '../components/SettlementConfigForm'
 import SettlementCreatorTable from '../components/SettlementCreatorTable'
@@ -41,11 +41,7 @@ export default function AdminSettlementScreen({ notify }: Pick<PageProps, 'notif
 
   return (
     <>
-      <PageTitle
-        label="SETTLEMENT"
-        title="거래 · 정산"
-        subtitle="고객의 데모 거래를 집계하고 코인 정산 기준을 적용합니다."
-      />
+      <PageTitle title="거래 · 정산" subtitle="고객의 데모 거래를 집계하고 코인 정산 기준을 적용합니다." />
       <SettlementSummary month={month.start.slice(0, 7)} total={current.total} />
 
       <SettlementPeriodFilter

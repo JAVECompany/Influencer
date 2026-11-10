@@ -1,9 +1,9 @@
 import { ClipboardList, Shield, UserRoundCheck } from 'lucide-react'
-import Button from '../../../../shared/components/ui/Button'
-import PageTitle from '../../../../shared/components/ui/PageTitle'
-import StatCard from '../../../../shared/components/ui/StatCard'
-import { isPublic } from '../../../../shared/store/appSelectors'
-import { useAppStore } from '../../../../shared/store/useAppStore'
+import Button from '../../../../shared/components/ui/actions/Button'
+import PageTitle from '../../../../shared/components/ui/layout/PageTitle'
+import StatCard from '../../../../shared/components/ui/display/StatCard'
+import { isPublic } from '../../../../shared/store/creator/creatorSelectors'
+import { useAppStore } from '../../../../shared/store/core/useAppStore'
 import { panel } from '../../../../shared/styles/controlStyles'
 import type { PageProps } from '../../../../shared/types/navigation'
 
@@ -13,11 +13,7 @@ export default function AdminDashboardScreen({ go }: Pick<PageProps, 'go'>) {
   const reported = state.posts.filter((p) => p.reports.length > 0 && !p.hidden).length
   return (
     <>
-      <PageTitle
-        label="OPERATIONS"
-        title="운영 개요"
-        subtitle="심사 요청, 계정, 신고와 거래를 한 곳에서 관리하세요."
-      />
+      <PageTitle title="운영 개요" />
       <div className="grid gap-3 sm:grid-cols-3">
         <StatCard label="검토 대기" value={pending + '건'} icon={ClipboardList} />
         <StatCard
@@ -29,7 +25,7 @@ export default function AdminDashboardScreen({ go }: Pick<PageProps, 'go'>) {
       </div>
       <section className={`${panel} mt-5 p-5`}>
         <h2 className="font-black">오늘의 운영</h2>
-        <p className="mt-2 text-sm text-dim">심사 요청과 고객 신고를 확인하세요.</p>
+        <p className="mt-2 text-sm text-muted">심사 요청과 고객 신고를 확인하세요.</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button onClick={() => go('review')}>심사 요청 보기</Button>
           <Button tone="subtle" onClick={() => go('home')}>

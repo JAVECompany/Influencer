@@ -1,0 +1,37 @@
+@theme inline {
+  --font-sans: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --color-canvas: var(--theme-canvas);
+  --color-surface: var(--theme-surface);
+  --color-raised: var(--theme-raised);
+  --color-shell: var(--theme-shell);
+  --color-line: var(--theme-line);
+  --color-foreground: var(--theme-foreground);
+  --color-muted: var(--theme-muted);
+  --color-accent: var(--theme-accent);
+  --color-accent-hover: var(--theme-accent-hover);
+  --color-on-accent: var(--theme-on-accent);
+  --color-accent-soft: var(--theme-accent-soft);
+  --color-danger: var(--theme-danger);
+  --color-live: var(--theme-live);
+  --color-on-live: var(--theme-on-live);
+  --color-like: var(--theme-like);
+  --color-media: var(--theme-media);
+  --color-on-media: var(--theme-on-media);
+}
+
+:root {
+  --theme-media: #0b1017;
+  --theme-on-media: #f5f8ff;
+  --theme-canvas-image: none;
+  --theme-panel-filter: none;
+  --theme-chrome-filter: blur(12px);
+  --theme-panel-shadow: none;
+  --theme-globe-image: radial-gradient(
+    ellipse at center,
+    var(--theme-accent-soft),
+    var(--theme-raised) 53%,
+    var(--theme-surface) 86%
+  );
+  --theme-banner-image: linear-gradient(110deg, var(--theme-raised), var(--theme-accent-soft));
+  --theme-balance-image: linear-gradient(105deg, var(--theme-accent-soft), transparent 86%);
+}

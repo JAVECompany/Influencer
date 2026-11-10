@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
 import { contentKindLabels } from '../../constants/contentKinds'
-import { canRead, isStoryAvailable, tracksAudience } from '../../store/appSelectors'
-import { useAppStore } from '../../store/useAppStore'
+import { canRead, isStoryAvailable, tracksAudience } from '../../store/content/contentSelectors'
+import { useAppStore } from '../../store/core/useAppStore'
 import type { Account } from '../../types/account'
 import type { Content } from '../../types/content'
-import Badge from '../ui/Badge'
-import Modal from '../ui/Modal'
-import ProtectedContent from '../ui/ProtectedContent'
+import Badge from '../ui/display/Badge'
+import Modal from '../ui/dialogs/Modal'
+import ProtectedContent from '../ui/privacy/ProtectedContent'
 import ContentMedia from './ContentMedia'
 
 export default function ContentPreviewDialog({
@@ -34,12 +34,12 @@ export default function ContentPreviewDialog({
     <Modal title={post.title} onClose={onClose} protectedContent>
       <ProtectedContent className="rounded-xl">
         <ContentMedia post={post} />
-        <div className="bg-night p-4">
+        <div className="bg-canvas p-4">
           <Badge live={post.kind === 'live'}>{contentKindLabels[post.kind]} 미리보기</Badge>
-          <p className="mt-2 text-sm leading-relaxed text-dim">{post.body}</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted">{post.body}</p>
         </div>
       </ProtectedContent>
-      {post.kind === 'live' && <p className="mt-3 text-xs text-dim">라이브 편성 미리보기 · 데모</p>}
+      {post.kind === 'live' && <p className="mt-3 text-xs text-muted">라이브 편성 미리보기 · 데모</p>}
     </Modal>
   )
 }

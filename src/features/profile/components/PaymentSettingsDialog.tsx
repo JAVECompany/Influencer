@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import Button from '../../../shared/components/ui/Button'
-import FieldLabel from '../../../shared/components/ui/FieldLabel'
-import Modal from '../../../shared/components/ui/Modal'
+import Button from '../../../shared/components/ui/actions/Button'
+import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
+import Modal from '../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../shared/styles/controlStyles'
 import type { Account, ProfileChanges } from '../../../shared/types/account'
 
@@ -24,7 +24,7 @@ export default function PaymentSettingsDialog({
           save({ payment }, '수단을 저장했어요.')
         }}
       >
-        <p className="text-sm text-dim">가상의 계좌 또는 결제수단을 선택하세요.</p>
+        <p className="text-sm text-muted">가상의 계좌 또는 결제수단을 선택하세요.</p>
         <FieldLabel title="데모 수단">
           <select className={field} value={payment} onChange={(event) => setPayment(event.target.value)}>
             <option value="">미등록</option>

@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent, PointerEvent } from 'react'
-import type { Angles, Box, ExploreItem } from '../types/creatorDiscovery'
-import { circleSize, globeCards } from '../utils/globeLayout'
+import type { Angles, ExploreItem } from '../types/creatorDiscovery'
+import { globeCards } from '../utils/globeLayout'
 
 const startingAngles = { yaw: 0, pitch: 0 }
 
@@ -26,31 +26,7 @@ export function useCreatorGlobe(items: ExploreItem[], peak: number) {
     return () => observer.disconnect()
   }, [])
 
-  const pinned = items
-    .filter((item) => item.subscribed)
-    .map((item) => ({
-      item,
-      size: circleSize(item.count, peak, width < 560),
-    }))
-  const reserveWidth = Math.min(
-    Math.max(0, width - 32),
-    Math.max(150, 20 + pinned.reduce((total, { size }) => total + Math.max(48, size + 10), 0))
-  )
-  const reserveHeight = 43 + Math.max(24, ...pinned.map(({ size }) => size))
-  const reserved: Box = [
-    width / 2 - reserveWidth / 2 - 6,
-    height / 2 - reserveHeight / 2 - 3,
-    width / 2 + reserveWidth / 2 + 6,
-    height / 2 + reserveHeight / 2 + 3,
-  ]
-  const visible = globeCards(
-    items.filter((item) => !item.subscribed),
-    width,
-    height,
-    angles,
-    reserved,
-    peak
-  )
+  const visible = globeCards(items, width, height, angles, peak)
   const move = (dx: number, dy: number, origin: Angles) => ({
     yaw: (origin.yaw + dx) % (2 * Math.PI),
     pitch: (origin.pitch + dy) % (2 * Math.PI),
@@ -61,8 +37,7 @@ export function useCreatorGlobe(items: ExploreItem[], peak: number) {
   }
 
   const beginDrag = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0 || (event.target instanceof Element && event.target.closest('[data-pinned]')))
-      return
+    if (event.button !== 0) return
     ignoreClick.current = false
     gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY, angles }
   }
@@ -77,7 +52,7 @@ export function useCreatorGlobe(items: ExploreItem[], peak: number) {
       ignoreClick.current = true
       setDragging(true)
     }
-    setAngles(move(dx * angleStep, dy * angleStep, drag.angles))
+    setAngles(move(dx * angleStep, -dy * angleStep, drag.angles))
   }
   const rotateByKey = (event: KeyboardEvent<HTMLDivElement>) => {
     const steps: Partial<Record<string, [number, number]>> = {
@@ -87,7 +62,7 @@ export function useCreatorGlobe(items: ExploreItem[], peak: number) {
       ArrowDown: [0, 0.32],
     }
     const step = steps[event.key]
-    if (!step || (event.target instanceof Element && event.target.closest('[data-pinned]'))) return
+    if (!step) return
     event.preventDefault()
     setAngles((old) => move(...step, old))
   }
@@ -101,8 +76,6 @@ export function useCreatorGlobe(items: ExploreItem[], peak: number) {
     viewport,
     dragging,
     angles,
-    pinned,
-    reserveWidth,
     visible,
     beginDrag,
     drag,

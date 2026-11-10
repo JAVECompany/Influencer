@@ -1,6 +1,6 @@
 import ContentPreviewDialog from '../../../../shared/components/content/ContentPreviewDialog'
-import Button from '../../../../shared/components/ui/Button'
-import PageTitle from '../../../../shared/components/ui/PageTitle'
+import Button from '../../../../shared/components/ui/actions/Button'
+import PageTitle from '../../../../shared/components/ui/layout/PageTitle'
 import { panel } from '../../../../shared/styles/controlStyles'
 import type { OperatorProps, PageProps } from '../../../../shared/types/navigation'
 import ModerationAccountRow from '../components/ModerationAccountRow'
@@ -26,11 +26,7 @@ export default function ModerationScreen({
   } = useModeration(notify)
   return (
     <>
-      <PageTitle
-        label="MODERATION"
-        title="운영 관리"
-        subtitle="콘텐츠 공개 상태와 계정 이용 권한을 관리하세요."
-      />
+      <PageTitle title="운영 관리" />
       <div className="mb-4 flex gap-2">
         <Button
           tone={tab === 'content' ? 'primary' : 'subtle'}
@@ -47,7 +43,7 @@ export default function ModerationScreen({
           계정
         </Button>
       </div>
-      <section className={`${panel} divide-y divide-edge`}>
+      <section className={`${panel} divide-y divide-line`}>
         {tab === 'content'
           ? posts.map((post) => (
               <ModerationContentRow

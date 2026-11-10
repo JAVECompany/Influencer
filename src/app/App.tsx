@@ -1,15 +1,17 @@
 import AuthScreen from '../features/auth/screens/AuthScreen'
-import FeedbackToast from '../shared/components/ui/FeedbackToast'
+import FeedbackToast from '../shared/components/ui/feedback/FeedbackToast'
 import { ContentPrivacyContext } from '../shared/contexts/contentPrivacyContext'
 import { FeedbackContext } from '../shared/contexts/feedbackContext'
-import { usePagePrivacyMask } from '../shared/hooks/usePagePrivacyMask'
-import { usePrintPrivacyMask } from '../shared/hooks/usePrintPrivacyMask'
-import { actor } from '../shared/store/appSelectors'
-import { useAppStore } from '../shared/store/useAppStore'
+import { usePagePrivacyMask } from '../shared/hooks/privacy/usePagePrivacyMask'
+import { usePrintPrivacyMask } from '../shared/hooks/privacy/usePrintPrivacyMask'
+import { useThemeSync } from '../shared/hooks/theme/useThemeSync'
+import { actor } from '../shared/store/auth/authSelectors'
+import { useAppStore } from '../shared/store/core/useAppStore'
 import WorkspaceLayout from './components/WorkspaceLayout'
 import { useAppFeedback } from './hooks/useAppFeedback'
 
 export default function App() {
+  useThemeSync()
   const account = useAppStore(actor)
   const inactive = usePagePrivacyMask()
   const printing = usePrintPrivacyMask()

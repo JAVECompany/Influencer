@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { useAppStore } from '../../../shared/store/useAppStore'
+import { useAppStore } from '../../../shared/store/core/useAppStore'
 import type { Notify } from '../../../shared/types/actionResult'
 
 export function useAuthForm(notify: Notify) {

@@ -1,0 +1,21 @@
+:root[data-theme='peach'] {
+  color-scheme: light;
+  --theme-canvas: #fff1e9;
+  --theme-surface: #fffaf6;
+  --theme-raised: #f9e9df;
+  --theme-shell: #fff5ee;
+  --theme-line: #eed8cd;
+  --theme-foreground: #382621;
+  --theme-muted: #6e5148;
+  --theme-accent: #963f2b;
+  --theme-accent-hover: #7f3424;
+  --theme-on-accent: #ffffff;
+  --theme-accent-soft: #f9e2d5;
+  --theme-danger: #9c3044;
+  --theme-live: #a43350;
+  --theme-on-live: #ffffff;
+  --theme-like: #a73155;
+  --theme-selection: #f9d7c5;
+  --theme-on-selection: #632f22;
+  --theme-backdrop: #4c2b2466;
+}

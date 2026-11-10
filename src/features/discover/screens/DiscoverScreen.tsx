@@ -1,6 +1,6 @@
 import { Compass, Search } from 'lucide-react'
-import EmptyState from '../../../shared/components/ui/EmptyState'
-import PageTitle from '../../../shared/components/ui/PageTitle'
+import EmptyState from '../../../shared/components/ui/feedback/EmptyState'
+import PageTitle from '../../../shared/components/ui/layout/PageTitle'
 import { panel } from '../../../shared/styles/controlStyles'
 import type { PageProps } from '../../../shared/types/navigation'
 import CreatorBubble from '../components/CreatorBubble'
@@ -12,19 +12,15 @@ export default function DiscoverScreen({ account, openCreator }: Pick<PageProps,
   const { query, setQuery, term, items, matches, peak } = useDiscoverCreators(account)
   return (
     <>
-      <PageTitle
-        label="DISCOVER"
-        title="크리에이터 탐색"
-        subtitle="중앙에는 내 구독, 주변에는 새로운 크리에이터가 표시됩니다."
-      />
+      <PageTitle title="크리에이터 탐색" />
       <label className={`${panel} mb-5 flex items-center gap-3 px-4`}>
-        <Search size={19} className="text-dim" />
+        <Search size={19} className="text-muted" />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           aria-label="닉네임 또는 핸들 검색"
           placeholder="닉네임 또는 @핸들 검색"
-          className="w-full bg-transparent py-3.5 text-sm outline-none placeholder:text-dim"
+          className="w-full bg-transparent py-3.5 text-sm outline-none placeholder:text-muted"
         />
       </label>
       {!matches.length ? (

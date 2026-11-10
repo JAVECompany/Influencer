@@ -15,15 +15,15 @@ export default function SettlementTotalCard({
   emphasis?: boolean
 }) {
   return (
-    <div className={`${panel} min-w-0 p-4 ${emphasis ? 'border-mint/35 bg-[#142c30]' : ''}`}>
-      <div className="flex items-center justify-between gap-3 text-xs font-bold text-dim">
+    <div className={`${panel} min-w-0 p-4 ${emphasis ? 'border-accent/35 bg-accent-soft' : ''}`}>
+      <div className="flex items-center justify-between gap-3 text-xs font-bold text-muted">
         {label}
-        <Icon className="shrink-0 text-mint" size={17} />
+        <Icon className="shrink-0 text-accent" size={17} />
       </div>
-      <p className={`mt-3 text-2xl font-black break-words tabular-nums ${emphasis ? 'text-mint' : ''}`}>
+      <p className={`mt-3 text-2xl font-black break-words tabular-nums ${emphasis ? 'text-accent' : ''}`}>
         {value}
       </p>
-      <p className="mt-1 text-xs leading-relaxed text-dim">{detail}</p>
+      <p className="mt-1 text-xs leading-relaxed text-muted">{detail}</p>
     </div>
   )
 }

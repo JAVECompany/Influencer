@@ -1,6 +1,6 @@
 import type { RefObject } from 'react'
 import { rouletteSegmentColors } from '../../constants/roulette'
-import type { WheelSegment } from '../../utils/roulette'
+import type { WheelSegment } from '../../utils/roulette/roulette'
 
 const center = 144
 
@@ -21,8 +21,15 @@ export default function RouletteWheel({
   return (
     <div className="relative mx-auto aspect-square w-full max-w-[292px]" aria-hidden="true">
       <div ref={disc} data-roulette-disc className="size-full">
-        <svg viewBox="0 0 288 288" className="size-full drop-shadow-[0_10px_16px_#03090c99]">
-          <circle cx={center} cy={center} r="139" fill="#0a1119" stroke="#53716f" strokeWidth="2" />
+        <svg viewBox="0 0 288 288" className="size-full drop-shadow-lg">
+          <circle
+            cx={center}
+            cy={center}
+            r="139"
+            fill="var(--theme-raised)"
+            stroke="var(--theme-line)"
+            strokeWidth="2"
+          />
           {segments.map(({ name, start, end }, i) => {
             const width = end - start
             const middle = (start + end) / 2
@@ -45,7 +52,12 @@ export default function RouletteWheel({
               'Z'
             return (
               <g key={i}>
-                <path d={path} fill={rouletteSegmentColors[i]} stroke="#182630" strokeWidth="1.4" />
+                <path
+                  d={path}
+                  fill={rouletteSegmentColors[i]}
+                  stroke="var(--theme-raised)"
+                  strokeWidth="1.4"
+                />
                 {width >= 18 && (
                   <text
                     x={x}
@@ -65,9 +77,16 @@ export default function RouletteWheel({
               </g>
             )
           })}
-          <circle cx={center} cy={center} r={rim} fill="none" stroke="#d6fff01a" strokeWidth="3" />
-          <circle cx={center} cy={center} r="25" fill="#13272e" stroke="#a6f2dd" strokeWidth="2" />
-          <circle cx={center} cy={center} r="7" fill="#62e8c4" />
+          <circle cx={center} cy={center} r={rim} fill="none" stroke="var(--theme-line)" strokeWidth="3" />
+          <circle
+            cx={center}
+            cy={center}
+            r="25"
+            fill="var(--theme-raised)"
+            stroke="var(--theme-accent)"
+            strokeWidth="2"
+          />
+          <circle cx={center} cy={center} r="7" fill="var(--theme-accent)" />
         </svg>
       </div>
       <svg
@@ -76,8 +95,8 @@ export default function RouletteWheel({
       >
         <path
           d="M6 2h20a3 3 0 0 1 3 3v9a5 5 0 0 1-1 3L18 31a2.5 2.5 0 0 1-4 0L4 17a5 5 0 0 1-1-3V5a3 3 0 0 1 3-3Z"
-          fill="#e1fff6"
-          stroke="#203a38"
+          fill="var(--theme-accent)"
+          stroke="var(--theme-on-accent)"
           strokeWidth="2"
         />
       </svg>

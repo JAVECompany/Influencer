@@ -1,8 +1,8 @@
 import { FileText } from 'lucide-react'
 import ContentPreviewDialog from '../../../shared/components/content/ContentPreviewDialog'
-import Button from '../../../shared/components/ui/Button'
-import ConfirmActionDialog from '../../../shared/components/ui/ConfirmActionDialog'
-import PageTitle from '../../../shared/components/ui/PageTitle'
+import Button from '../../../shared/components/ui/actions/Button'
+import ConfirmActionDialog from '../../../shared/components/ui/dialogs/ConfirmActionDialog'
+import PageTitle from '../../../shared/components/ui/layout/PageTitle'
 import type { OperatorProps } from '../../../shared/types/navigation'
 import ContentAudienceDialog from '../components/ContentAudienceDialog'
 import CreatorSettingsDialog from '../components/CreatorSettingsDialog'
@@ -32,11 +32,7 @@ export default function CreatorStudioScreen({ account, notify }: OperatorProps) 
 
   return (
     <>
-      <PageTitle
-        label="CREATOR STUDIO"
-        title="스튜디오"
-        subtitle={creator.name + '님의 구독 콘텐츠를 관리하세요.'}
-      >
+      <PageTitle title="스튜디오">
         <Button onClick={() => setDialog('publish')}>
           <FileText size={17} /> 콘텐츠 등록
         </Button>

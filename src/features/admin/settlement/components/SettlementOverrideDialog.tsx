@@ -1,8 +1,8 @@
-import Button from '../../../../shared/components/ui/Button'
-import FieldLabel from '../../../../shared/components/ui/FieldLabel'
-import Modal from '../../../../shared/components/ui/Modal'
+import Button from '../../../../shared/components/ui/actions/Button'
+import FieldLabel from '../../../../shared/components/ui/forms/FieldLabel'
+import Modal from '../../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../../shared/styles/controlStyles'
-import { formatNumber } from '../../../../shared/utils/format'
+import { formatNumber } from '../../../../shared/utils/format/format'
 import type { SettlementRow } from '../types/settlementReport'
 
 export default function SettlementOverrideDialog({
@@ -20,7 +20,7 @@ export default function SettlementOverrideDialog({
 }) {
   return (
     <Modal title={row.creator.name + ' 정산 코인 입력'} onClose={onClose}>
-      <p className="mb-4 text-sm text-dim">
+      <p className="mb-4 text-sm text-muted">
         {start} ~ {end} · 원장에 기록된 사용 코인 {formatNumber(row.coins)}
       </p>
       <form

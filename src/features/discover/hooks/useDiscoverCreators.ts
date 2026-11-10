@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { hasSubscription, isPublic, subscriberCount } from '../../../shared/store/appSelectors'
-import { useAppStore } from '../../../shared/store/useAppStore'
+import { hasSubscription, subscriberCount } from '../../../shared/store/subscription/subscriptionSelectors'
+import { isPublic } from '../../../shared/store/creator/creatorSelectors'
+import { useAppStore } from '../../../shared/store/core/useAppStore'
 import type { Account } from '../../../shared/types/account'
 
 export function useDiscoverCreators(account: Account) {

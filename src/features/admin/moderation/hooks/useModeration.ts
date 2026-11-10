@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { isAccountDisabled } from '../../../../shared/store/appSelectors'
-import { useAppStore } from '../../../../shared/store/useAppStore'
+import { isAccountDisabled } from '../../../../shared/store/account/accountSelectors'
+import { useAppStore } from '../../../../shared/store/core/useAppStore'
 import type { Content } from '../../../../shared/types/content'
 import type { PageProps } from '../../../../shared/types/navigation'
 

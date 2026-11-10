@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { useAppStore } from '../../../shared/store/useAppStore'
+import { useAppStore } from '../../../shared/store/core/useAppStore'
 import type { ApplicationMethod } from '../../../shared/types/account'
 import type { OperatorProps } from '../../../shared/types/navigation'
-import { readFormValue } from '../../../shared/utils/formData'
+import { readFormValue } from '../../../shared/utils/forms/formData'
 
 export function useCreatorApplication({ account, notify }: OperatorProps) {
   const state = useAppStore()

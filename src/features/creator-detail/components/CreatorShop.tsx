@@ -1,9 +1,9 @@
 import { ShoppingBag } from 'lucide-react'
 import ProductCard from '../../../shared/components/products/ProductCard'
-import Button from '../../../shared/components/ui/Button'
+import Button from '../../../shared/components/ui/actions/Button'
 import { panel } from '../../../shared/styles/controlStyles'
 import type { Product, Roulette } from '../../../shared/types/commerce'
-import { formatNumber } from '../../../shared/utils/format'
+import { formatNumber } from '../../../shared/utils/format/format'
 import type { ShopOffer } from '../types/shopOffer'
 
 export default function CreatorShop({
@@ -22,9 +22,9 @@ export default function CreatorShop({
   return (
     <section className={`${panel} p-5`}>
       <h2 className="mb-3 flex items-center gap-2 font-black">
-        <ShoppingBag size={18} className="text-mint" /> 크리에이터 상점
+        <ShoppingBag size={18} className="text-accent" /> 크리에이터 상점
       </h2>
-      {!products.length && !roulette && <p className="text-sm text-dim">등록된 상품이 없어요.</p>}
+      {!products.length && !roulette && <p className="text-sm text-muted">등록된 상품이 없어요.</p>}
       <div className="grid gap-2">
         {products.map((p) => {
           const unlocked = staff || purchases.has(p.id)
@@ -37,10 +37,10 @@ export default function CreatorShop({
           )
         })}
         {roulette && (
-          <div className="flex items-center justify-between gap-3 rounded-xl bg-night p-3">
+          <div className="flex items-center justify-between gap-3 rounded-xl bg-canvas p-3">
             <div>
               <p className="text-sm font-bold">크리에이터 룰렛</p>
-              <p className="mt-1 text-xs text-dim">
+              <p className="mt-1 text-xs text-muted">
                 {formatNumber(roulette.cost)} 코인으로 원판을 돌릴 수 있어요.
               </p>
             </div>

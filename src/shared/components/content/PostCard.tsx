@@ -1,17 +1,17 @@
 import { Flag, Heart, LockKeyhole, MessageCircle } from 'lucide-react'
-import { canRead } from '../../store/appSelectors'
-import { useAppStore } from '../../store/useAppStore'
+import { canRead } from '../../store/content/contentSelectors'
+import { useAppStore } from '../../store/core/useAppStore'
 import { panel } from '../../styles/controlStyles'
 import type { Content } from '../../types/content'
 import type { FeedProps } from '../../types/feed'
-import { formatRelativeTime } from '../../utils/format'
-import Avatar from '../ui/Avatar'
-import Button from '../ui/Button'
-import ProtectedContent from '../ui/ProtectedContent'
+import { formatRelativeTime } from '../../utils/format/format'
+import Avatar from '../ui/media/Avatar'
+import Button from '../ui/actions/Button'
+import ProtectedContent from '../ui/privacy/ProtectedContent'
 import ContentMedia from './ContentMedia'
 
 const iconAction =
-  'grid size-10 place-items-center rounded-xl text-dim transition hover:bg-white/5 hover:text-white'
+  'grid size-10 place-items-center rounded-xl text-muted transition hover:bg-foreground/5 hover:text-foreground'
 
 export default function PostCard({
   post,
@@ -33,12 +33,12 @@ export default function PostCard({
           <Avatar person={creator} account={state.accounts[creator.id]} className="size-10" />
           <span className="min-w-0">
             <span className="block truncate text-sm font-black">{creator.name}</span>
-            <span className="text-xs text-dim">
+            <span className="text-xs text-muted">
               @{creator.handle} · {formatRelativeTime(post.at)}
             </span>
           </span>
         </button>
-        <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#1b3036] px-3 py-1.5 text-[10px] font-bold text-mint">
+        <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1.5 text-[10px] font-bold text-accent">
           <LockKeyhole size={12} />
           {staff ? (post.hidden ? '숨김 · 검수 중' : '관리자 검수') : '구독자 전용'}
         </span>
@@ -47,12 +47,12 @@ export default function PostCard({
         <ContentMedia post={post} />
         <div className="px-4 pt-4 pb-2">
           <h2 className="text-[17px] font-black">{post.title}</h2>
-          <p className="mt-1.5 text-sm leading-relaxed break-words text-dim">{post.body}</p>
+          <p className="mt-1.5 text-sm leading-relaxed break-words text-muted">{post.body}</p>
         </div>
       </ProtectedContent>
       {staff ? (
         <footer className="flex items-center justify-between gap-2 px-4 py-2">
-          <span className="text-xs text-dim">신고 {post.reports.length}건</span>
+          <span className="text-xs text-muted">신고 {post.reports.length}건</span>
           <Button
             tone="subtle"
             onClick={() =>
@@ -74,9 +74,13 @@ export default function PostCard({
             className={iconAction}
             onClick={() => state.managePost(post.id, 'like')}
           >
-            <Heart size={20} fill={liked ? '#ee7a9f' : 'none'} color={liked ? '#ee7a9f' : 'currentColor'} />
+            <Heart
+              size={20}
+              fill={liked ? 'currentColor' : 'none'}
+              className={liked ? 'text-like' : undefined}
+            />
           </button>
-          {post.likes.length > 0 && <span className="text-xs text-dim">{post.likes.length}</span>}
+          {post.likes.length > 0 && <span className="text-xs text-muted">{post.likes.length}</span>}
           <button type="button" aria-label="채팅" className={iconAction} onClick={() => openChat(creator.id)}>
             <MessageCircle size={19} />
           </button>

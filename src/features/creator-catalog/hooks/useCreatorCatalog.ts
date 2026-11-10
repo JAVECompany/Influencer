@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAppStore } from '../../../shared/store/useAppStore'
+import { useAppStore } from '../../../shared/store/core/useAppStore'
 import type { ActionResult } from '../../../shared/types/actionResult'
 import type { Product, Roulette } from '../../../shared/types/commerce'
 import type { OperatorProps } from '../../../shared/types/navigation'

@@ -1,9 +1,9 @@
 import { CircleDollarSign, Layers3, UsersRound } from 'lucide-react'
-import Button from '../../../shared/components/ui/Button'
-import StatCard from '../../../shared/components/ui/StatCard'
+import Button from '../../../shared/components/ui/actions/Button'
+import StatCard from '../../../shared/components/ui/display/StatCard'
 import { panel } from '../../../shared/styles/controlStyles'
 import type { Creator } from '../../../shared/types/account'
-import { formatKrw, formatNumber } from '../../../shared/utils/format'
+import { formatKrw, formatNumber } from '../../../shared/utils/format/format'
 
 export default function StudioOverview({
   creator,
@@ -26,7 +26,7 @@ export default function StudioOverview({
       <section className={`${panel} mb-5 flex flex-wrap items-center justify-between gap-3 p-5`}>
         <div>
           <p className="font-black">공개 프로필</p>
-          <p className="mt-1 text-sm break-words text-dim">
+          <p className="mt-1 text-sm break-words text-muted">
             @{creator.handle} · {creator.bio}
           </p>
         </div>

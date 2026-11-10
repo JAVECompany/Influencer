@@ -1,4 +1,4 @@
-import Button from '../../../shared/components/ui/Button'
+import Button from '../../../shared/components/ui/actions/Button'
 import { field, panel } from '../../../shared/styles/controlStyles'
 import type { Creator } from '../../../shared/types/account'
 
@@ -15,7 +15,7 @@ export default function FeedReviewFilter({
 }) {
   return (
     <div className={`${panel} mb-5 flex flex-wrap items-end gap-2 p-3`}>
-      <label className="min-w-40 flex-1 text-xs font-bold text-dim">
+      <label className="min-w-40 flex-1 text-xs font-bold text-muted">
         검수할 크리에이터
         <select
           className={`${field} mt-1`}

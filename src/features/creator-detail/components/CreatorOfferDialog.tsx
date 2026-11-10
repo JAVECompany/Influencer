@@ -1,7 +1,7 @@
 import ProductThumbnail from '../../../shared/components/products/ProductThumbnail'
-import Button from '../../../shared/components/ui/Button'
-import Modal from '../../../shared/components/ui/Modal'
-import { formatKrw, formatNumber } from '../../../shared/utils/format'
+import Button from '../../../shared/components/ui/actions/Button'
+import Modal from '../../../shared/components/ui/dialogs/Modal'
+import { formatKrw, formatNumber } from '../../../shared/utils/format/format'
 import type { ShopOffer } from '../types/shopOffer'
 
 export default function CreatorOfferDialog({
@@ -22,7 +22,7 @@ export default function CreatorOfferDialog({
       {offer.type === 'product' && (
         <ProductThumbnail product={offer} locked className="mb-4 aspect-video w-full" />
       )}
-      <p className="mb-4 text-sm leading-relaxed text-dim">
+      <p className="mb-4 text-sm leading-relaxed text-muted">
         {offer.type === 'subscribe'
           ? formatKrw(price) + ' / 월 · 모의 구독을 시작할까요?'
           : formatNumber(offer.cost) + ' 코인 · 보유 ' + formatNumber(balance) + ' 코인'}

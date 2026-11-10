@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { coinPacks } from '../../../shared/constants/coinPacks'
-import { useAppStore } from '../../../shared/store/useAppStore'
+import { useAppStore } from '../../../shared/store/core/useAppStore'
 import type { PageProps } from '../../../shared/types/navigation'
 
 export function useCoinStore({ account, notify }: Pick<PageProps, 'account' | 'notify'>) {

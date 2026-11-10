@@ -1,4 +1,4 @@
-import Button from '../../../../shared/components/ui/Button'
+import Button from '../../../../shared/components/ui/actions/Button'
 import { contentKindLabels } from '../../../../shared/constants/contentKinds'
 import type { Content } from '../../../../shared/types/content'
 import type { PageProps } from '../../../../shared/types/navigation'
@@ -20,12 +20,12 @@ export default function ModerationContentRow({
     <div className="flex flex-wrap items-center justify-between gap-3 p-4">
       <div className="min-w-0">
         <p className="text-sm font-black break-words">{post.title}</p>
-        <p className="mt-1 text-xs text-dim">
+        <p className="mt-1 text-xs text-muted">
           <button
             type="button"
             aria-label={ownerName + ' 크리에이터 상세'}
             onClick={() => openCreator(post.owner)}
-            className="font-bold text-mint hover:underline"
+            className="font-bold text-accent hover:underline"
           >
             {ownerName}
           </button>

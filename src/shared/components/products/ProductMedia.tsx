@@ -1,9 +1,9 @@
 import { useContext, useEffect, useRef } from 'react'
 import { ContentPrivacyContext } from '../../contexts/contentPrivacyContext'
 import type { Product } from '../../types/commerce'
-import { isProductVideo } from '../../utils/productMedia'
-import DemoScene from '../ui/DemoScene'
-import ProtectedContent from '../ui/ProtectedContent'
+import { isProductVideo } from '../../utils/media/productMedia'
+import DemoScene from '../ui/media/DemoScene'
+import ProtectedContent from '../ui/privacy/ProtectedContent'
 
 export default function ProductMedia({ product }: { product: Product }) {
   const mask = useContext(ContentPrivacyContext)
@@ -30,17 +30,17 @@ export default function ProductMedia({ product }: { product: Product }) {
           onPlay={(event) => {
             if (mask) event.currentTarget.pause()
           }}
-          className="max-h-[55dvh] w-full bg-black"
+          className="max-h-[55dvh] w-full bg-media"
         />
       ) : (
         <img
           src={product.media}
           alt={product.name}
           draggable={false}
-          className="max-h-[55dvh] w-full bg-black object-contain"
+          className="max-h-[55dvh] w-full bg-media object-contain"
         />
       )}
-      <p className="mt-3 text-sm break-words text-dim">{product.detail}</p>
+      <p className="mt-3 text-sm break-words text-muted">{product.detail}</p>
     </ProtectedContent>
   )
 }

@@ -1,0 +1,33 @@
+@layer components {
+  .theme-panel {
+    box-shadow: var(--theme-panel-shadow);
+    backdrop-filter: var(--theme-panel-filter);
+  }
+
+  .theme-chrome {
+    box-shadow: var(--theme-panel-shadow);
+    backdrop-filter: var(--theme-chrome-filter);
+  }
+
+  .theme-globe {
+    background-image: var(--theme-globe-image);
+  }
+
+  .theme-banner {
+    background-color: var(--theme-raised);
+    background-image: var(--theme-banner-image);
+  }
+
+  .theme-balance {
+    background-image: var(--theme-balance-image);
+  }
+
+  .theme-auth-overlay {
+    background-image: linear-gradient(
+      to bottom,
+      var(--theme-surface),
+      transparent 43%,
+      var(--theme-surface) 92%
+    );
+  }
+}

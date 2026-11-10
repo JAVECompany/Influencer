@@ -12,11 +12,11 @@ export default function ProductCard({
   children: ReactNode
 }) {
   return (
-    <article className="grid items-center gap-3 rounded-xl bg-night p-3 sm:grid-cols-[100px_minmax(0,1fr)_auto]">
+    <article className="grid items-center gap-3 rounded-xl bg-canvas p-3 sm:grid-cols-[100px_minmax(0,1fr)_auto]">
       <ProductThumbnail product={product} locked={locked} className="aspect-video w-full sm:w-[100px]" />
       <div className="min-w-0">
         <p className="text-sm font-bold break-words">{product.name}</p>
-        <p className="mt-1 text-xs break-words text-dim">
+        <p className="mt-1 text-xs break-words text-muted">
           {product.detail}
           {product.archived && ' · 판매 종료'}
         </p>

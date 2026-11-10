@@ -1,7 +1,7 @@
 import type { CSSProperties, MouseEventHandler } from 'react'
 import { Check } from 'lucide-react'
-import Avatar from '../../../shared/components/ui/Avatar'
-import { formatNumber } from '../../../shared/utils/format'
+import Avatar from '../../../shared/components/ui/media/Avatar'
+import { formatNumber } from '../../../shared/utils/format/format'
 import type { ExploreItem } from '../types/creatorDiscovery'
 
 export default function CreatorBubble({
@@ -16,6 +16,7 @@ export default function CreatorBubble({
   style?: CSSProperties
 }) {
   const { creator, count, subscribed, account } = item
+  const subscriberCount = formatNumber(count)
   const bubbleStyle: CSSProperties & { '--portrait-size': string } = {
     ...style,
     '--portrait-size': size + 'px',
@@ -25,7 +26,7 @@ export default function CreatorBubble({
       type="button"
       onClick={onClick}
       style={bubbleStyle}
-      aria-label={creator.name + ' · 구독자 ' + formatNumber(count) + '명' + (subscribed ? ' · 구독 중' : '')}
+      aria-label={creator.name + ' · 구독자 ' + subscriberCount + '명' + (subscribed ? ' · 구독 중' : '')}
       data-creator={creator.id}
       data-subscribed={subscribed}
       className="group flex min-h-11 min-w-11 flex-col items-center justify-center gap-1 rounded-xl text-center focus-visible:z-10"
@@ -35,19 +36,19 @@ export default function CreatorBubble({
           person={creator}
           account={account}
           className={`size-(--portrait-size) border-2 shadow-md ${
-            subscribed ? 'border-mint ring-2 ring-mint/25' : 'border-white/25 group-hover:border-mint/65'
+            subscribed ? 'border-accent ring-2 ring-accent/25' : 'border-line group-hover:border-accent/65'
           }`}
         />
         <span
-          className="absolute -top-1 -right-2 rounded-full border border-white/20 bg-[#1c303b] px-1.5 py-0.5 text-[9px] leading-none font-black text-white tabular-nums"
+          className="absolute -top-0.5 left-1/2 -translate-x-1/2 rounded-full border border-line bg-raised px-1.5 py-0.5 text-[9px] leading-none font-black whitespace-nowrap text-foreground tabular-nums"
           aria-hidden="true"
         >
-          {count > 999 ? '999+' : count}
+          {subscriberCount}
         </span>
         {subscribed && (
           <span
             aria-hidden="true"
-            className="absolute right-0 bottom-0 grid size-4 place-items-center rounded-full bg-mint text-night"
+            className="absolute right-0 bottom-0 grid size-4 place-items-center rounded-full bg-accent text-on-accent"
           >
             <Check size={11} strokeWidth={3} />
           </span>
@@ -55,7 +56,7 @@ export default function CreatorBubble({
       </span>
       <span
         className={`w-full truncate px-1 text-[10px] font-bold leading-tight sm:text-[11px] ${
-          subscribed ? 'text-mint' : 'text-white'
+          subscribed ? 'text-accent' : 'text-foreground'
         }`}
       >
         {creator.name}

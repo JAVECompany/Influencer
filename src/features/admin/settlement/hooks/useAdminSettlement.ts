@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAppStore } from '../../../../shared/store/useAppStore'
+import { useAppStore } from '../../../../shared/store/core/useAppStore'
 import type { PageProps } from '../../../../shared/types/navigation'
 import type { SettlementRow } from '../types/settlementReport'
 import { dateInKorea, settlementPeriod, summarizeSettlement } from '../utils/settlement'

@@ -1,6 +1,6 @@
 import { CalendarDays } from 'lucide-react'
-import Button from '../../../../shared/components/ui/Button'
-import FieldLabel from '../../../../shared/components/ui/FieldLabel'
+import Button from '../../../../shared/components/ui/actions/Button'
+import FieldLabel from '../../../../shared/components/ui/forms/FieldLabel'
 import { field, panel } from '../../../../shared/styles/controlStyles'
 import { periodOptions, settlementPeriod } from '../utils/settlement'
 import type { PeriodMode } from '../utils/settlement'
@@ -27,7 +27,7 @@ export default function SettlementPeriodFilter({
   return (
     <section className={`${panel} mb-5 p-4 sm:p-5`}>
       <h2 className="mb-3 flex items-center gap-2 font-black">
-        <CalendarDays size={17} className="text-mint" /> 거래 조회 기간
+        <CalendarDays size={17} className="text-accent" /> 거래 조회 기간
       </h2>
       <div className="flex flex-wrap gap-2">
         {periodOptions.map(([key, label]) => (
@@ -64,7 +64,7 @@ export default function SettlementPeriodFilter({
           </FieldLabel>
         </div>
       )}
-      <p className="mt-3 text-xs leading-relaxed text-dim">
+      <p className="mt-3 text-xs leading-relaxed text-muted">
         {period
           ? period.start + ' ~ ' + period.end + ' · 한국시간, 양 끝 날짜 포함'
           : '시작일과 종료일을 확인해 주세요.'}

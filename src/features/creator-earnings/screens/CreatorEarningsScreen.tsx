@@ -1,22 +1,18 @@
 import { CircleDollarSign, Sparkles } from 'lucide-react'
 import TransactionLedger from '../../../shared/components/transactions/TransactionLedger'
-import FieldLabel from '../../../shared/components/ui/FieldLabel'
-import PageTitle from '../../../shared/components/ui/PageTitle'
-import StatCard from '../../../shared/components/ui/StatCard'
+import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
+import PageTitle from '../../../shared/components/ui/layout/PageTitle'
+import StatCard from '../../../shared/components/ui/display/StatCard'
 import { field } from '../../../shared/styles/controlStyles'
 import type { PageProps } from '../../../shared/types/navigation'
-import { formatKrw, formatNumber } from '../../../shared/utils/format'
+import { formatKrw, formatNumber } from '../../../shared/utils/format/format'
 import { useCreatorEarnings } from '../hooks/useCreatorEarnings'
 
 export default function CreatorEarningsScreen({ account }: Pick<PageProps, 'account'>) {
   const { period, setPeriod, filtered, revenue, used } = useCreatorEarnings(account.id)
   return (
     <>
-      <PageTitle
-        label="TRANSACTIONS"
-        title="수익 내역"
-        subtitle="데모 거래 원장 · 수수료, 환불, 송금 정책은 협의 중입니다."
-      >
+      <PageTitle title="수익 내역" subtitle="데모 거래 원장 · 수수료, 환불, 송금 정책은 협의 중입니다.">
         <FieldLabel title="조회 월">
           <input
             type="month"

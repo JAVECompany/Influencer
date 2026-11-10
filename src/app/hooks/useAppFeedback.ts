@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { FeedbackMessage } from '../../shared/contexts/feedbackContext'
-import { useAppStore } from '../../shared/store/useAppStore'
+import { useAppStore } from '../../shared/store/core/useAppStore'
 import type { Notify } from '../../shared/types/actionResult'
 
 export function useAppFeedback(accountId: string | null) {

@@ -1,8 +1,8 @@
 import { Calculator } from 'lucide-react'
-import Button from '../../../../shared/components/ui/Button'
-import FieldLabel from '../../../../shared/components/ui/FieldLabel'
+import Button from '../../../../shared/components/ui/actions/Button'
+import FieldLabel from '../../../../shared/components/ui/forms/FieldLabel'
 import { field, panel } from '../../../../shared/styles/controlStyles'
-import { formatNumber } from '../../../../shared/utils/format'
+import { formatNumber } from '../../../../shared/utils/format/format'
 
 export default function SettlementConfigForm({
   coinWon,
@@ -16,7 +16,7 @@ export default function SettlementConfigForm({
   return (
     <section className={`${panel} mb-5 p-4 sm:p-5`}>
       <h2 className="mb-3 flex items-center gap-2 font-black">
-        <Calculator size={17} className="text-mint" /> 코인 정산 기준
+        <Calculator size={17} className="text-accent" /> 코인 정산 기준
       </h2>
       <form
         key={coinWon + ':' + feeBps}
@@ -52,7 +52,7 @@ export default function SettlementConfigForm({
         </FieldLabel>
         <Button type="submit">정산 기준 적용</Button>
       </form>
-      <p className="mt-3 text-xs leading-relaxed text-dim">
+      <p className="mt-3 text-xs leading-relaxed text-muted">
         현재 {formatNumber(coinWon)}원/코인 · {formatNumber(feeBps / 100)}%. 코인 충전 묶음 가격과 별개인 데모
         환산 단가입니다.
       </p>

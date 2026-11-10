@@ -1,4 +1,4 @@
-import FieldLabel from '../../../shared/components/ui/FieldLabel'
+import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import { field } from '../../../shared/styles/controlStyles'
 import type { DraftReward } from '../types/rouletteDraft'
 
@@ -12,8 +12,8 @@ export default function RouletteRewardFields({
   onChange: (changes: Partial<DraftReward>) => void
 }) {
   return (
-    <fieldset className="grid grid-cols-[minmax(0,1fr)_6rem] gap-2 rounded-xl bg-night p-3">
-      <legend className="px-1 text-xs font-bold text-mint">
+    <fieldset className="grid grid-cols-[minmax(0,1fr)_6rem] gap-2 rounded-xl bg-canvas p-3">
+      <legend className="px-1 text-xs font-bold text-accent">
         {index + 1}번 상품{index === 0 ? ' · 1등' : ''}
       </legend>
       <FieldLabel title="상품명">

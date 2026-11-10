@@ -1,6 +1,6 @@
 import { MessageCircle } from 'lucide-react'
-import EmptyState from '../../../shared/components/ui/EmptyState'
-import PageTitle from '../../../shared/components/ui/PageTitle'
+import EmptyState from '../../../shared/components/ui/feedback/EmptyState'
+import PageTitle from '../../../shared/components/ui/layout/PageTitle'
 import type { PageProps } from '../../../shared/types/navigation'
 import ChatPartnerList from '../components/ChatPartnerList'
 import ChatThread from '../components/ChatThread'
@@ -28,7 +28,6 @@ export default function ChatScreen({
   return (
     <>
       <PageTitle
-        label="INBOX"
         title="채팅"
         subtitle={
           customerView

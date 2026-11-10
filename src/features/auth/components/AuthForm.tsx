@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react'
-import BrandLogo from '../../../shared/components/ui/BrandLogo'
-import Button from '../../../shared/components/ui/Button'
-import FieldLabel from '../../../shared/components/ui/FieldLabel'
+import BrandLogo from '../../../shared/components/ui/branding/BrandLogo'
+import Button from '../../../shared/components/ui/actions/Button'
+import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import { roles } from '../../../shared/constants/roles'
 import { demoAccounts } from '../../../shared/data/demoAccounts'
 import { field, panel } from '../../../shared/styles/controlStyles'
@@ -28,17 +28,9 @@ export default function AuthForm({ notify }: Pick<PageProps, 'notify'>) {
       <div className="mb-8 lg:hidden">
         <BrandLogo />
       </div>
-      <p className="mb-2 text-xs font-bold tracking-[.18em] text-mint">
-        {signup ? 'CREATE ACCOUNT' : 'BAMGYEOL DEMO'}
-      </p>
-      <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-        {signup ? '밤결에 가입하기' : '밤결에 오신 걸 환영해요'}
+      <h2 className="mb-6 text-3xl font-bold tracking-tight sm:text-4xl">
+        {signup ? '계정 만들기' : '로그인'}
       </h2>
-      <p className="mt-3 mb-6 text-sm leading-relaxed text-dim">
-        {signup
-          ? '같은 브라우저에서 가입과 입점 흐름을 체험할 수 있어요.'
-          : '로그인하고 역할별 화면을 체험해 보세요.'}
-      </p>
       <form className="grid gap-4" onSubmit={submit}>
         {signup && (
           <>
@@ -48,13 +40,13 @@ export default function AuthForm({ notify }: Pick<PageProps, 'notify'>) {
                 <option value="influencer">크리에이터</option>
               </select>
             </FieldLabel>
-            <label className="flex items-start gap-2 text-sm text-dim">
+            <label className="flex items-start gap-2 text-sm text-muted">
               <input
                 type="checkbox"
                 required
                 checked={terms}
                 onChange={(event) => setTerms(event.target.checked)}
-                className="mt-1 accent-mint"
+                className="mt-1 accent-accent"
               />
               데모 이용 조건에 동의합니다. 입력 정보는 이 브라우저에 저장됩니다.
             </label>
@@ -98,7 +90,7 @@ export default function AuthForm({ notify }: Pick<PageProps, 'notify'>) {
       </form>
       {!signup && (
         <div className={`${panel} mt-5 p-4`}>
-          <p className="mb-3 text-xs font-bold text-dim">체험 계정 · 선택하면 아이디와 비밀번호가 입력돼요</p>
+          <p className="mb-3 text-xs font-semibold text-muted">체험 계정</p>
           <div className="grid grid-cols-3 gap-2">
             {demoAccounts.map((demo) => (
               <Button

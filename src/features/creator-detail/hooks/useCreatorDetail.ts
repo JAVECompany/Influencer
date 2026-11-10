@@ -1,15 +1,11 @@
 import { useState } from 'react'
-import {
-  canRead,
-  hasSubscription,
-  isPublic,
-  isStoryAvailable,
-  subscriberCount,
-} from '../../../shared/store/appSelectors'
-import { useAppStore } from '../../../shared/store/useAppStore'
+import { canRead, isStoryAvailable } from '../../../shared/store/content/contentSelectors'
+import { hasSubscription, subscriberCount } from '../../../shared/store/subscription/subscriptionSelectors'
+import { isPublic } from '../../../shared/store/creator/creatorSelectors'
+import { useAppStore } from '../../../shared/store/core/useAppStore'
 import type { Account } from '../../../shared/types/account'
 import type { Notify } from '../../../shared/types/actionResult'
-import { byRecent } from '../../../shared/utils/contentOrder'
+import { byRecent } from '../../../shared/utils/content/contentOrder'
 import type { ShopOffer } from '../types/shopOffer'
 
 export function useCreatorDetail(id: string, account: Account, notify: Notify) {

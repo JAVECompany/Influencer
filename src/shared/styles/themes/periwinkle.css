@@ -1,0 +1,21 @@
+:root[data-theme='periwinkle'] {
+  color-scheme: light;
+  --theme-canvas: #f1effb;
+  --theme-surface: #fcfbff;
+  --theme-raised: #e9e5f8;
+  --theme-shell: #f8f6ff;
+  --theme-line: #ddd6ef;
+  --theme-foreground: #282142;
+  --theme-muted: #5b5274;
+  --theme-accent: #55449a;
+  --theme-accent-hover: #473782;
+  --theme-on-accent: #ffffff;
+  --theme-accent-soft: #ebe5fb;
+  --theme-danger: #99314f;
+  --theme-live: #9d3056;
+  --theme-on-live: #ffffff;
+  --theme-like: #a53164;
+  --theme-selection: #e1d8fb;
+  --theme-on-selection: #3c3068;
+  --theme-backdrop: #261b4666;
+}

@@ -1,5 +1,5 @@
 import type { Content } from '../../types/content'
-import DemoScene from '../ui/DemoScene'
+import DemoScene from '../ui/media/DemoScene'
 
 export default function ContentMedia({ post }: { post: Content }) {
   return post.media ? (

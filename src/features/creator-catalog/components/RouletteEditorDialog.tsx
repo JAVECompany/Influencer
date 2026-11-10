@@ -1,7 +1,7 @@
 import RouletteWheelDialog from '../../../shared/components/roulette/RouletteWheelDialog'
-import Button from '../../../shared/components/ui/Button'
-import FieldLabel from '../../../shared/components/ui/FieldLabel'
-import Modal from '../../../shared/components/ui/Modal'
+import Button from '../../../shared/components/ui/actions/Button'
+import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
+import Modal from '../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../shared/styles/controlStyles'
 import type { Roulette } from '../../../shared/types/commerce'
 import { useRouletteDraft } from '../hooks/useRouletteDraft'
@@ -68,7 +68,7 @@ export default function RouletteEditorDialog({
             />
           </FieldLabel>
         </div>
-        <p className="text-xs leading-relaxed text-dim">
+        <p className="text-xs leading-relaxed text-muted">
           첫 상품이 1등입니다. 상품별 당첨 확률에 따라 원판의 칸 크기가 정해집니다.
         </p>
         {rows.map((row, index) => (
@@ -79,9 +79,9 @@ export default function RouletteEditorDialog({
             onChange={(changes) => update(index, changes)}
           />
         ))}
-        <p className="text-xs text-dim">당첨 확률 합계 · {totalChance}%</p>
+        <p className="text-xs text-muted">당첨 확률 합계 · {totalChance}%</p>
         {error && (
-          <p role="alert" className="text-sm text-red-200">
+          <p role="alert" className="text-sm text-danger">
             {error}
           </p>
         )}

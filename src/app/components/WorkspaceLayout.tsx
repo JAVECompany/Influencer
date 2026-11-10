@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import CreatorDetailScreen from '../../features/creator-detail/screens/CreatorDetailScreen'
-import { useAppStore } from '../../shared/store/useAppStore'
+import { useAppStore } from '../../shared/store/core/useAppStore'
 import type { PageKey, PageProps } from '../../shared/types/navigation'
 import { applicationNav, navItems, pages } from '../navigation/workspaceNavigation'
 import WorkspaceHeader from './WorkspaceHeader'
@@ -41,7 +41,9 @@ export default function WorkspaceLayout({ account, notify }: Pick<PageProps, 'ac
       aria-current={current === id ? 'page' : undefined}
       onClick={() => go(id)}
       className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-1 py-2 text-[10px] font-bold transition sm:text-xs lg:w-full lg:flex-none lg:flex-row lg:justify-start lg:gap-3 lg:px-3.5 lg:py-3 lg:text-sm ${
-        current === id ? 'bg-[#163337] text-mint' : 'text-dim hover:bg-white/5 hover:text-white'
+        current === id
+          ? 'bg-accent-soft text-accent'
+          : 'text-muted hover:bg-foreground/5 hover:text-foreground'
       }`}
     >
       <Icon size={20} strokeWidth={current === id ? 2.5 : 1.85} aria-hidden="true" />
@@ -88,7 +90,7 @@ export default function WorkspaceLayout({ account, notify }: Pick<PageProps, 'ac
       </div>
       <nav
         aria-label="모바일 주 메뉴"
-        className="fixed inset-x-0 bottom-0 z-30 flex gap-1 border-t border-edge bg-[#0e151d]/98 px-2 pt-1.5 pb-[calc(.4rem+env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden"
+        className="theme-chrome fixed inset-x-0 bottom-0 z-30 flex gap-1 border-t border-line bg-shell px-2 pt-1.5 pb-[calc(.4rem+env(safe-area-inset-bottom))] lg:hidden"
       >
         {navButtons}
       </nav>

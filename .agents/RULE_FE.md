@@ -5,7 +5,8 @@
 - `src/main.tsx`는 React를 마운트하고 전역 스타일을 불러온다. 앱 전체의 구성, 레이아웃과 역할별 화면 연결은 `src/app/`에 둔다.
 - 페이지는 `src/features/<page>/screens/<Name>Screen.tsx`에 둔다. 같은 관리자 영역처럼 그룹이 필요한 경우 `features/admin/settlement/screens/AdminSettlementScreen.tsx`처럼 그룹 아래에 페이지 폴더를 둔다.
 - 페이지 전용 코드는 페이지의 `components/`, `hooks/`, `utils/`, `types/`, `store/`로 역할에 맞춰 나눈다. 필요한 폴더만 만든다. 페이지 내에서 한 컴포넌트만 사용하는 단순 props 타입과 상수는 해당 파일에 둘 수 있다.
-- 여러 페이지에서 쓰는 코드는 `src/shared/components/`, `hooks/`, `utils/`, `types/`, `store/`에 역할별로 둔다. 공통 UI 프리미티브는 `shared/components/ui/`에, 거래 장부나 콘텐츠 카드처럼 도메인에 특화된 재사용 컴포넌트는 `shared/components/<domain>/`에 둔다.
+- 여러 페이지에서 쓰는 코드는 `src/shared/` 아래의 `components/`, `hooks/`, `utils/`, `types/`, `store/`로 나눈다. 공통 컴포넌트·훅·유틸은 파일이 하나뿐이어도 해당 기능의 하위 폴더에 배치한다. 예를 들어 `components/content/`, `hooks/privacy/`, `utils/media/`를 사용한다.
+- 공통 UI 프리미티브는 `components/ui/` 아래에서 버튼은 `actions/`, 다이얼로그는 `dialogs/`, 입력 요소는 `forms/`에 둔다. 새 파일은 같은 역할의 기존 폴더에 배치하고, 새 역할이 생기면 그 역할을 드러내는 폴더를 만든다.
 - UI 컴포넌트 파일은 PascalCase로 작성하고 컴포넌트 이름과 파일명을 일치시킨다. 화면은 `Screen`, 다이얼로그는 `Dialog`처럼 역할이 드러나는 이름을 사용한다. 기본 내보내기는 파일의 단일 컴포넌트에만 사용한다.
 - 기능 폴더는 kebab-case를 사용한다. 훅은 `useHomeFeed.ts`, 스토어는 `useAppStore.ts`, 유틸과 타입은 `globeLayout.ts`, `settlementReport.ts`처럼 camelCase와 의미 있는 이름을 사용한다.
 - 필요한 모듈의 경로를 직접 가져온다. `shared/`는 페이지나 앱 조립 계층에 의존하지 않는다. 페이지 전용 코드를 다른 페이지에서 쓰게 되면 실제 공통 책임을 확인한 뒤 승격한다.
@@ -17,7 +18,10 @@
 - UI는 렌더링, 접근성, 입력값 전달을 담당한다. React 상태·이벤트·브라우저 생명주기를 묶는 동작은 훅에, React와 무관한 계산·정렬·검증은 순수 유틸에 둔다.
 - 권한, 거래, 구독, 구입 가능 여부처럼 상태 변경에 필요한 규칙은 스토어 액션과 공용 판정 로직에 둔다. 화면에서 동일 규칙을 중복 구현하지 않는다.
 - 입력값이나 모달 상태는 쓰는 컴포넌트 또는 페이지 훅에서 관리한다. 한 페이지의 여러 영역이 함께 쓰는 상태는 필요할 때 페이지 `store/`로 옮기고, 페이지 간 공유 상태는 `shared/store/`의 Zustand 스토어에서 관리한다. 구독 범위가 명확하면 selector를 사용한다.
+- 공통 스토어 파일은 `store/` 아래의 도메인 또는 역할별 하위 폴더에 배치한다. 액션과 selector는 `store/auth/`, `store/content/`, `store/subscription/`처럼 해당 도메인에 두고, 액션 타입은 해당 slice에 둔다.
+- `store/core/useAppStore.ts`는 slice 조합을 담당한다. 저장 옵션과 마이그레이션은 `store/persistence/`, 공통 상태 갱신 도구는 `store/updates/`에서 관리한다. 코인 잔액과 거래 원장처럼 함께 바뀌는 데이터는 같은 스토어 업데이트로 반영한다.
 - Zustand 저장 키 `bamgyeol-demo-v1`와 기존 데이터 호환성을 유지한다. 저장 구조를 바꾸는 작업에서는 버전과 마이그레이션을 검토하고, 새 저장소와 기존 저장소에서 각각 재현한다.
+- 브라우저 테마 설정은 `shared/store/theme/useThemeStore.ts`에서 별도 저장한다. 기본값은 시스템 설정이며 사용자가 선택한 설정은 모든 역할에서 공유한다. 새 테마를 추가하면 선택 목록과 최초 화면에 적용하는 초기화 코드를 함께 갱신한다.
 
 ## 코드 포맷
 
@@ -27,6 +31,8 @@
 
 ## 스타일과 검증
 
-- 공통 Tailwind 테마와 전역 스타일은 `src/shared/styles/global.css`에서 관리한다. 반복하는 버튼, 필드, 모달은 공통 UI를 재사용하고 페이지 전용 클래스는 해당 컴포넌트에 둔다.
+- `src/shared/styles/global.css`는 스타일을 불러오는 진입점으로 사용한다. 공통 색상 토큰은 `src/shared/styles/themes/tokens.css`에 두고 테마별 팔레트는 같은 폴더의 독립 CSS 파일에 둔다.
+- 화면의 배경, 텍스트, 강조색은 `bg-surface`, `text-foreground`, `bg-accent`처럼 역할을 나타내는 토큰을 사용한다. 사진과 영상 위에는 대비를 유지하는 미디어 전용 토큰을 사용한다.
+- 반복하는 버튼, 필드, 모달은 공통 UI를 재사용하고 페이지 전용 클래스는 해당 컴포넌트에 둔다. 강조색은 화면의 주요 행동이나 선택 상태에 우선 사용한다. 상태를 아이콘이나 스위치로 표시할 때는 접근성 이름과 상태도 제공한다.
 - 화면을 나눌 때 역할별 메뉴, 반응형 레이아웃, 키보드 조작, 모달의 포커스와 닫기 동작, 보호 콘텐츠 가림을 보존한다. 일반 열람 화면에는 워터마크를 표시하지 않는다.
 - 테스트 작성·실행, 린트, 빌드는 사용자 요청이 있을 때만 수행한다. `npm run build`에는 타입 검사가 포함된다. 변경 사항과 실제 수행한 검증 범위를 [프론트엔드 변경 이력](CHANGELOG_FE.md)에 기록한다.

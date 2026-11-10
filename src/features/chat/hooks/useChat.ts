@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { hasSubscription } from '../../../shared/store/appSelectors'
-import { useAppStore } from '../../../shared/store/useAppStore'
+import { hasSubscription } from '../../../shared/store/subscription/subscriptionSelectors'
+import { useAppStore } from '../../../shared/store/core/useAppStore'
 import type { PageProps } from '../../../shared/types/navigation'
 
 export function useChat({ account, initial, notify }: Pick<PageProps, 'account' | 'initial' | 'notify'>) {

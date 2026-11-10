@@ -1,8 +1,8 @@
-import Avatar from '../../../../shared/components/ui/Avatar'
-import Badge from '../../../../shared/components/ui/Badge'
-import Button from '../../../../shared/components/ui/Button'
+import Avatar from '../../../../shared/components/ui/media/Avatar'
+import Badge from '../../../../shared/components/ui/display/Badge'
+import Button from '../../../../shared/components/ui/actions/Button'
 import type { Account } from '../../../../shared/types/account'
-import { formatKrw, formatNumber } from '../../../../shared/utils/format'
+import { formatKrw, formatNumber } from '../../../../shared/utils/format/format'
 import type { SettlementRow } from '../types/settlementReport'
 
 export default function SettlementCreatorRow({
@@ -15,7 +15,7 @@ export default function SettlementCreatorRow({
   onEdit: (row: SettlementRow) => void
 }) {
   return (
-    <tr className="border-t border-edge hover:bg-white/3 [&>td]:px-3 [&>td]:py-2.5">
+    <tr className="border-t border-line hover:bg-foreground/3 [&>td]:px-3 [&>td]:py-2.5">
       <th scope="row" className="px-3 py-2.5 text-left">
         <span className="flex items-center gap-2 whitespace-nowrap">
           <Avatar person={row.creator} account={account} className="size-7" />
@@ -41,7 +41,7 @@ export default function SettlementCreatorRow({
       </td>
       <td>{formatKrw(row.net)}</td>
       <td>{formatKrw(row.fee)}</td>
-      <td className="font-bold text-mint">{formatKrw(row.due)}</td>
+      <td className="font-bold text-accent">{formatKrw(row.due)}</td>
     </tr>
   )
 }

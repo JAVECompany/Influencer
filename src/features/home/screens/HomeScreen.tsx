@@ -2,9 +2,9 @@ import { ArrowRight, Compass } from 'lucide-react'
 import ContentPreviewDialog from '../../../shared/components/content/ContentPreviewDialog'
 import PostCard from '../../../shared/components/content/PostCard'
 import StoryRail from '../../../shared/components/content/StoryRail'
-import Button from '../../../shared/components/ui/Button'
-import EmptyState from '../../../shared/components/ui/EmptyState'
-import PageTitle from '../../../shared/components/ui/PageTitle'
+import Button from '../../../shared/components/ui/actions/Button'
+import EmptyState from '../../../shared/components/ui/feedback/EmptyState'
+import PageTitle from '../../../shared/components/ui/layout/PageTitle'
 import type { FeedProps } from '../../../shared/types/feed'
 import type { PageProps } from '../../../shared/types/navigation'
 import FeedReviewFilter from '../components/FeedReviewFilter'
@@ -37,7 +37,6 @@ export default function HomeScreen({
   return (
     <>
       <PageTitle
-        label={staff ? 'CONTENT REVIEW' : 'YOUR ORBIT'}
         title={staff ? '전체 크리에이터 피드' : '나의 피드'}
         subtitle={
           staff
@@ -57,7 +56,7 @@ export default function HomeScreen({
         <div className="min-w-0">
           <StoryRail stories={stories} onOpen={setPreview} creators={creators} accounts={accounts} />
           <h2 className="mb-3 flex items-center justify-between text-sm font-black">
-            최근 게시글 <span className="text-[11px] font-medium tracking-wide text-dim">최신순</span>
+            최근 게시글 <span className="text-[11px] font-medium tracking-wide text-muted">최신순</span>
           </h2>
           <div className="grid gap-5">
             {feed.slice(0, limit).map((post) => (

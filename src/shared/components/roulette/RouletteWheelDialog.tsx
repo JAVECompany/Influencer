@@ -1,12 +1,12 @@
 import { Coins, Gift } from 'lucide-react'
 import { rouletteSegmentColors } from '../../constants/roulette'
-import { useRouletteSpin } from '../../hooks/useRouletteSpin'
+import { useRouletteSpin } from '../../hooks/roulette/useRouletteSpin'
 import type { SpendResult } from '../../types/actionResult'
 import type { Roulette } from '../../types/commerce'
-import { formatNumber } from '../../utils/format'
-import Badge from '../ui/Badge'
-import Button from '../ui/Button'
-import Modal from '../ui/Modal'
+import { formatNumber } from '../../utils/format/format'
+import Badge from '../ui/display/Badge'
+import Button from '../ui/actions/Button'
+import Modal from '../ui/dialogs/Modal'
 import RouletteWheel from './RouletteWheel'
 
 interface RouletteWheelProps {
@@ -42,9 +42,9 @@ export default function RouletteWheelDialog({
   return (
     <Modal title="크리에이터 룰렛" onClose={onClose}>
       <div className="grid gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-dim">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted">
           <p className="flex items-center gap-1.5">
-            <Coins size={16} className="text-mint" />
+            <Coins size={16} className="text-accent" />
             {formatNumber(cost)} 코인 / 1회
           </p>
           {mode === 'customer' ? (
@@ -54,14 +54,14 @@ export default function RouletteWheelDialog({
           )}
         </div>
         {topPrizeCost != null && (
-          <section className="rounded-xl border border-mint/25 bg-[#142d30] p-3">
+          <section className="rounded-xl border border-accent/25 bg-accent-soft p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="min-w-0">
                 <p className="flex items-center gap-1.5 text-sm font-black">
-                  <Gift size={17} className="shrink-0 text-mint" />
+                  <Gift size={17} className="shrink-0 text-accent" />
                   1등 확정 구매
                 </p>
-                <p className="mt-1 text-xs break-words text-dim">
+                <p className="mt-1 text-xs break-words text-muted">
                   {rewards[0].name} · {formatNumber(topPrizeCost)} 코인
                 </p>
               </div>
@@ -85,13 +85,13 @@ export default function RouletteWheelDialog({
         {result && (
           <p
             role="status"
-            className="rounded-xl bg-[#162e32] px-3 py-2.5 text-center text-sm font-bold break-words text-mint"
+            className="rounded-xl bg-accent-soft px-3 py-2.5 text-center text-sm font-bold break-words text-accent"
           >
             {result.guaranteed ? '1등 확정 구매' : '당첨'} · {result.reward}
           </p>
         )}
         {error && (
-          <p role="alert" className="text-center text-sm text-red-200">
+          <p role="alert" className="text-center text-sm text-danger">
             {error}
           </p>
         )}
@@ -102,7 +102,7 @@ export default function RouletteWheelDialog({
         )}
         <ul
           aria-label="상품별 당첨 확률"
-          className="grid gap-2 rounded-xl bg-night p-3 text-xs text-dim sm:grid-cols-2"
+          className="grid gap-2 rounded-xl bg-canvas p-3 text-xs text-muted sm:grid-cols-2"
         >
           {rewards.map((reward, i) => (
             <li key={i} className="flex items-start gap-2">

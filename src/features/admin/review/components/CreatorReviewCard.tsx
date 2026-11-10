@@ -1,6 +1,6 @@
-import Avatar from '../../../../shared/components/ui/Avatar'
-import Badge from '../../../../shared/components/ui/Badge'
-import Button from '../../../../shared/components/ui/Button'
+import Avatar from '../../../../shared/components/ui/media/Avatar'
+import Badge from '../../../../shared/components/ui/display/Badge'
+import Button from '../../../../shared/components/ui/actions/Button'
 import { creatorReviewStatus } from '../../../../shared/constants/creatorReviewStatus'
 import { panel } from '../../../../shared/styles/controlStyles'
 import type { Account, Creator } from '../../../../shared/types/account'
@@ -22,7 +22,7 @@ export default function CreatorReviewCard({
         <Avatar person={creator} account={account} className="size-10" />
         <div className="min-w-0 flex-1">
           <h2 className="truncate font-black">{creator.name}</h2>
-          <p className="text-xs text-dim">
+          <p className="text-xs text-muted">
             @{creator.handle} · {creator.method === 'link' ? '링크 접수' : '직접 입력'}
           </p>
         </div>
@@ -30,7 +30,7 @@ export default function CreatorReviewCard({
       </div>
       {creator.instagram && (
         <a
-          className="text-sm break-all text-mint underline"
+          className="text-sm break-all text-accent underline"
           href={creator.instagram}
           target="_blank"
           rel="noreferrer"
@@ -39,11 +39,11 @@ export default function CreatorReviewCard({
         </a>
       )}
       {creator.email && (
-        <p className="text-sm break-all text-dim">
+        <p className="text-sm break-all text-muted">
           {creator.email} · {creator.bio}
         </p>
       )}
-      {creator.reason && <p className="mt-2 text-sm text-dim">{creator.reason}</p>}
+      {creator.reason && <p className="mt-2 text-sm text-muted">{creator.reason}</p>}
       {creator.status === 'pending' && (
         <div className="mt-4 flex gap-2">
           <Button onClick={() => onApprove(creator.id)}>승인</Button>

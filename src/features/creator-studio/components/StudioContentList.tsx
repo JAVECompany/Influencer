@@ -1,11 +1,11 @@
 import { Eye, Trash2, UsersRound } from 'lucide-react'
-import Button from '../../../shared/components/ui/Button'
+import Button from '../../../shared/components/ui/actions/Button'
 import { contentKindLabels } from '../../../shared/constants/contentKinds'
-import { audienceForCreator, tracksAudience } from '../../../shared/store/appSelectors'
-import { useAppStore } from '../../../shared/store/useAppStore'
+import { audienceForCreator, tracksAudience } from '../../../shared/store/content/contentSelectors'
+import { useAppStore } from '../../../shared/store/core/useAppStore'
 import { panel } from '../../../shared/styles/controlStyles'
 import type { Content } from '../../../shared/types/content'
-import { formatNumber, formatRelativeTime } from '../../../shared/utils/format'
+import { formatNumber, formatRelativeTime } from '../../../shared/utils/format/format'
 
 export default function StudioContentList({
   posts,
@@ -20,16 +20,16 @@ export default function StudioContentList({
 }) {
   const state = useAppStore()
   return (
-    <section className={`${panel} divide-y divide-edge`}>
+    <section className={`${panel} divide-y divide-line`}>
       <h2 className="p-5 font-black">내 콘텐츠</h2>
-      {!posts.length && <p className="p-5 text-sm text-dim">등록된 콘텐츠가 없어요.</p>}
+      {!posts.length && <p className="p-5 text-sm text-muted">등록된 콘텐츠가 없어요.</p>}
       {posts.map((p) => {
         const label = p.kind === 'live' ? '참여자' : '조회 고객'
         return (
           <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
             <div className="min-w-0">
               <p className="text-sm font-bold break-words">{p.title}</p>
-              <p className="mt-1 text-xs text-dim">
+              <p className="mt-1 text-xs text-muted">
                 {contentKindLabels[p.kind]} · {formatRelativeTime(p.at)}
                 {p.hidden && ' · 운영자 숨김'}
               </p>

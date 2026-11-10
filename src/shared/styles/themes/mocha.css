@@ -1,0 +1,21 @@
+:root[data-theme='mocha'] {
+  color-scheme: light;
+  --theme-canvas: #f3ebe4;
+  --theme-surface: #fcf7f2;
+  --theme-raised: #eee3da;
+  --theme-shell: #f9f2eb;
+  --theme-line: #e2d2c6;
+  --theme-foreground: #33271f;
+  --theme-muted: #67554a;
+  --theme-accent: #774a34;
+  --theme-accent-hover: #613c29;
+  --theme-on-accent: #ffffff;
+  --theme-accent-soft: #efdfd2;
+  --theme-danger: #97384a;
+  --theme-live: #a03951;
+  --theme-on-live: #ffffff;
+  --theme-like: #a13656;
+  --theme-selection: #e8d2bf;
+  --theme-on-selection: #4b3024;
+  --theme-backdrop: #40302666;
+}

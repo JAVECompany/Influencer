@@ -1,7 +1,7 @@
 import { ImageIcon, LockKeyhole, Video } from 'lucide-react'
 import type { Product } from '../../types/commerce'
-import { isProductVideo } from '../../utils/productMedia'
-import DemoScene from '../ui/DemoScene'
+import { isProductVideo } from '../../utils/media/productMedia'
+import DemoScene from '../ui/media/DemoScene'
 
 export default function ProductThumbnail({
   product,
@@ -17,7 +17,7 @@ export default function ProductThumbnail({
     <div
       data-product-thumbnail
       data-blurred-thumbnail={locked || undefined}
-      className={`relative isolate shrink-0 overflow-hidden rounded-xl bg-[#25323b] ${className}`}
+      className={`relative isolate shrink-0 overflow-hidden rounded-xl bg-raised ${className}`}
       aria-label={locked ? '흐리게 가린 상품 미리보기' : product.name + ' 미리보기'}
       role="img"
     >
@@ -48,7 +48,7 @@ export default function ProductThumbnail({
       {locked && (
         <div
           aria-hidden="true"
-          className="absolute inset-0 grid place-items-center bg-night/30 text-white/85"
+          className="absolute inset-0 grid place-items-center bg-media/30 text-on-media"
         >
           <LockKeyhole size={19} />
         </div>
@@ -56,7 +56,7 @@ export default function ProductThumbnail({
       <Type
         aria-hidden="true"
         size={13}
-        className="absolute right-2 bottom-2 rounded-sm bg-night/70 p-0.5 text-white"
+        className="absolute right-2 bottom-2 rounded-sm bg-media/70 p-0.5 text-on-media"
       />
     </div>
   )

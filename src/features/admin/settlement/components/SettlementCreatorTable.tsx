@@ -1,6 +1,6 @@
 import { field, panel } from '../../../../shared/styles/controlStyles'
 import type { Account } from '../../../../shared/types/account'
-import { formatKrw, formatNumber } from '../../../../shared/utils/format'
+import { formatKrw, formatNumber } from '../../../../shared/utils/format/format'
 import type { SettlementReport, SettlementRow } from '../types/settlementReport'
 import SettlementCreatorRow from './SettlementCreatorRow'
 
@@ -24,7 +24,7 @@ export default function SettlementCreatorTable({
       <div className="flex flex-wrap items-end justify-between gap-3 p-4 sm:p-5">
         <div>
           <h2 className="font-black">크리에이터별 정산</h2>
-          <p className="mt-1 text-xs text-dim">
+          <p className="mt-1 text-xs text-muted">
             상품 구매와 룰렛에 실제 사용된 코인을 집계합니다. 직접 입력은 조회 기간과 크리에이터에만
             적용합니다.
           </p>
@@ -39,7 +39,7 @@ export default function SettlementCreatorTable({
       </div>
       <div className="max-h-[540px] overflow-auto" tabIndex={0} aria-label="크리에이터 정산 표 스크롤">
         <table className="w-full min-w-[870px] border-collapse text-right text-xs tabular-nums">
-          <thead className="sticky top-0 z-10 bg-[#182632] text-dim">
+          <thead className="sticky top-0 z-10 bg-raised text-muted">
             <tr className="[&>th]:px-3 [&>th]:py-3">
               <th scope="col" className="text-left">
                 크리에이터
@@ -64,20 +64,20 @@ export default function SettlementCreatorTable({
             ))}
           </tbody>
         </table>
-        {!rows.length && <p className="p-5 text-sm text-dim">일치하는 크리에이터가 없어요.</p>}
+        {!rows.length && <p className="p-5 text-sm text-muted">일치하는 크리에이터가 없어요.</p>}
       </div>
-      <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-edge bg-night/50 px-4 py-3 text-xs text-dim">
+      <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-line bg-canvas/50 px-4 py-3 text-xs text-muted">
         <span>
-          선택 기간 코인 합계 <strong className="ml-1 text-white">{formatNumber(total.coins)}</strong>
+          선택 기간 코인 합계 <strong className="ml-1 text-foreground">{formatNumber(total.coins)}</strong>
         </span>
         <span>
-          코인 정산 총액 <strong className="ml-1 text-white">{formatKrw(total.gross)}</strong>
+          코인 정산 총액 <strong className="ml-1 text-foreground">{formatKrw(total.gross)}</strong>
         </span>
         <span>
-          플랫폼 수수료 합계 <strong className="ml-1 text-white">{formatKrw(total.fee)}</strong>
+          플랫폼 수수료 합계 <strong className="ml-1 text-foreground">{formatKrw(total.fee)}</strong>
         </span>
         <span>
-          전체 지급 예정 <strong className="ml-1 text-mint">{formatKrw(total.due)}</strong>
+          전체 지급 예정 <strong className="ml-1 text-accent">{formatKrw(total.due)}</strong>
         </span>
       </div>
     </section>

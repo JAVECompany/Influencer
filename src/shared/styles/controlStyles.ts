@@ -1,4 +1,4 @@
-export const panel = 'rounded-2xl border border-edge bg-panel'
+export const panel = 'theme-panel rounded-2xl border border-line bg-surface'
 
 export const field =
-  'w-full rounded-xl border border-edge bg-night px-4 py-3 text-sm text-white placeholder:text-dim/70 focus:border-mint focus:outline-none'
+  'w-full rounded-xl border border-line bg-canvas px-4 py-3 text-sm text-foreground placeholder:text-muted focus:border-accent'

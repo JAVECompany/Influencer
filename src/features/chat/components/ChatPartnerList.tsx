@@ -1,4 +1,4 @@
-import Avatar from '../../../shared/components/ui/Avatar'
+import Avatar from '../../../shared/components/ui/media/Avatar'
 import { panel } from '../../../shared/styles/controlStyles'
 import type { Account, Creator } from '../../../shared/types/account'
 
@@ -27,7 +27,7 @@ export default function ChatPartnerList({
           aria-pressed={thread === id}
           onClick={() => onSelect(id)}
           className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-bold ${
-            thread === id ? 'bg-[#193338] text-mint' : 'hover:bg-white/5'
+            thread === id ? 'bg-accent-soft text-accent' : 'hover:bg-foreground/5'
           }`}
         >
           <Avatar person={other(id)} account={accounts[id]} className="size-9" />

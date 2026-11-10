@@ -1,6 +1,6 @@
 import { BadgeCheck } from 'lucide-react'
-import EmptyState from '../../../../shared/components/ui/EmptyState'
-import PageTitle from '../../../../shared/components/ui/PageTitle'
+import EmptyState from '../../../../shared/components/ui/feedback/EmptyState'
+import PageTitle from '../../../../shared/components/ui/layout/PageTitle'
 import type { PageProps } from '../../../../shared/types/navigation'
 import CreatorReviewCard from '../components/CreatorReviewCard'
 import RejectApplicationDialog from '../components/RejectApplicationDialog'
@@ -11,7 +11,6 @@ export default function CreatorReviewScreen({ notify }: Pick<PageProps, 'notify'
   return (
     <>
       <PageTitle
-        label="APPLICATIONS"
         title="심사 요청 목록"
         subtitle="크리에이터의 신청 정보를 확인한 뒤 검색 공개 여부를 결정하세요."
       />

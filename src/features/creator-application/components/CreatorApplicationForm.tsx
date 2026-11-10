@@ -1,6 +1,6 @@
 import type { FormEventHandler } from 'react'
-import Button from '../../../shared/components/ui/Button'
-import FieldLabel from '../../../shared/components/ui/FieldLabel'
+import Button from '../../../shared/components/ui/actions/Button'
+import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
 import { field, panel } from '../../../shared/styles/controlStyles'
 import type { ApplicationMethod, Creator } from '../../../shared/types/account'
 
@@ -75,7 +75,7 @@ export default function CreatorApplicationForm({
           </FieldLabel>
         </div>
       )}
-      <p className="text-xs text-dim">
+      <p className="text-xs text-muted">
         데모에는 Instagram 비밀번호, 주민등록번호, 계좌번호를 입력하지 마세요.
       </p>
       <Button type="submit" className="justify-self-start">

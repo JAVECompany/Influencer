@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import Button from '../../../shared/components/ui/Button'
-import FieldLabel from '../../../shared/components/ui/FieldLabel'
-import Modal from '../../../shared/components/ui/Modal'
+import Button from '../../../shared/components/ui/actions/Button'
+import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
+import Modal from '../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../shared/styles/controlStyles'
 import type { Account, ProfileChanges } from '../../../shared/types/account'
 import type { Notify } from '../../../shared/types/actionResult'
-import { readMediaFile } from '../../../shared/utils/readMediaFile'
+import { readMediaFile } from '../../../shared/utils/media/readMediaFile'
 
 export default function EditProfileDialog({
   account,

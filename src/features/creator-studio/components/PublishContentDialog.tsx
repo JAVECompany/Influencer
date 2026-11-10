@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import Button from '../../../shared/components/ui/Button'
-import FieldLabel from '../../../shared/components/ui/FieldLabel'
-import Modal from '../../../shared/components/ui/Modal'
+import Button from '../../../shared/components/ui/actions/Button'
+import FieldLabel from '../../../shared/components/ui/forms/FieldLabel'
+import Modal from '../../../shared/components/ui/dialogs/Modal'
 import { field } from '../../../shared/styles/controlStyles'
 import type { Notify } from '../../../shared/types/actionResult'
 import type { ContentKind, PublishInput } from '../../../shared/types/content'
-import { readFormValue } from '../../../shared/utils/formData'
-import { readMediaFile } from '../../../shared/utils/readMediaFile'
+import { readFormValue } from '../../../shared/utils/forms/formData'
+import { readMediaFile } from '../../../shared/utils/media/readMediaFile'
 
 export default function PublishContentDialog({
   onPublish,
@@ -57,7 +57,7 @@ export default function PublishContentDialog({
         <FieldLabel title="이미지 (선택 · 280 KB 이하)">
           <input name="media" type="file" accept="image/png,image/jpeg,image/webp" className={field} />
         </FieldLabel>
-        {kind === 'live' && <p className="text-xs text-dim">구독자 홈에 편성 미리보기가 표시됩니다.</p>}
+        {kind === 'live' && <p className="text-xs text-muted">구독자 홈에 편성 미리보기가 표시됩니다.</p>}
         <Button type="submit">구독자에게 공개</Button>
       </form>
     </Modal>

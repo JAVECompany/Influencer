@@ -1,0 +1,25 @@
+:root[data-theme='orbit'] {
+  color-scheme: dark;
+  --theme-canvas: #0b1017;
+  --theme-surface: #121b25;
+  --theme-raised: #182632;
+  --theme-shell: #0e151d;
+  --theme-line: #263344;
+  --theme-foreground: #f2f6fa;
+  --theme-muted: #a1afbf;
+  --theme-accent: #62e8c4;
+  --theme-accent-hover: #99f5df;
+  --theme-on-accent: #082621;
+  --theme-accent-soft: #163337;
+  --theme-danger: #ffa6b7;
+  --theme-live: #a52c50;
+  --theme-on-live: #ffffff;
+  --theme-like: #ee7a9f;
+  --theme-selection: #276f61;
+  --theme-on-selection: #ffffff;
+  --theme-backdrop: #030609bf;
+  --theme-globe-image: radial-gradient(ellipse at center, #253e4a, #182734 40%, #0e1722 76%);
+  --theme-banner-image: radial-gradient(ellipse at top right, #355d66, transparent 75%),
+    linear-gradient(100deg, #182533, #101a2d);
+  --theme-balance-image: linear-gradient(105deg, #182f35, #121b25 80%);
+}
