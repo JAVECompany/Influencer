@@ -1,5 +1,6 @@
 import { ReceiptText } from 'lucide-react'
-import { useAppStore } from '../../store/app'
+import { useAccountStore } from '../../store/account/account'
+import { useCreatorStore } from '../../store/creator/creator'
 import { panel } from '../../styles/controlStyles'
 import type { Transaction, TransactionType } from '../../types/commerce'
 import { formatKrw, formatNumber, formatRelativeTime } from '../../utils/format/format'
@@ -29,7 +30,8 @@ export default function TransactionLedger({
   showParties?: boolean
   absoluteDates?: boolean
 }) {
-  const state = useAppStore()
+  const accounts = useAccountStore((state) => state.accounts)
+  const creators = useCreatorStore((state) => state.creators)
   return (
     <section className={`${panel} overflow-hidden`}>
       <h2 className="flex items-center gap-2 px-5 py-4 font-black">
@@ -47,8 +49,8 @@ export default function TransactionLedger({
             </p>
             <p className="mt-1 text-xs break-words text-muted">
               {[
-                showParties && (state.accounts[t.customer]?.name ?? t.customer),
-                t.owner && state.creators[t.owner]?.name,
+                showParties && (accounts[t.customer]?.name ?? t.customer),
+                t.owner && creators[t.owner]?.name,
                 absoluteDates ? settlementDate.format(t.at) : formatRelativeTime(t.at),
               ]
                 .filter(Boolean)

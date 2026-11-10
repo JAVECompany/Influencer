@@ -1,17 +1,24 @@
 import { useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { coinPacks } from '../../../shared/constants/coinPacks'
-import { useAppStore } from '../../../shared/store/app'
+import { useWalletStore } from '../../../shared/store/wallet/wallet'
 import type { PageProps } from '../../../shared/types/navigation'
 
 export function useCoinStore({ account, notify }: Pick<PageProps, 'account' | 'notify'>) {
-  const state = useAppStore()
+  const { balances, transactions: allTransactions } = useWalletStore(
+    useShallow(({ balances, transactions }) => ({ balances, transactions }))
+  )
+  const topUpCoins = useWalletStore((state) => state.topUp)
   const [pack, setPack] = useState<(typeof coinPacks)[number] | null>(null)
-  const balance = state.balances[account.id] ?? 0
-  const transactions = state.transactions.filter((item) => item.customer === account.id)
+  const balance = balances[account.id] ?? 0
+  const transactions = allTransactions.filter((item) => item.customer === account.id)
   const close = () => setPack(null)
   const topUp = () => {
-    if (!pack) return
-    notify(state.topUp(pack.coins), '코인을 충전했어요.')
+    if (!pack) {
+      return
+    }
+
+    notify(topUpCoins(pack.coins), '코인을 충전했어요.')
     close()
   }
 

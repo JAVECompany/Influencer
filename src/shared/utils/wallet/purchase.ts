@@ -50,8 +50,10 @@ export function preparePurchase(
     account?.role !== 'customer' ||
     !isPublic(state, creator) ||
     !hasSubscription(state, account.id, creator)
-  )
+  ) {
     return fail('구독 중인 고객만 이용할 수 있습니다.')
+  }
+
   const guaranteed = type === 'roulette-guaranteed'
   const product =
     type === 'product'
@@ -60,18 +62,27 @@ export function preparePurchase(
   const roulette = type === 'roulette' || guaranteed ? state.roulettes[creator] : undefined
   const cost = guaranteed ? roulette?.topPrizeCost : (product || roulette)?.cost
   const balance = Object.hasOwn(state.balances, account.id) ? state.balances[account.id] ?? 0 : 0
-  if (!cost || (product && !isProductForSale(product, state.transactions)))
+  if (!cost || (product && !isProductForSale(product, state.transactions))) {
     return fail('현재 구매할 수 없는 상품입니다.')
-  if (product && state.transactions.some((t) => t.productId === productId && t.customer === account.id))
+  }
+  if (product && state.transactions.some((t) => t.productId === productId && t.customer === account.id)) {
     return fail('이미 구매한 상품입니다.')
+  }
+
   const physical = product && isPhysicalProduct(product)
   const shipping = physical && address ? normalizeShippingAddress(address) : undefined
-  if (physical && (!shipping || !validShippingAddress(shipping)))
+  if (physical && (!shipping || !validShippingAddress(shipping))) {
     return fail('받는 분, 연락처, 5자리 우편번호와 주소를 확인해 주세요.')
-  if (balance < cost) return fail('코인이 부족합니다. 스토어에서 충전할 수 있어요.')
+  }
+  if (balance < cost) {
+    return fail('코인이 부족합니다. 스토어에서 충전할 수 있어요.')
+  }
+
   const rewardIndex = roulette ? (guaranteed ? 0 : drawRewardIndex(roulette.rewards)) : undefined
   const reward = roulette && rewardIndex !== undefined ? roulette.rewards[rewardIndex]?.name : product?.name
-  if (!reward) return fail('상품을 찾을 수 없습니다.')
+  if (!reward) {
+    return fail('상품을 찾을 수 없습니다.')
+  }
 
   return {
     balance: balance - cost,

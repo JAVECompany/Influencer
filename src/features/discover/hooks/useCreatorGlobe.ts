@@ -18,7 +18,10 @@ export function useCreatorGlobe(items: ExploreItem[], peak: number) {
   const [dragging, setDragging] = useState(false)
   useLayoutEffect(() => {
     const element = viewport.current
-    if (!element) return
+    if (!element) {
+      return
+    }
+
     const sync = () => setDimensions({ width: element.clientWidth, height: element.clientHeight })
     const observer = new ResizeObserver(sync)
     sync()
@@ -37,16 +40,25 @@ export function useCreatorGlobe(items: ExploreItem[], peak: number) {
   }
 
   const beginDrag = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return
+    if (event.button !== 0) {
+      return
+    }
+
     ignoreClick.current = false
     gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY, angles }
   }
   const drag = (event: PointerEvent<HTMLDivElement>) => {
     const drag = gesture.current
-    if (drag?.id !== event.pointerId) return
+    if (drag?.id !== event.pointerId) {
+      return
+    }
+
     const dx = event.clientX - drag.x
     const dy = event.clientY - drag.y
-    if (!ignoreClick.current && Math.hypot(dx, dy) < 6) return
+    if (!ignoreClick.current && Math.hypot(dx, dy) < 6) {
+      return
+    }
+
     if (!ignoreClick.current) {
       event.currentTarget.setPointerCapture(event.pointerId)
       ignoreClick.current = true
@@ -62,12 +74,17 @@ export function useCreatorGlobe(items: ExploreItem[], peak: number) {
       ArrowDown: [0, 0.32],
     }
     const step = steps[event.key]
-    if (!step) return
+    if (!step) {
+      return
+    }
+
     event.preventDefault()
     setAngles((old) => move(...step, old))
   }
   const leave = () => {
-    if (!ignoreClick.current) end()
+    if (!ignoreClick.current) {
+      end()
+    }
   }
   const reset = () => setAngles(startingAngles)
   const acceptsClick = (detail: number) => !ignoreClick.current || detail === 0

@@ -21,7 +21,10 @@ export default function Modal({
   const mask = useContext(ContentPrivacyContext)
   useEffect(() => {
     const dialog = ref.current
-    if (!dialog) return
+    if (!dialog) {
+      return
+    }
+
     dialog.showModal()
     return () => dialog.close()
   }, [])

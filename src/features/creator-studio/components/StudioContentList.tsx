@@ -2,7 +2,8 @@ import { Eye, Trash2, UsersRound } from 'lucide-react'
 import Button from '../../../shared/components/ui/actions/Button'
 import { contentKindLabels } from '../../../shared/constants/contentKinds'
 import { audienceForCreator, tracksAudience } from '../../../shared/utils/content/contentAccess'
-import { useAppStore } from '../../../shared/store/app'
+import { useAccountStore } from '../../../shared/store/account/account'
+import { useAuthStore } from '../../../shared/store/auth/auth'
 import { panel } from '../../../shared/styles/controlStyles'
 import type { Content } from '../../../shared/types/content'
 import { formatNumber, formatRelativeTime } from '../../../shared/utils/format/format'
@@ -18,7 +19,9 @@ export default function StudioContentList({
   onPreview: (id: string) => void
   onDelete: (post: Content) => void
 }) {
-  const state = useAppStore()
+  const accounts = useAccountStore((state) => state.accounts)
+  const session = useAuthStore((state) => state.session)
+  const state = { accounts, session }
   return (
     <section className={`${panel} divide-y divide-line`}>
       <h2 className="p-5 font-black">내 콘텐츠</h2>

@@ -33,18 +33,26 @@ export function useRouletteSpin(
 
   const play = async (guaranteed: boolean) => {
     const wheel = disc.current
-    if (!wheel || busy.current || review) return
+    if (!wheel || busy.current || review) {
+      return
+    }
+
     setResult(null)
     const sample = guaranteed ? 0 : preview ? drawRewardIndex(rewards) : 0
     const draw: SpendResult | undefined = preview
       ? { success: true, rewardIndex: sample, reward: rewards[sample].name }
       : onPlay?.(guaranteed)
-    if (!draw) return
+    if (!draw) {
+      return
+    }
     if ('error' in draw && draw.error) {
       setError(draw.error)
       return
     }
-    if (draw.rewardIndex === undefined || draw.reward === undefined) return
+    if (draw.rewardIndex === undefined || draw.reward === undefined) {
+      return
+    }
+
     setError('')
     setConfirm(false)
     const segment = segments[draw.rewardIndex]
@@ -64,7 +72,9 @@ export function useRouletteSpin(
       try {
         await animation.finished
       } catch {
-        if (motion.current !== animation) return
+        if (motion.current !== animation) {
+          return
+        }
       }
     }
     wheel.style.transform = transform(to)

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { FeedbackMessage } from '../../shared/contexts/feedbackContext'
-import { useAppStore } from '../../shared/store/app'
+import { useAuthStore } from '../../shared/store/auth/auth'
 import type { Notify } from '../../shared/types/actionResult'
 
 export function useAppFeedback(accountId: string | null) {
@@ -8,11 +8,14 @@ export function useAppFeedback(accountId: string | null) {
   const notify: Notify = (result, success) => {
     const text = result.error || success
     setMessage(
-      text ? { text, error: Boolean(result.error), accountId: useAppStore.getState().session } : null
+      text ? { text, error: Boolean(result.error), accountId: useAuthStore.getState().session } : null
     )
   }
   useEffect(() => {
-    if (!message) return
+    if (!message) {
+      return
+    }
+
     const timeout = setTimeout(() => setMessage(null), 4400)
     return () => clearTimeout(timeout)
   }, [message])

@@ -40,7 +40,9 @@ export default function PublishContentDialog({
             value={kind}
             onChange={(event) => {
               const next = event.target.value
-              if (next === 'post' || next === 'story' || next === 'live') setKind(next)
+              if (next === 'post' || next === 'story' || next === 'live') {
+                setKind(next)
+              }
             }}
           >
             <option value="post">게시글</option>

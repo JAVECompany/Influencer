@@ -12,7 +12,10 @@ import { useAdminSettlement } from '../hooks/useAdminSettlement'
 
 export default function AdminSettlementScreen({ notify }: Pick<PageProps, 'notify'>) {
   const settlement = useAdminSettlement(notify)
-  if (!settlement) return null
+  if (!settlement) {
+    return null
+  }
+
   const {
     accounts,
     mode,

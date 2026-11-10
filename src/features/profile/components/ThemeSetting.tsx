@@ -17,7 +17,9 @@ export default function ThemeSetting() {
           value={theme}
           onChange={(event) => {
             const value = event.currentTarget.value
-            if (isThemePreference(value)) setTheme(value)
+            if (isThemePreference(value)) {
+              setTheme(value)
+            }
           }}
           className="w-36 appearance-none rounded-lg border border-line bg-canvas py-2.5 pr-8 pl-3 text-sm font-semibold text-foreground hover:border-accent/50 sm:w-44"
         >

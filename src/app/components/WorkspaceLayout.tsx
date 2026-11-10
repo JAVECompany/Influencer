@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import CreatorDetailScreen from '../../features/creator-detail/screens/CreatorDetailScreen'
-import { useAppStore } from '../../shared/store/app'
+import { useAuthStore } from '../../shared/store/auth/auth'
+import { useCreatorStore } from '../../shared/store/creator/creator'
+import { useWalletStore } from '../../shared/store/wallet/wallet'
 import type { PageKey, PageProps } from '../../shared/types/navigation'
 import { applicationNav, navItems, pages } from '../navigation/workspaceNavigation'
 import WorkspaceHeader from './WorkspaceHeader'
 import WorkspaceSidebar from './WorkspaceSidebar'
 
 export default function WorkspaceLayout({ account, notify }: Pick<PageProps, 'account' | 'notify'>) {
-  const state = useAppStore()
+  const creator = useCreatorStore((state) => state.creators[account.id])
+  const balance = useWalletStore((state) => state.balances[account.id] ?? 0)
+  const signOut = useAuthStore((state) => state.signOut)
   const nav =
-    account.role === 'influencer' && state.creators[account.id]?.status !== 'approved'
-      ? applicationNav
-      : navItems[account.role]
+    account.role === 'influencer' && creator?.status !== 'approved' ? applicationNav : navItems[account.role]
   const [tab, setTab] = useState(nav[0][0])
   const [detail, setDetail] = useState<string | null>(null)
   const [chat, setChat] = useState<string | null>(null)
@@ -54,16 +56,16 @@ export default function WorkspaceLayout({ account, notify }: Pick<PageProps, 'ac
     <div className="min-h-dvh">
       <WorkspaceSidebar
         account={account}
-        creator={state.creators[account.id]}
+        creator={creator}
         navButtons={navButtons}
         onHome={() => go(nav[0][0])}
-        onSignOut={state.signOut}
+        onSignOut={signOut}
       />
       <div className="lg:ml-[220px]">
         <WorkspaceHeader
           account={account}
           title={detail ? '크리에이터' : nav.find(([id]) => id === current)?.[1]}
-          balance={state.balances[account.id] ?? 0}
+          balance={balance}
           onHome={() => go(nav[0][0])}
           onStore={() => go('store')}
         />

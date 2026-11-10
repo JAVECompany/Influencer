@@ -49,7 +49,10 @@ export function settlementPeriod(
       : mode === 'month'
       ? new Date(Date.UTC(month.getUTCFullYear(), month.getUTCMonth() + 1, 0)).toISOString().slice(0, 10)
       : today
-  if (!start || !end || start > end || (mode === 'custom' && end > today)) return null
+  if (!start || !end || start > end || (mode === 'custom' && end > today)) {
+    return null
+  }
+
   return { start, end, key: start + '/' + end }
 }
 
@@ -59,21 +62,35 @@ function coinSplit(coins: number, coinWon: number, feeBps: number) {
   return { gross, fee, net: gross - fee }
 }
 
-export function summarizeSettlement(state: AppData, period: SettlementPeriod) {
+export function summarizeSettlement(
+  state: Pick<AppData, 'accounts' | 'creators' | 'settlement' | 'transactions'>,
+  period: SettlementPeriod
+) {
   const items: Transaction[] = []
   const totals = new Map<string, { coins: number; subs: number }>()
   const monthly = new Map<string, number>()
   const { coinWon, feeBps, overrides } = state.settlement
   const manual = overrides[period.key] ?? {}
   for (const transaction of state.transactions) {
-    if (state.accounts[transaction.customer]?.role === 'admin') continue
+    if (state.accounts[transaction.customer]?.role === 'admin') {
+      continue
+    }
+
     const date = dateInKorea(transaction.at)
-    if (date < period.start || date > period.end) continue
+    if (date < period.start || date > period.end) {
+      continue
+    }
+
     items.push(transaction)
     const { owner, type, coins = 0, won = 0 } = transaction
-    if (!owner || !state.creators[owner]) continue
+    if (!owner || !state.creators[owner]) {
+      continue
+    }
+
     const total = totals.get(owner) ?? { coins: 0, subs: 0 }
-    if (type === 'product' || type === 'roulette') total.coins += coins
+    if (type === 'product' || type === 'roulette') {
+      total.coins += coins
+    }
     if (type === 'subscribe') {
       total.subs += won
       const month = date.slice(0, 7)

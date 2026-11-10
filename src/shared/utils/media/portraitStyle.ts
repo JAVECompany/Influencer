@@ -13,7 +13,10 @@ const atlases = [
 ]
 
 export function portraitStyle(index?: number): CSSProperties | undefined {
-  if (index === undefined || !Number.isInteger(index) || index < 0 || index >= 100) return undefined
+  if (index === undefined || !Number.isInteger(index) || index < 0 || index >= 100) {
+    return undefined
+  }
+
   const atlas = atlases[index < 60 ? 0 : index < 70 ? 1 : 2]
   const tile = index < 60 ? index : index < 70 ? index - 60 : index - 70
   const cell = atlas.width / atlas.columns

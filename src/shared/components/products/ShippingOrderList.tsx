@@ -1,4 +1,5 @@
-import { useAppStore } from '../../store/app'
+import { useProductStore } from '../../store/products/product'
+import { useWalletStore } from '../../store/wallet/wallet'
 import { panel } from '../../styles/controlStyles'
 import type { Account } from '../../types/account'
 import type { Notify } from '../../types/actionResult'
@@ -6,8 +7,8 @@ import { formatNumber } from '../../utils/format/format'
 import Button from '../ui/actions/Button'
 
 export default function ShippingOrderList({ account, notify }: { account: Account; notify: Notify }) {
-  const transactions = useAppStore((state) => state.transactions)
-  const markProductShipped = useAppStore((state) => state.markProductShipped)
+  const transactions = useWalletStore((state) => state.transactions)
+  const markProductShipped = useProductStore((state) => state.markProductShipped)
   const seller = account.role === 'influencer'
   const orders = transactions.filter(
     (order) =>
@@ -23,7 +24,10 @@ export default function ShippingOrderList({ account, notify }: { account: Accoun
       <ul className="grid gap-2">
         {orders.map((order) => {
           const shipping = order.shipping
-          if (!shipping) return null
+          if (!shipping) {
+            return null
+          }
+
           return (
             <li key={order.id} className="rounded-xl bg-canvas p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">

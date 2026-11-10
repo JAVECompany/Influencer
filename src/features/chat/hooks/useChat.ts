@@ -3,11 +3,19 @@ import {
   hasSubscription,
   subscriptionsForCustomer,
 } from '../../../shared/utils/subscription/subscriptionAccess'
-import { useAppStore } from '../../../shared/store/app'
+import { useAccountStore } from '../../../shared/store/account/account'
+import { useChatStore } from '../../../shared/store/chat/chat'
+import { useCreatorStore } from '../../../shared/store/creator/creator'
+import { useSubscriptionStore } from '../../../shared/store/subscription/subscription'
 import type { PageProps } from '../../../shared/types/navigation'
 
 export function useChat({ account, initial, notify }: Pick<PageProps, 'account' | 'initial' | 'notify'>) {
-  const state = useAppStore()
+  const accounts = useAccountStore((state) => state.accounts)
+  const creators = useCreatorStore((state) => state.creators)
+  const subscriptions = useSubscriptionStore((state) => state.subscriptions)
+  const allMessages = useChatStore((state) => state.messages)
+  const state = { accounts, creators, subscriptions }
+  const sendChatMessage = useChatStore((state) => state.sendMessage)
   const [selected, setSelected] = useState(initial ?? null)
   const [text, setText] = useState('')
   const customerView = account.role === 'customer'
@@ -19,7 +27,7 @@ export function useChat({ account, initial, notify }: Pick<PageProps, 'account' 
   const other = (id: string) => (customerView ? state.creators[id] : state.accounts[id])
   const thread = selected && ids.includes(selected) ? selected : null
   const messages = thread
-    ? state.messages.filter((m) =>
+    ? allMessages.filter((m) =>
         customerView
           ? m.customer === account.id && m.creator === thread
           : m.creator === account.id && m.customer === thread
@@ -27,7 +35,9 @@ export function useChat({ account, initial, notify }: Pick<PageProps, 'account' 
     : []
   const log = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    if (log.current) log.current.scrollTop = log.current.scrollHeight
+    if (log.current) {
+      log.current.scrollTop = log.current.scrollHeight
+    }
   }, [thread, messages.length])
   const selectThread = (id: string) => {
     setSelected(id)
@@ -35,10 +45,16 @@ export function useChat({ account, initial, notify }: Pick<PageProps, 'account' 
   }
   const closeThread = () => setSelected(null)
   const sendMessage = () => {
-    if (!thread) return
-    const result = state.sendMessage(thread, text)
-    if (result.error) notify(result)
-    else setText('')
+    if (!thread) {
+      return
+    }
+
+    const result = sendChatMessage(thread, text)
+    if (result.error) {
+      notify(result)
+    } else {
+      setText('')
+    }
   }
 
   return {

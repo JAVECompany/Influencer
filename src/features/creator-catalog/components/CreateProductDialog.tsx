@@ -27,7 +27,10 @@ export default function CreateProductDialog({
         className="grid gap-4"
         onSubmit={async (event) => {
           event.preventDefault()
-          if (submitting) return
+          if (submitting) {
+            return
+          }
+
           const data = new FormData(event.currentTarget)
           const file = data.get('media')
           setSubmitting(true)

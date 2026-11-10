@@ -21,8 +21,10 @@ export default function ChangePasswordDialog({
         onSubmit={(event) => {
           event.preventDefault()
           const data = new FormData(event.currentTarget)
-          if (data.get('next') !== data.get('confirm'))
+          if (data.get('next') !== data.get('confirm')) {
             return notify({ error: '새 비밀번호 확인이 일치하지 않아요.' })
+          }
+
           save(
             { current: String(data.get('current') ?? ''), password: String(data.get('next') ?? '') },
             '비밀번호를 변경했어요.'

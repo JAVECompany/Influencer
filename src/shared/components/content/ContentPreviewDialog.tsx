@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { contentKindLabels } from '../../constants/contentKinds'
+import { useContentAccessData } from '../../hooks/content/useContentAccessData'
 import { canRead, isStoryAvailable, tracksAudience } from '../../utils/content/contentAccess'
-import { useAppStore } from '../../store/app'
+import { useContentStore } from '../../store/content/content'
 import type { Account } from '../../types/account'
 import type { Content } from '../../types/content'
 import Badge from '../ui/display/Badge'
@@ -18,18 +19,23 @@ export default function ContentPreviewDialog({
   account: Account
   onClose: () => void
 }) {
-  const state = useAppStore()
+  const access = useContentAccessData()
+  const recordAudience = useContentStore((state) => state.recordAudience)
   const canOpen = Boolean(
-    post && canRead(state, post) && (account.role !== 'customer' || isStoryAvailable(post))
+    post && canRead(access, post) && (account.role !== 'customer' || isStoryAvailable(post))
   )
   const track = canOpen && account.role === 'customer' && tracksAudience(post)
   const id = post?.id
-  const { recordAudience } = state
   useEffect(() => {
-    if (track && id) recordAudience(id)
+    if (track && id) {
+      recordAudience(id)
+    }
   }, [track, id, recordAudience])
 
-  if (!post || !canOpen) return null
+  if (!post || !canOpen) {
+    return null
+  }
+
   return (
     <Modal title={post.title} onClose={onClose} protectedContent>
       <ProtectedContent className="rounded-xl">

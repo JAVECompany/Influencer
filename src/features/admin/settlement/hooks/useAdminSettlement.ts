@@ -1,12 +1,26 @@
 import { useState } from 'react'
-import { useAppStore } from '../../../../shared/store/app'
+import { useShallow } from 'zustand/react/shallow'
+import { useAccountStore } from '../../../../shared/store/account/account'
+import { useCreatorStore } from '../../../../shared/store/creator/creator'
+import { useSettlementStore } from '../../../../shared/store/settlement/settlement'
+import { useWalletStore } from '../../../../shared/store/wallet/wallet'
 import type { PageProps } from '../../../../shared/types/navigation'
 import type { SettlementRow } from '../types/settlementReport'
 import { dateInKorea, settlementPeriod, summarizeSettlement } from '../utils/settlement'
 import type { PeriodMode } from '../utils/settlement'
 
 export function useAdminSettlement(notify: PageProps['notify']) {
-  const state = useAppStore()
+  const accounts = useAccountStore((state) => state.accounts)
+  const creators = useCreatorStore((state) => state.creators)
+  const settlement = useSettlementStore((state) => state.settlement)
+  const transactions = useWalletStore((state) => state.transactions)
+  const state = { accounts, creators, settlement, transactions }
+  const { configureSettlement, overrideSettlementCoins } = useSettlementStore(
+    useShallow(({ configureSettlement, overrideSettlementCoins }) => ({
+      configureSettlement,
+      overrideSettlementCoins,
+    }))
+  )
   const [mode, setMode] = useState<PeriodMode>('month')
   const [start, setStart] = useState('')
   const [end, setEnd] = useState('')
@@ -17,7 +31,10 @@ export function useAdminSettlement(notify: PageProps['notify']) {
   const today = dateInKorea(now)
   const month = settlementPeriod('month', '', '', now)
   const period = settlementPeriod(mode, start, end, now)
-  if (!month) return null
+  if (!month) {
+    return null
+  }
+
   const current = summarizeSettlement(state, month)
   const report = period && (period.key === month.key ? current : summarizeSettlement(state, period))
   const { coinWon, feeBps } = state.settlement
@@ -28,13 +45,18 @@ export function useAdminSettlement(notify: PageProps['notify']) {
         creator.name.toLowerCase().includes(term) || creator.handle.toLowerCase().includes(term)
     ) ?? []
   const editCoins = (coins: number | null) => {
-    if (!period || !edit) return
-    const result = state.overrideSettlementCoins(period.key, edit.creator.id, coins)
+    if (!period || !edit) {
+      return
+    }
+
+    const result = overrideSettlementCoins(period.key, edit.creator.id, coins)
     notify(
       result,
       coins === null ? '거래 내역의 코인 수로 복원했어요.' : '선택 기간의 정산 코인 수를 설정했어요.'
     )
-    if (!result.error) setEdit(null)
+    if (!result.error) {
+      setEdit(null)
+    }
   }
 
   const changeMode = (next: PeriodMode) => {
@@ -51,7 +73,7 @@ export function useAdminSettlement(notify: PageProps['notify']) {
   }
   const loadMore = () => setHistoryLimit(historyLimit + 20)
   const saveConfig = (unit: number, fee: number) =>
-    notify(state.configureSettlement(unit, Math.round(fee * 100)), '코인 정산 기준을 저장했어요.')
+    notify(configureSettlement(unit, Math.round(fee * 100)), '코인 정산 기준을 저장했어요.')
 
   return {
     accounts: state.accounts,

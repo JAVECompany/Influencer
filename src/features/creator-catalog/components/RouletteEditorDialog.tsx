@@ -33,7 +33,10 @@ export default function RouletteEditorDialog({
     closePreview,
   } = useRouletteDraft(roulette)
 
-  if (preview) return <RouletteWheelDialog roulette={preview} mode="preview" onClose={closePreview} />
+  if (preview) {
+    return <RouletteWheelDialog roulette={preview} mode="preview" onClose={closePreview} />
+  }
+
   return (
     <Modal title="룰렛 설정" onClose={onClose}>
       <form

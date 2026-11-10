@@ -25,8 +25,10 @@ export function prepareApplication(
   account: Account,
   { method, instagram, name, handle, email, bio }: ApplicationInput
 ): Creator | Failure {
-  if (method === 'link' && !validInstagram(instagram))
+  if (method === 'link' && !validInstagram(instagram)) {
     return fail('https://www.instagram.com/사용자이름 형식으로 입력해 주세요.')
+  }
+
   const normalized =
     method === 'link' ? new URL(instagram).pathname.split('/')[1].toLowerCase() : handle.trim().toLowerCase()
   if (
@@ -38,10 +40,12 @@ export function prepareApplication(
   if (method === 'direct' && (!name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !bio.trim())) {
     return fail('표시 이름, 연락 이메일 및 소개를 입력해 주세요.')
   }
+
   const display = method === 'link' ? account.name : name.trim()
   if (display.length > 20 || isNameTaken(state, display, account.id)) {
     return fail('중복되지 않는 표시 이름을 입력해 주세요.')
   }
+
   return {
     id: account.id,
     name: display,

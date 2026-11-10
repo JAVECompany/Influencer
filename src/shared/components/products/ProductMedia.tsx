@@ -9,7 +9,9 @@ export default function ProductMedia({ product }: { product: Product }) {
   const mask = useContext(ContentPrivacyContext)
   const video = useRef<HTMLVideoElement>(null)
   useEffect(() => {
-    if (mask) video.current?.pause()
+    if (mask) {
+      video.current?.pause()
+    }
   }, [mask])
 
   return (
@@ -28,7 +30,9 @@ export default function ProductMedia({ product }: { product: Product }) {
           preload="metadata"
           aria-label={product.name}
           onPlay={(event) => {
-            if (mask) event.currentTarget.pause()
+            if (mask) {
+              event.currentTarget.pause()
+            }
           }}
           className="max-h-[55dvh] w-full bg-media"
         />

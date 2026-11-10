@@ -1,5 +1,8 @@
 export function readMediaFile(file: File | null | undefined, allowVideo = false): Promise<string> {
-  if (!file) return Promise.resolve('')
+  if (!file) {
+    return Promise.resolve('')
+  }
+
   const image = ['image/png', 'image/jpeg', 'image/webp'].includes(file.type)
   const video = allowVideo && ['video/mp4', 'video/webm'].includes(file.type)
   if ((!image && !video) || file.size > 280_000) {
@@ -11,6 +14,7 @@ export function readMediaFile(file: File | null | undefined, allowVideo = false)
       )
     )
   }
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () =>

@@ -1,6 +1,7 @@
 import { Flag, Heart, LockKeyhole, MessageCircle } from 'lucide-react'
+import { useContentAccessData } from '../../hooks/content/useContentAccessData'
 import { canRead } from '../../utils/content/contentAccess'
-import { useAppStore } from '../../store/app'
+import { useContentStore } from '../../store/content/content'
 import { panel } from '../../styles/controlStyles'
 import type { Content } from '../../types/content'
 import type { FeedProps } from '../../types/feed'
@@ -20,9 +21,14 @@ export default function PostCard({
   openChat,
   notify,
 }: FeedProps & { post: Content }) {
-  const state = useAppStore()
-  const creator = state.creators[post.owner]
-  if (!creator || !canRead(state, post)) return null
+  const access = useContentAccessData()
+  const managePost = useContentStore((state) => state.managePost)
+  const creator = access.creators[post.owner]
+  if (!creator || !canRead(access, post)) {
+    return null
+  }
+
+  const creatorAccount = access.accounts[creator.id]
   const staff = account.role === 'admin'
   const liked = post.likes.includes(account.id)
   const reported = post.reports.includes(account.id)
@@ -30,7 +36,7 @@ export default function PostCard({
     <article className={`${panel} overflow-hidden`}>
       <header className="flex items-center justify-between gap-2 px-4 py-3.5">
         <button onClick={() => openCreator(creator.id)} className="flex min-w-0 items-center gap-3 text-left">
-          <Avatar person={creator} account={state.accounts[creator.id]} className="size-10" />
+          <Avatar person={creator} account={creatorAccount} className="size-10" />
           <span className="min-w-0">
             <span className="block truncate text-sm font-black">{creator.name}</span>
             <span className="text-xs text-muted">
@@ -57,7 +63,7 @@ export default function PostCard({
             tone="subtle"
             onClick={() =>
               notify(
-                state.managePost(post.id, 'hide'),
+                managePost(post.id, 'hide'),
                 post.hidden ? '콘텐츠를 다시 공개했어요.' : '콘텐츠를 숨겼어요.'
               )
             }
@@ -72,7 +78,7 @@ export default function PostCard({
             aria-label="좋아요"
             aria-pressed={liked}
             className={iconAction}
-            onClick={() => state.managePost(post.id, 'like')}
+            onClick={() => managePost(post.id, 'like')}
           >
             <Heart
               size={20}
@@ -89,7 +95,7 @@ export default function PostCard({
             aria-label={reported ? '신고 완료' : '게시글 신고'}
             disabled={reported}
             className={`ml-auto ${iconAction}`}
-            onClick={() => notify(state.managePost(post.id, 'report'), '운영팀 검토 목록에 등록했어요.')}
+            onClick={() => notify(managePost(post.id, 'report'), '운영팀 검토 목록에 등록했어요.')}
           >
             <Flag size={17} />
           </button>

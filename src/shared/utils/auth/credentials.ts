@@ -8,8 +8,13 @@ export const isPasswordLengthValid = (password: string) => password.length >= 6 
 
 export function authenticate(accounts: AppData['accounts'], id: string, password: string): Account | Failure {
   const account = accounts[id.trim().toLowerCase()]
-  if (!account || account.password !== password) return fail('아이디와 비밀번호를 확인해 주세요.')
-  if (account.disabled) return fail('이용이 정지된 계정입니다.')
+  if (!account || account.password !== password) {
+    return fail('아이디와 비밀번호를 확인해 주세요.')
+  }
+  if (account.disabled) {
+    return fail('이용이 정지된 계정입니다.')
+  }
+
   return account
 }
 
@@ -19,17 +24,25 @@ export function prepareSignUp(
 ): Account | Failure {
   const key = id.trim().toLowerCase()
   const nickname = name.trim()
-  if (!terms || !adult) return fail('약관 동의와 모의 성인 확인이 필요합니다.')
+  if (!terms || !adult) {
+    return fail('약관 동의와 모의 성인 확인이 필요합니다.')
+  }
   if (
     !/^[a-z0-9_]{4,24}$/.test(key) ||
     Object.hasOwn(state.accounts, key) ||
     Object.hasOwn(state.creators, key)
-  )
+  ) {
     return fail('사용할 수 없는 아이디입니다.')
-  if (!isPasswordLengthValid(password)) return fail('비밀번호는 6~72자로 입력해 주세요.')
-  if (!nickname || nickname.length > 20 || isNameTaken(state, nickname))
+  }
+  if (!isPasswordLengthValid(password)) {
+    return fail('비밀번호는 6~72자로 입력해 주세요.')
+  }
+  if (!nickname || nickname.length > 20 || isNameTaken(state, nickname)) {
     return fail('중복되지 않는 닉네임을 입력해 주세요.')
-  if (role !== 'customer' && role !== 'influencer') return fail('가입 유형을 선택해 주세요.')
+  }
+  if (role !== 'customer' && role !== 'influencer') {
+    return fail('가입 유형을 선택해 주세요.')
+  }
 
   return {
     id: key,

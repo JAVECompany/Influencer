@@ -17,12 +17,14 @@ export default function Avatar({
   const color = avatarPalettes[(person?.art ?? 0) % avatarPalettes.length] ?? avatarPalettes[0]
   const gradient = useId()
   const image = account?.avatar || person?.avatar
-  if (image)
+  if (image) {
     return (
       <img src={image} alt="" className={`aspect-square shrink-0 rounded-full object-cover ${className}`} />
     )
+  }
+
   const portrait = portraitStyle(person?.portrait)
-  if (portrait)
+  if (portrait) {
     return (
       <span
         aria-hidden="true"
@@ -30,7 +32,8 @@ export default function Avatar({
         className={`block aspect-square shrink-0 rounded-full bg-raised bg-no-repeat ${className}`}
       />
     )
-  if (person?.art === undefined)
+  }
+  if (person?.art === undefined) {
     return (
       <span
         aria-hidden="true"
@@ -39,6 +42,8 @@ export default function Avatar({
         {(account?.name || person?.name || '밤').slice(0, 1)}
       </span>
     )
+  }
+
   const variation = person.art % 3
   return (
     <svg

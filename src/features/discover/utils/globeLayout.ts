@@ -53,7 +53,10 @@ export function globeCards(
   angles: Angles,
   peak: number
 ) {
-  if (!width || !height) return []
+  if (!width || !height) {
+    return []
+  }
+
   const compact = width < 560
   const radiusX = width * (compact ? 0.57 : 0.51)
   const radiusY = height * 0.49
@@ -68,16 +71,23 @@ export function globeCards(
     const depth = -sinYaw * x + cosYaw * z
     const rotY = cosPitch * y - sinPitch * depth
     const rotZ = sinPitch * y + cosPitch * depth
-    if (rotZ < 0.01) continue
+    if (rotZ < 0.01) {
+      continue
+    }
+
     const size = Math.round(circleSize(item.count, peak, compact) * (0.64 + 0.36 * rotZ))
     const left = width / 2 + radiusX * rotX
     const top = height / 2 + radiusY * rotY
     const w = cardWidth(size, item.count)
     const h = cardHeight(size)
     const box: Box = [left - w / 2, top - h / 2 - 2, left + w / 2, top + h / 2]
-    if (box[0] < 5 || box[1] < 6 || box[2] > width - 5 || box[3] > height - 6) continue
-    if (occupied.some(([x1, y1, x2, y2]) => box[0] < x2 && box[2] > x1 && box[1] < y2 && box[3] > y1))
+    if (box[0] < 5 || box[1] < 6 || box[2] > width - 5 || box[3] > height - 6) {
       continue
+    }
+    if (occupied.some(([x1, y1, x2, y2]) => box[0] < x2 && box[2] > x1 && box[1] < y2 && box[3] > y1)) {
+      continue
+    }
+
     occupied.push(box)
     visible.push({ item, size, left, top, width: w, depth: rotZ })
   }

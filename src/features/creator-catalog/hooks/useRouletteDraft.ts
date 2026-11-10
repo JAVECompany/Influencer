@@ -34,8 +34,9 @@ export function useRouletteDraft(roulette?: Roulette) {
   const openPreview = () => {
     const settings = draft()
     const message = rouletteConfigurationError(settings.cost, settings.rewards, settings.topPrizeCost)
-    if (message) setError(message)
-    else {
+    if (message) {
+      setError(message)
+    } else {
       setError('')
       setPreview(settings)
     }

@@ -7,10 +7,12 @@ export function prepareContent(
   owner: string,
   art: number
 ): Content | Failure {
-  if (!title.trim() || !body.trim() || !['post', 'story', 'live'].includes(kind))
+  if (!title.trim() || !body.trim() || !['post', 'story', 'live'].includes(kind)) {
     return fail('콘텐츠 제목과 내용을 입력해 주세요.')
-  if (media && (media.length > 400_000 || !/^data:image\/(png|jpeg|webp);base64,/.test(media)))
+  }
+  if (media && (media.length > 400_000 || !/^data:image\/(png|jpeg|webp);base64,/.test(media))) {
     return fail('지원하는 이미지 파일을 선택해 주세요.')
+  }
 
   return {
     id: crypto.randomUUID(),

@@ -40,6 +40,7 @@ export default function CreatorOfferDialog({
             onConfirm()
             return
           }
+
           const data = new FormData(event.currentTarget)
           onConfirm({
             recipient: readFormValue(data, 'recipient'),

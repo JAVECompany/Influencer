@@ -1,19 +1,19 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { useAppStore } from '../../../shared/store/app'
+import { useCreatorStore } from '../../../shared/store/creator/creator'
 import type { ApplicationMethod } from '../../../shared/types/account'
 import type { OperatorProps } from '../../../shared/types/navigation'
 import { readFormValue } from '../../../shared/utils/forms/formData'
 
 export function useCreatorApplication({ account, notify }: OperatorProps) {
-  const state = useAppStore()
+  const creator = useCreatorStore((state) => state.creators[account.id])
+  const apply = useCreatorStore((state) => state.apply)
   const [method, setMethod] = useState<ApplicationMethod>('link')
-  const creator = state.creators[account.id]
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
     notify(
-      state.apply({
+      apply({
         method,
         instagram: readFormValue(data, 'instagram'),
         name: readFormValue(data, 'name'),

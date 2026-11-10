@@ -15,6 +15,7 @@ export function rouletteConfigurationError(cost: number, rewards: Reward[], topP
   ) {
     return '상품명을 입력하고 당첨 확률의 합을 100%로 맞춰 주세요.'
   }
+
   return ''
 }
 
@@ -24,7 +25,9 @@ export function prepareRoulette(
   topPrizeCost: number | null
 ): Roulette | Failure {
   const error = rouletteConfigurationError(cost, rewards, topPrizeCost)
-  if (error) return fail(error)
+  if (error) {
+    return fail(error)
+  }
 
   return {
     cost,

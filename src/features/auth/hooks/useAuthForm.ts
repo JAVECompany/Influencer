@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { useAppStore } from '../../../shared/store/app'
+import { useShallow } from 'zustand/react/shallow'
+import { useAuthStore } from '../../../shared/store/auth/auth'
 import type { Notify } from '../../../shared/types/actionResult'
 
 export function useAuthForm(notify: Notify) {
-  const signIn = useAppStore((state) => state.signIn)
-  const signUp = useAppStore((state) => state.signUp)
+  const { signIn, signUp } = useAuthStore(useShallow(({ signIn, signUp }) => ({ signIn, signUp })))
   const [signup, setSignup] = useState(false)
   const [id, setId] = useState('')
   const [password, setPassword] = useState('')
@@ -27,7 +27,9 @@ export function useAuthForm(notify: Notify) {
         }),
         '데모 계정을 만들었어요.'
       )
-    } else notify(signIn(id, password))
+    } else {
+      notify(signIn(id, password))
+    }
   }
   const selectDemo = (id: string) => {
     setId(id)

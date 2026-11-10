@@ -37,7 +37,9 @@ export const migrateDemoState = (persisted: unknown, version: number): SessionDa
     })
   )
 
-  if (version >= 1) return { ...state, products, roulettes }
+  if (version >= 1) {
+    return { ...state, products, roulettes }
+  }
 
   return {
     ...state,

@@ -4,7 +4,9 @@ import App from './app/App'
 import './shared/styles/global.css'
 
 const root = document.getElementById('root')
-if (!root) throw new Error('App root not found')
+if (!root) {
+  throw new Error('App root not found')
+}
 createRoot(root).render(
   <StrictMode>
     <App />

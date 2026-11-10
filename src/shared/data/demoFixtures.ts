@@ -96,7 +96,9 @@ export function mockPosts(now: number): Content[] {
       reports: [],
     })
     const items = [entry('post', 90 + i * 41)]
-    if (i % 13 === 0) items.push(entry(i % 2 ? 'story' : 'live', 20 + i))
+    if (i % 13 === 0) {
+      items.push(entry(i % 2 ? 'story' : 'live', 20 + i))
+    }
     return items
   })
 }
@@ -120,8 +122,9 @@ export function mockTransactions(now: number, roster: Creator[]): Transaction[] 
         const items: Transaction[] = [
           { ...data, id, type: i % 2 ? 'roulette' : 'product', coins: 25 + ((period * 31 + i * 17) % 230) },
         ]
-        if (i < 9 || (i + period) % 3 !== 0)
+        if (i < 9 || (i + period) % 3 !== 0) {
           items.push({ ...data, id: id + '-sub', type: 'subscribe', won: creator.price })
+        }
         return items
       })
     )

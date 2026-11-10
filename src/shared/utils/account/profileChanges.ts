@@ -13,8 +13,10 @@ export function prepareProfileChanges(
   const update: Omit<ProfileChanges, 'current'> = {}
   if (typeof changes.name === 'string') {
     const name = changes.name.trim()
-    if (!name || name.length > 20 || isNameTaken(state, name, account.id))
+    if (!name || name.length > 20 || isNameTaken(state, name, account.id)) {
       return fail('중복되지 않는 닉네임을 입력해 주세요.')
+    }
+
     update.name = name
   }
   if (typeof changes.avatar === 'string') {
@@ -24,13 +26,23 @@ export function prepareProfileChanges(
     ) {
       return fail('PNG, JPG 또는 WEBP 이미지를 280 KB 이하로 선택해 주세요.')
     }
+
     update.avatar = changes.avatar
   }
-  if (typeof changes.notifications === 'boolean') update.notifications = changes.notifications
-  if (typeof changes.payment === 'string') update.payment = changes.payment.trim().slice(0, 24)
+  if (typeof changes.notifications === 'boolean') {
+    update.notifications = changes.notifications
+  }
+  if (typeof changes.payment === 'string') {
+    update.payment = changes.payment.trim().slice(0, 24)
+  }
   if (changes.password) {
-    if (account.password !== changes.current) return fail('현재 비밀번호를 확인해 주세요.')
-    if (!isPasswordLengthValid(changes.password)) return fail('비밀번호는 6~72자로 입력해 주세요.')
+    if (account.password !== changes.current) {
+      return fail('현재 비밀번호를 확인해 주세요.')
+    }
+    if (!isPasswordLengthValid(changes.password)) {
+      return fail('비밀번호는 6~72자로 입력해 주세요.')
+    }
+
     update.password = changes.password
   }
   return update

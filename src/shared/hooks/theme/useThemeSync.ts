@@ -10,7 +10,9 @@ export function useThemeSync() {
     const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
     const apply = () => {
       root.dataset.theme = theme === 'system' ? (system.matches ? 'dark' : 'light') : theme
-      if (themeColor) themeColor.content = getComputedStyle(root).getPropertyValue('--theme-canvas').trim()
+      if (themeColor) {
+        themeColor.content = getComputedStyle(root).getPropertyValue('--theme-canvas').trim()
+      }
     }
     apply()
 

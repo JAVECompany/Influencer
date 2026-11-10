@@ -106,7 +106,9 @@ export default function CreatorGlobe({
               size={size}
               style={{ width: '100%' }}
               onClick={(event) => {
-                if (acceptsClick(event.detail)) openCreator(item.creator.id)
+                if (acceptsClick(event.detail)) {
+                  openCreator(item.creator.id)
+                }
               }}
             />
           </div>

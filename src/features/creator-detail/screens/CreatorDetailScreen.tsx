@@ -22,13 +22,15 @@ export default function CreatorDetailScreen({
   notify,
 }: FeedProps & { id: string; back: () => void }) {
   const detail = useCreatorDetail(id, account, notify)
-  if (!detail)
+  if (!detail) {
     return (
       <>
         <BackButton onClick={back} />
         <EmptyState title="프로필을 열 수 없어요" />
       </>
     )
+  }
+
   const {
     creator,
     creatorAccount,
