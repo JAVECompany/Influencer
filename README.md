@@ -38,3 +38,5 @@ Git 연결 시 프로젝트 루트에서 빌드 명령 `npm run build`, 출력 �
 ## 문서
 
 [고객](docs/customer.md) · [인플루언서](docs/influencer.md) · [관리자](docs/admin.md) · [기획 및 사용자 흐름](docs/plan.md)
+
+[개발 지침 및 변경 이력](.agents/AGENTS.md)

@@ -1,0 +1,76 @@
+import ContentPreviewDialog from '../../../../shared/components/content/ContentPreviewDialog'
+import Button from '../../../../shared/components/ui/Button'
+import PageTitle from '../../../../shared/components/ui/PageTitle'
+import { panel } from '../../../../shared/styles/controlStyles'
+import type { OperatorProps, PageProps } from '../../../../shared/types/navigation'
+import ModerationAccountRow from '../components/ModerationAccountRow'
+import ModerationContentRow from '../components/ModerationContentRow'
+import { useModeration } from '../hooks/useModeration'
+
+export default function ModerationScreen({
+  account,
+  notify,
+  openCreator,
+}: OperatorProps & Pick<PageProps, 'openCreator'>) {
+  const {
+    tab,
+    setTab,
+    preview,
+    previewPost,
+    setPreview,
+    posts,
+    accounts,
+    creators,
+    togglePost,
+    toggleAccount,
+  } = useModeration(notify)
+  return (
+    <>
+      <PageTitle
+        label="MODERATION"
+        title="운영 관리"
+        subtitle="콘텐츠 공개 상태와 계정 이용 권한을 관리하세요."
+      />
+      <div className="mb-4 flex gap-2">
+        <Button
+          tone={tab === 'content' ? 'primary' : 'subtle'}
+          aria-pressed={tab === 'content'}
+          onClick={() => setTab('content')}
+        >
+          콘텐츠
+        </Button>
+        <Button
+          tone={tab === 'accounts' ? 'primary' : 'subtle'}
+          aria-pressed={tab === 'accounts'}
+          onClick={() => setTab('accounts')}
+        >
+          계정
+        </Button>
+      </div>
+      <section className={`${panel} divide-y divide-edge`}>
+        {tab === 'content'
+          ? posts.map((post) => (
+              <ModerationContentRow
+                key={post.id}
+                post={post}
+                ownerName={creators[post.owner]?.name ?? post.owner}
+                openCreator={openCreator}
+                onPreview={setPreview}
+                onToggle={togglePost}
+              />
+            ))
+          : accounts.map((account) => (
+              <ModerationAccountRow
+                key={account.id}
+                account={account}
+                creator={creators[account.id]}
+                onToggle={toggleAccount}
+              />
+            ))}
+      </section>
+      {preview && (
+        <ContentPreviewDialog post={previewPost} account={account} onClose={() => setPreview(null)} />
+      )}
+    </>
+  )
+}

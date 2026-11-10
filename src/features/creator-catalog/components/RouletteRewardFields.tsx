@@ -1,0 +1,56 @@
+import FieldLabel from '../../../shared/components/ui/FieldLabel'
+import { field } from '../../../shared/styles/controlStyles'
+import type { DraftReward } from '../types/rouletteDraft'
+
+export default function RouletteRewardFields({
+  row,
+  index,
+  onChange,
+}: {
+  row: DraftReward
+  index: number
+  onChange: (changes: Partial<DraftReward>) => void
+}) {
+  return (
+    <fieldset className="grid grid-cols-2 gap-2 rounded-xl bg-night p-3 sm:grid-cols-[minmax(0,1.4fr)_1fr_1fr]">
+      <legend className="px-1 text-xs font-bold text-mint">
+        {index + 1}번 상품{index === 0 ? ' · 1등' : ''}
+      </legend>
+      <div className="col-span-2 sm:col-span-1">
+        <FieldLabel title="상품명">
+          <input
+            required
+            maxLength={60}
+            className={field}
+            value={row.name}
+            onChange={(e) => onChange({ name: e.target.value })}
+          />
+        </FieldLabel>
+      </div>
+      <FieldLabel title="표시 비중 (%)">
+        <input
+          type="number"
+          required
+          min={1}
+          max={99}
+          className={field}
+          value={row.displayChance}
+          onChange={(e) =>
+            onChange({ displayChance: e.target.value, ...(row.manual ? {} : { chance: e.target.value }) })
+          }
+        />
+      </FieldLabel>
+      <FieldLabel title="실제 확률 (%)">
+        <input
+          type="number"
+          required
+          min={1}
+          max={99}
+          className={field}
+          value={row.chance}
+          onChange={(e) => onChange({ chance: e.target.value, manual: e.target.value !== row.displayChance })}
+        />
+      </FieldLabel>
+    </fieldset>
+  )
+}

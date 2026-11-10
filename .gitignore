@@ -1,3 +1,30 @@
+# 의존성 및 빌드 산출물
 node_modules/
 dist/
+*.tsbuildinfo
+
+# 개발 도구 캐시 및 임시 산출물
+.vite/
+.wrangler/
+/.artifacts/
+coverage/
+*.log
+
+# 로컬 환경 설정 및 비밀 값
+.env
+.env.*
+!.env.example
+!.env.*.example
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+!.dev.vars.*.example
 *.local
+
+# IDE 및 운영체제별 파일
+/.idea/
+/.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+Desktop.ini
