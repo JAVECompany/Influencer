@@ -31,7 +31,9 @@ export default function ChatScreen({
         label="INBOX"
         title="채팅"
         subtitle={
-          customerView ? '구독 중인 크리에이터와 이야기를 나눠 보세요.' : '구독자가 보낸 메시지를 확인하세요.'
+          customerView
+            ? '구독 중인 크리에이터와 이야기를 나눠 보세요.'
+            : '현재 내 콘텐츠를 구독 중인 고객에게만 메시지를 보낼 수 있어요.'
         }
       />
       {!ids.length ? (

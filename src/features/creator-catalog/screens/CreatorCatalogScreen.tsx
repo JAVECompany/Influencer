@@ -45,7 +45,7 @@ export default function CreatorCatalogScreen({ account, notify }: OperatorProps)
       />
       {preview && (
         <Modal title={preview.name} onClose={() => setPreview(null)} protectedContent>
-          <ProductMedia product={preview} viewer={account.id} />
+          <ProductMedia product={preview} />
         </Modal>
       )}
       {dialog === 'product' && (

@@ -1,3 +1,4 @@
+import { defaultRouletteRewards } from '../constants/roulette'
 import type { Creator } from '../types/account'
 import type { Content, ContentKind } from '../types/content'
 import type { AppData } from '../types/demoState'
@@ -114,10 +115,7 @@ export const initialData: AppData = {
     influencer123: {
       cost: 20,
       topPrizeCost: 80,
-      rewards: [
-        { name: '비공개 사진', chance: 30 },
-        { name: '다음 기회에', chance: 70 },
-      ],
+      rewards: defaultRouletteRewards,
     },
   },
   messages: [

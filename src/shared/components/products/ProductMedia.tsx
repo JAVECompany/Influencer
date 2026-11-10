@@ -5,7 +5,7 @@ import { isProductVideo } from '../../utils/productMedia'
 import DemoScene from '../ui/DemoScene'
 import ProtectedContent from '../ui/ProtectedContent'
 
-export default function ProductMedia({ product, viewer }: { product: Product; viewer: string }) {
+export default function ProductMedia({ product }: { product: Product }) {
   const mask = useContext(ContentPrivacyContext)
   const video = useRef<HTMLVideoElement>(null)
   useEffect(() => {
@@ -13,7 +13,7 @@ export default function ProductMedia({ product, viewer }: { product: Product; vi
   }, [mask])
 
   return (
-    <ProtectedContent viewer={viewer} className="rounded-xl">
+    <ProtectedContent className="rounded-xl">
       {!product.media ? (
         <DemoScene art={product.art} className="aspect-video w-full" />
       ) : isProductVideo(product) ? (

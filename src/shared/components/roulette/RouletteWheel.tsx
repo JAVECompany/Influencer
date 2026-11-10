@@ -1,7 +1,6 @@
 import type { RefObject } from 'react'
-import { wheelSegments } from '../../utils/roulette'
-
-const colors = ['#66e8c4', '#6189b4', '#d7ae73', '#8b8fc4', '#62a497', '#b88495', '#7aa1bb', '#96b179']
+import { rouletteSegmentColors } from '../../constants/roulette'
+import type { WheelSegment } from '../../utils/roulette'
 
 const center = 144
 
@@ -16,7 +15,7 @@ export default function RouletteWheel({
   segments,
   disc,
 }: {
-  segments: ReturnType<typeof wheelSegments>
+  segments: WheelSegment[]
   disc: RefObject<HTMLDivElement | null>
 }) {
   return (
@@ -24,30 +23,45 @@ export default function RouletteWheel({
       <div ref={disc} data-roulette-disc className="size-full">
         <svg viewBox="0 0 288 288" className="size-full drop-shadow-[0_10px_16px_#03090c99]">
           <circle cx={center} cy={center} r="139" fill="#0a1119" stroke="#53716f" strokeWidth="2" />
-          {segments.map(({ start, end, center: middle }, i) => {
-            const [x, y] = at(middle, rim * 0.75)
+          {segments.map(({ name, start, end }, i) => {
+            const width = end - start
+            const middle = (start + end) / 2
+            const [x, y] = at(middle, rim * 0.6)
+            const tilt = middle > 180 ? middle + 90 : middle - 90
+            const characters = Array.from(name)
+            const label = characters.length > 14 ? characters.slice(0, 13).join('') + '…' : name
+            const fontSize = width < 27 ? 10 : 12
+            const estimatedLength = Array.from(label).reduce(
+              (length, character) => length + fontSize * (character.charCodeAt(0) < 128 ? 0.55 : 1),
+              0
+            )
             const path =
               'M144 144L' +
               at(start, rim).join(' ') +
               'A130 130 0 ' +
-              Number(end - start > 180) +
+              Number(width > 180) +
               ' 1 ' +
               at(end, rim).join(' ') +
               'Z'
             return (
               <g key={i}>
-                <path d={path} fill={colors[i]} stroke="#182630" strokeWidth="1.4" />
-                <text
-                  x={x}
-                  y={y}
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fill="#101b23"
-                  fontSize={end - start < 14 ? '9' : '17'}
-                  fontWeight="900"
-                >
-                  {i + 1}
-                </text>
+                <path d={path} fill={rouletteSegmentColors[i]} stroke="#182630" strokeWidth="1.4" />
+                {width >= 18 && (
+                  <text
+                    x={x}
+                    y={y}
+                    transform={`rotate(${tilt} ${x} ${y})`}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="#101b23"
+                    fontSize={fontSize}
+                    fontWeight="900"
+                    textLength={estimatedLength > 90 ? 90 : undefined}
+                    lengthAdjust="spacingAndGlyphs"
+                  >
+                    {label}
+                  </text>
+                )}
               </g>
             )
           })}

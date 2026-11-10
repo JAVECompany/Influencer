@@ -46,7 +46,7 @@ export default function FeedSidebar({
       )}
       <div className="flex items-start gap-3 px-2 py-3 text-xs leading-relaxed text-dim">
         <ShieldCheck size={17} className="shrink-0 text-mint" />
-        <span>구독 전용 콘텐츠에는 이용자별 워터마크가 표시됩니다.</span>
+        <span>구독 전용 콘텐츠는 다른 탭으로 전환하면 가려집니다.</span>
       </div>
     </aside>
   )

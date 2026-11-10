@@ -15,7 +15,6 @@ export interface Product {
 export interface Reward {
   name: string
   chance: number
-  displayChance?: number
 }
 
 export interface Roulette {

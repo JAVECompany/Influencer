@@ -6,8 +6,11 @@ export const actor = (state: SessionData) => {
   return account?.disabled ? undefined : account
 }
 
+export const isAccountDisabled = (state: SessionData, id: string) =>
+  state.accounts[id]?.disabled ?? state.creators[id]?.disabled ?? false
+
 export const isPublic = (state: SessionData, id: string) =>
-  state.creators[id]?.status === 'approved' && !state.accounts[id]?.disabled
+  state.creators[id]?.status === 'approved' && !isAccountDisabled(state, id)
 
 export const hasSubscription = (state: SessionData, customer: string, creator: string) =>
   state.accounts[customer]?.role === 'customer' &&

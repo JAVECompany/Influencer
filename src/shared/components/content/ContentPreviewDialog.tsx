@@ -32,7 +32,7 @@ export default function ContentPreviewDialog({
   if (!post || !canOpen) return null
   return (
     <Modal title={post.title} onClose={onClose} protectedContent>
-      <ProtectedContent viewer={account.id} className="rounded-xl">
+      <ProtectedContent className="rounded-xl">
         <ContentMedia post={post} />
         <div className="bg-night p-4">
           <Badge live={post.kind === 'live'}>{contentKindLabels[post.kind]} 미리보기</Badge>

@@ -7,7 +7,7 @@ import type { Failure, Success } from '../types/actionResult'
 import type { Transaction, TransactionType } from '../types/commerce'
 import type { Content } from '../types/content'
 import type { SessionData } from '../types/demoState'
-import { displayShare, drawRewardIndex, rouletteConfigurationError } from '../utils/roulette'
+import { drawRewardIndex, rouletteConfigurationError } from '../utils/roulette'
 import { actor, canRead, hasSubscription, isPublic, isStoryAvailable, tracksAudience } from './appSelectors'
 import type { AppStore } from './appStoreTypes'
 import { migrateDemoState } from './migrateDemoState'
@@ -75,7 +75,11 @@ export const useAppStore = create<AppStore>()(
         const key = id.trim().toLowerCase()
         const nickname = name.trim()
         if (!terms || !adult) return fail('약관 동의와 모의 성인 확인이 필요합니다.')
-        if (!/^[a-z0-9_]{4,24}$/.test(key) || Object.hasOwn(state.accounts, key))
+        if (
+          !/^[a-z0-9_]{4,24}$/.test(key) ||
+          Object.hasOwn(state.accounts, key) ||
+          Object.hasOwn(state.creators, key)
+        )
           return fail('사용할 수 없는 아이디입니다.')
         if (password.length < 6 || password.length > 72) return fail('비밀번호는 6~72자로 입력해 주세요.')
         if (
@@ -248,11 +252,17 @@ export const useAppStore = create<AppStore>()(
 
       toggleAccount(id) {
         const state = get()
-        const a = actor(state)
         const target = state.accounts[id]
-        if (a?.role !== 'admin' || !target || target.role === 'admin')
+        if (actor(state)?.role !== 'admin' || target?.role === 'admin')
           return fail('계정 상태를 변경할 수 없습니다.')
-        set({ accounts: { ...state.accounts, [id]: { ...target, disabled: !target.disabled } } })
+        if (target) {
+          set({ accounts: { ...state.accounts, [id]: { ...target, disabled: !target.disabled } } })
+          return ok
+        }
+
+        const creator = state.creators[id]
+        if (creator?.status !== 'approved') return fail('계정 상태를 변경할 수 없습니다.')
+        set({ creators: { ...state.creators, [id]: { ...creator, disabled: !creator.disabled } } })
         return ok
       },
 
@@ -427,7 +437,6 @@ export const useAppStore = create<AppStore>()(
               rewards: rewards.map((r) => ({
                 name: r.name.trim().slice(0, 60),
                 chance: r.chance,
-                displayChance: displayShare(r),
               })),
             },
           },
@@ -478,8 +487,12 @@ export const useAppStore = create<AppStore>()(
           return fail('메시지를 보낼 수 없습니다.')
         const customer = a.role === 'customer' ? a.id : counterpart
         const creator = a.role === 'influencer' ? a.id : counterpart
-        if (state.accounts[customer]?.disabled || !hasSubscription(state, customer, creator))
-          return fail('활성 구독에서 채팅할 수 있습니다.')
+        if (!hasSubscription(state, customer, creator))
+          return fail(
+            a.role === 'influencer'
+              ? '현재 내 콘텐츠를 구독 중인 고객에게만 메시지를 보낼 수 있어요.'
+              : '구독 중인 크리에이터에게만 메시지를 보낼 수 있어요.'
+          )
         set({
           messages: [
             ...state.messages,
@@ -491,7 +504,7 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'bamgyeol-demo-v1',
-      version: 1,
+      version: 2,
       migrate: migrateDemoState,
       partialize: ({
         accounts,

@@ -1,9 +1,9 @@
 import { Coins, Gift } from 'lucide-react'
+import { rouletteSegmentColors } from '../../constants/roulette'
 import { useRouletteSpin } from '../../hooks/useRouletteSpin'
 import type { SpendResult } from '../../types/actionResult'
 import type { Roulette } from '../../types/commerce'
 import { formatNumber } from '../../utils/format'
-import { displayShare } from '../../utils/roulette'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 import Modal from '../ui/Modal'
@@ -82,29 +82,12 @@ export default function RouletteWheelDialog({
           </section>
         )}
         <RouletteWheel segments={segments} disc={disc} />
-        <p className="text-center text-xs text-dim">
-          원판 구간 크기는 시각 연출용이며 실제 당첨 확률을 뜻하지 않습니다.
-        </p>
-        {review && (
-          <ul className="grid gap-1 rounded-xl bg-night p-3 text-xs text-dim">
-            {rewards.map((reward, i) => (
-              <li key={i} className="flex flex-wrap justify-between gap-x-2 gap-y-1">
-                <span>
-                  {i + 1}번 · {reward.name}
-                </span>
-                <span>
-                  표시 {displayShare(reward)}% · 실제 {reward.chance}%
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
         {result && (
           <p
             role="status"
             className="rounded-xl bg-[#162e32] px-3 py-2.5 text-center text-sm font-bold break-words text-mint"
           >
-            {result.guaranteed ? '1등 확정 구매' : result.rewardIndex + 1 + '번 결과'} · {result.reward}
+            {result.guaranteed ? '1등 확정 구매' : '당첨'} · {result.reward}
           </p>
         )}
         {error && (
@@ -117,6 +100,22 @@ export default function RouletteWheelDialog({
             {spinning ? '원판이 돌고 있어요' : '원판 돌리기'}
           </Button>
         )}
+        <ul
+          aria-label="상품별 당첨 확률"
+          className="grid gap-2 rounded-xl bg-night p-3 text-xs text-dim sm:grid-cols-2"
+        >
+          {rewards.map((reward, i) => (
+            <li key={i} className="flex items-start gap-2">
+              <span
+                aria-hidden="true"
+                className="mt-0.5 size-3 shrink-0 rounded-full"
+                style={{ backgroundColor: rouletteSegmentColors[i] }}
+              />
+              <span className="min-w-0 flex-1 break-words">{reward.name}</span>
+              <span className="shrink-0 tabular-nums">{reward.chance}%</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </Modal>
   )

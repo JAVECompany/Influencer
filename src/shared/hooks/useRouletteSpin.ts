@@ -3,7 +3,7 @@ import type { SpendResult } from '../types/actionResult'
 import type { Roulette } from '../types/commerce'
 import { drawRewardIndex, stopRotation, wheelSegments } from '../utils/roulette'
 
-type WheelResult = { rewardIndex: number; reward: string; guaranteed: boolean }
+type WheelResult = { reward: string; guaranteed: boolean }
 
 export function useRouletteSpin(
   roulette: Roulette,
@@ -23,7 +23,13 @@ export function useRouletteSpin(
   const preview = mode === 'preview'
   const review = mode === 'review'
 
-  useEffect(() => () => motion.current?.cancel(), [])
+  useEffect(
+    () => () => {
+      motion.current?.cancel()
+      motion.current = null
+    },
+    []
+  )
 
   const play = async (guaranteed: boolean) => {
     const wheel = disc.current
@@ -43,31 +49,33 @@ export function useRouletteSpin(
     setConfirm(false)
     const segment = segments[draw.rewardIndex]
     const from = rotation.current
-    const to = stopRotation(from, segment)
-    rotation.current = to
+    const to = guaranteed ? stopRotation(from, segment, 0.5) : stopRotation(from, segment)
     const transform = (angle: number) => 'rotate(' + angle + 'deg)'
-    wheel.style.transform = transform(to)
-    if (!guaranteed && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let animation: Animation | null = null
+    if (!guaranteed && !matchMedia('(prefers-reduced-motion: reduce)').matches && wheel.animate) {
       busy.current = true
       setSpinning(true)
-      motion.current = wheel.animate(
-        [
-          { transform: transform(from), offset: 0, easing: 'cubic-bezier(0.12, 0.6, 0.35, 1)' },
-          { transform: transform(to - 210), offset: 0.61, easing: 'cubic-bezier(0.12, 0.42, 0.36, 1)' },
-          { transform: transform(to - 26), offset: 0.84, easing: 'cubic-bezier(0.2, 0.56, 0.3, 1)' },
-          { transform: transform(to), offset: 1 },
-        ],
-        { duration: 4800 }
-      )
+      animation = wheel.animate([{ transform: transform(from) }, { transform: transform(to) }], {
+        duration: 4600,
+        easing: 'cubic-bezier(0.18, 0.62, 0.34, 1)',
+        fill: 'forwards',
+      })
+      motion.current = animation
       try {
-        await motion.current.finished
+        await animation.finished
       } catch {
-        if (!disc.current) return
+        if (motion.current !== animation) return
       }
+    }
+    wheel.style.transform = transform(to)
+    rotation.current = to
+    if (animation) {
+      motion.current = null
+      animation.cancel()
       busy.current = false
       setSpinning(false)
     }
-    setResult({ reward: draw.reward, rewardIndex: draw.rewardIndex, guaranteed })
+    setResult({ reward: draw.reward, guaranteed })
   }
 
   const cancelPurchase = () => {

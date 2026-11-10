@@ -24,7 +24,7 @@ export default function RouletteEditorDialog({
     rows,
     preview,
     error,
-    sum,
+    totalChance,
     draft,
     update,
     addReward,
@@ -69,8 +69,7 @@ export default function RouletteEditorDialog({
           </FieldLabel>
         </div>
         <p className="text-xs leading-relaxed text-dim">
-          첫 상품이 1등입니다. 원판 표시 비중을 입력하면 실제 확률에 같은 값이 들어가며, 실제 확률은 직접
-          수정할 수 있어요.
+          첫 상품이 1등입니다. 상품별 당첨 확률에 따라 원판의 칸 크기가 정해집니다.
         </p>
         {rows.map((row, index) => (
           <RouletteRewardFields
@@ -80,9 +79,7 @@ export default function RouletteEditorDialog({
             onChange={(changes) => update(index, changes)}
           />
         ))}
-        <p className="text-xs text-dim">
-          합계 · 표시 비중 {sum('displayChance')}% / 실제 확률 {sum('chance')}%
-        </p>
+        <p className="text-xs text-dim">당첨 확률 합계 · {totalChance}%</p>
         {error && (
           <p role="alert" className="text-sm text-red-200">
             {error}

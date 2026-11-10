@@ -1,32 +1,27 @@
 import { useState } from 'react'
+import { defaultRouletteRewards } from '../../../shared/constants/roulette'
 import type { Roulette } from '../../../shared/types/commerce'
-import { displayShare, rouletteConfigurationError } from '../../../shared/utils/roulette'
+import { rouletteConfigurationError } from '../../../shared/utils/roulette'
 import type { DraftReward } from '../types/rouletteDraft'
-
-const emptyReward = (): DraftReward => ({ name: '', chance: '', displayChance: '', manual: false })
 
 export function useRouletteDraft(roulette?: Roulette) {
   const [cost, setCost] = useState(roulette?.cost ?? '')
   const [topPrice, setTopPrice] = useState(roulette?.topPrizeCost ?? '')
-  const [rows, setRows] = useState(
-    () =>
-      roulette?.rewards.map((reward) => ({
-        name: reward.name,
-        chance: String(reward.chance),
-        displayChance: String(displayShare(reward)),
-        manual: reward.chance !== displayShare(reward),
-      })) ?? [emptyReward(), emptyReward()]
+  const [rows, setRows] = useState<DraftReward[]>(() =>
+    (roulette?.rewards ?? defaultRouletteRewards).map(({ name, chance }) => ({
+      name,
+      chance: String(chance),
+    }))
   )
   const [preview, setPreview] = useState<Roulette | null>(null)
   const [error, setError] = useState('')
-  const sum = (key: 'chance' | 'displayChance') => rows.reduce((total, row) => total + Number(row[key]), 0)
+  const totalChance = rows.reduce((total, row) => total + Number(row.chance), 0)
   const draft = (): Roulette => ({
     cost: Number(cost),
     topPrizeCost: topPrice === '' ? null : Number(topPrice),
     rewards: rows.map((row) => ({
       name: row.name.trim(),
       chance: Number(row.chance),
-      displayChance: Number(row.displayChance),
     })),
   })
   const update = (index: number, changes: Partial<DraftReward>) => {
@@ -34,7 +29,7 @@ export function useRouletteDraft(roulette?: Roulette) {
     setRows((old) => old.map((row, i) => (i === index ? { ...row, ...changes } : row)))
   }
 
-  const addReward = () => setRows([...rows, emptyReward()])
+  const addReward = () => setRows([...rows, { name: '', chance: '' }])
   const removeReward = () => setRows(rows.slice(0, -1))
   const openPreview = () => {
     const settings = draft()
@@ -55,7 +50,7 @@ export function useRouletteDraft(roulette?: Roulette) {
     rows,
     preview,
     error,
-    sum,
+    totalChance,
     draft,
     update,
     addReward,

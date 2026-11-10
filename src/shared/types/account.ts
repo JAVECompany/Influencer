@@ -25,6 +25,7 @@ export interface Creator {
   art: number
   status: ReviewStatus
   reason: string
+  disabled?: boolean
   instagram?: string
   email?: string
   method?: ApplicationMethod

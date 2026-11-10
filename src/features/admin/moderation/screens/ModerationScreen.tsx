@@ -19,7 +19,7 @@ export default function ModerationScreen({
     previewPost,
     setPreview,
     posts,
-    accounts,
+    managedAccounts,
     creators,
     togglePost,
     toggleAccount,
@@ -59,12 +59,13 @@ export default function ModerationScreen({
                 onToggle={togglePost}
               />
             ))
-          : accounts.map((account) => (
+          : managedAccounts.map(({ id, account, creator, disabled }) => (
               <ModerationAccountRow
-                key={account.id}
+                key={id}
                 account={account}
-                creator={creators[account.id]}
-                onToggle={toggleAccount}
+                creator={creator}
+                disabled={disabled}
+                onToggle={() => toggleAccount(id)}
               />
             ))}
       </section>

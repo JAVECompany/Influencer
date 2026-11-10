@@ -100,7 +100,7 @@ export default function CreatorDetailScreen({
       )}
       {offer?.type === 'owned' && (
         <Modal title={offer.name} onClose={closeOffer} protectedContent>
-          <ProductMedia product={offer} viewer={account.id} />
+          <ProductMedia product={offer} />
         </Modal>
       )}
       {offer?.type === 'roulette' && roulette && active && (

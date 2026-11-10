@@ -10,9 +10,9 @@ export function useChat({ account, initial, notify }: Pick<PageProps, 'account' 
   const customerView = account.role === 'customer'
   const ids = customerView
     ? (state.subscriptions[account.id] ?? []).filter((id) => hasSubscription(state, account.id, id))
-    : Object.keys(state.subscriptions).filter(
-        (id) => !state.accounts[id]?.disabled && hasSubscription(state, id, account.id)
-      )
+    : account.role === 'influencer'
+    ? Object.keys(state.subscriptions).filter((id) => hasSubscription(state, id, account.id))
+    : []
   const other = (id: string) => (customerView ? state.creators[id] : state.accounts[id])
   const thread = selected && ids.includes(selected) ? selected : null
   const messages = thread

@@ -43,7 +43,7 @@ export default function PostCard({
           {staff ? (post.hidden ? '숨김 · 검수 중' : '관리자 검수') : '구독자 전용'}
         </span>
       </header>
-      <ProtectedContent viewer={account.id}>
+      <ProtectedContent>
         <ContentMedia post={post} />
         <div className="px-4 pt-4 pb-2">
           <h2 className="text-[17px] font-black">{post.title}</h2>

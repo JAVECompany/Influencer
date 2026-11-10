@@ -1,14 +1,12 @@
 import type { Reward } from '../types/commerce'
 
-interface WheelSegment {
+export interface WheelSegment {
+  name: string
   start: number
   end: number
-  center: number
 }
 
 const degrees = (angle: number) => ((angle % 360) + 360) % 360
-
-export const displayShare = (reward: Reward) => reward.displayChance ?? reward.chance
 
 export function rouletteConfigurationError(cost: number, rewards: Reward[], topPrizeCost?: number | null) {
   const valid = (n: number, max: number) => Number.isInteger(n) && n > 0 && n <= max
@@ -18,11 +16,10 @@ export function rouletteConfigurationError(cost: number, rewards: Reward[], topP
   if (
     rewards.length < 2 ||
     rewards.length > 8 ||
-    rewards.some((r) => !r.name.trim() || !valid(r.chance, 99) || !valid(displayShare(r), 99)) ||
-    rewards.reduce((sum, r) => sum + r.chance, 0) !== 100 ||
-    rewards.reduce((sum, r) => sum + displayShare(r), 0) !== 100
+    rewards.some((r) => !r.name.trim() || !valid(r.chance, 99)) ||
+    rewards.reduce((sum, r) => sum + r.chance, 0) !== 100
   ) {
-    return '상품명을 입력하고 원판 표시 비중과 실제 확률의 합을 각각 100%로 맞춰 주세요.'
+    return '상품명을 입력하고 당첨 확률의 합을 100%로 맞춰 주세요.'
   }
   return ''
 }
@@ -37,16 +34,17 @@ export function drawRewardIndex(rewards: Reward[], random = Math.random()) {
 }
 
 export function wheelSegments(rewards: Reward[]): WheelSegment[] {
-  const total = rewards.reduce((sum, reward) => sum + displayShare(reward), 0)
-  let start = 0
-  return rewards.map((reward) => {
-    const end = start + (displayShare(reward) / total) * 360
-    const segment = { start, end, center: (start + end) / 2 }
-    start = end
-    return segment
+  let cumulativeChance = 0
+  return rewards.map(({ name, chance }) => {
+    const start = (cumulativeChance / 100) * 360
+    cumulativeChance += chance
+    return { name, start, end: (cumulativeChance / 100) * 360 }
   })
 }
 
-export function stopRotation(rotation: number, segment: WheelSegment) {
-  return rotation + 360 * 5 + degrees(-segment.center - rotation)
+export function stopRotation(rotation: number, { start, end }: WheelSegment, position = Math.random()) {
+  const width = end - start
+  const margin = Math.min(1.5, width * 0.2)
+  const landing = start + margin + position * (width - margin * 2)
+  return rotation + 360 * 5 + degrees(-landing - rotation)
 }
