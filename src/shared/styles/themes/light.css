@@ -1,5 +1,6 @@
 :root {
   color-scheme: light;
+  --theme-brand-mark: url('/brand/logos/light.png');
   --theme-canvas: #f4f6fa;
   --theme-surface: #ffffff;
   --theme-raised: #edf1f7;

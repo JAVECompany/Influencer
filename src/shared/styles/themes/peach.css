@@ -1,5 +1,6 @@
 :root[data-theme='peach'] {
   color-scheme: light;
+  --theme-brand-mark: url('/brand/logos/peach.png');
   --theme-canvas: #fff1e9;
   --theme-surface: #fffaf6;
   --theme-raised: #f9e9df;

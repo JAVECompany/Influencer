@@ -1,5 +1,6 @@
 :root[data-theme='orbit'] {
   color-scheme: dark;
+  --theme-brand-mark: url('/brand/logos/orbit.png');
   --theme-canvas: #0b1017;
   --theme-surface: #121b25;
   --theme-raised: #182632;

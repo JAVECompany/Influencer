@@ -15,19 +15,8 @@ export default function CreatorGlobe({
   peak: number
   openCreator: IPageProps['openCreator']
 }) {
-  const {
-    viewport,
-    dragging,
-    angles,
-    visible,
-    beginDrag,
-    drag,
-    end,
-    leave,
-    rotateByKey,
-    reset,
-    acceptsClick,
-  } = useCreatorGlobe(items, peak)
+  const { viewport, dragging, angles, visible, beginDrag, drag, end, leave, reset, acceptsClick } =
+    useCreatorGlobe(items, peak)
 
   return (
     <section
@@ -36,7 +25,7 @@ export default function CreatorGlobe({
     >
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-line/75 px-3 py-2.5 sm:px-5">
         <p className="flex items-center gap-2 text-xs font-bold text-muted">
-          <Move size={15} className="text-accent" /> 드래그 또는 방향키로 탐색{' '}
+          <Move size={15} className="text-accent" aria-hidden="true" /> 드래그로 탐색
           <span className="ml-1 text-accent">{formatNumber(items.length)}명</span>
         </p>
         <Button tone="plain" className="min-h-8 px-2 py-1 text-xs" onClick={reset}>
@@ -45,8 +34,6 @@ export default function CreatorGlobe({
       </header>
       <div
         ref={viewport}
-        tabIndex={0}
-        aria-label="크리에이터 지구본, 방향키로 회전"
         data-constellation
         className={`relative isolate h-[440px] touch-none overflow-hidden theme-globe select-none sm:h-[500px] ${
           dragging ? 'cursor-grabbing' : 'cursor-grab'
@@ -57,7 +44,6 @@ export default function CreatorGlobe({
         onPointerCancel={end}
         onLostPointerCapture={end}
         onPointerLeave={leave}
-        onKeyDown={rotateByKey}
       >
         <svg
           aria-hidden="true"

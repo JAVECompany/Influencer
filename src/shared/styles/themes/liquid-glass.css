@@ -1,5 +1,6 @@
 :root[data-theme='liquid-glass'] {
   color-scheme: light;
+  --theme-brand-mark: url('/brand/logos/liquid-glass.png');
   --theme-canvas: #e8effe;
   --theme-surface: rgb(255 255 255 / 0.72);
   --theme-raised: rgb(255 255 255 / 0.9);

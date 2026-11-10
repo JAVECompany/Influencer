@@ -1,5 +1,6 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
+  --theme-brand-mark: url('/brand/logos/dark.png');
   --theme-canvas: #101218;
   --theme-surface: #181c25;
   --theme-raised: #222836;

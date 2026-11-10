@@ -8,8 +8,13 @@ export function useThemeSync() {
     const system = window.matchMedia('(prefers-color-scheme: dark)')
     const root = document.documentElement
     const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+    const favicon = document.querySelector<HTMLLinkElement>('link[rel="icon"]')
     const apply = () => {
-      root.dataset.theme = theme === 'system' ? (system.matches ? 'dark' : 'light') : theme
+      const resolvedTheme = theme === 'system' ? (system.matches ? 'dark' : 'light') : theme
+      root.dataset.theme = resolvedTheme
+      if (favicon) {
+        favicon.href = `${import.meta.env.BASE_URL}brand/logos/${resolvedTheme}.png`
+      }
       if (themeColor) {
         themeColor.content = getComputedStyle(root).getPropertyValue('--theme-canvas').trim()
       }

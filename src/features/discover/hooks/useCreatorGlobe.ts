@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import type { KeyboardEvent, PointerEvent } from 'react'
+import type { PointerEvent } from 'react'
 import type { AnglesType, IExploreItem } from '../types/creatorDiscovery'
 import { layoutGlobeCards } from '../utils/globeLayout'
 
@@ -64,22 +64,7 @@ export function useCreatorGlobe(items: IExploreItem[], peak: number) {
       ignoreClick.current = true
       setDragging(true)
     }
-    setAngles(move(dx * angleStep, -dy * angleStep, drag.angles))
-  }
-  const rotateByKey = (event: KeyboardEvent<HTMLDivElement>) => {
-    const steps: Partial<Record<string, [number, number]>> = {
-      ArrowLeft: [-0.32, 0],
-      ArrowRight: [0.32, 0],
-      ArrowUp: [0, -0.32],
-      ArrowDown: [0, 0.32],
-    }
-    const step = steps[event.key]
-    if (!step) {
-      return
-    }
-
-    event.preventDefault()
-    setAngles((old) => move(...step, old))
+    setAngles(move(-dx * angleStep, -dy * angleStep, drag.angles))
   }
   const leave = () => {
     if (!ignoreClick.current) {
@@ -98,7 +83,6 @@ export function useCreatorGlobe(items: IExploreItem[], peak: number) {
     drag,
     end,
     leave,
-    rotateByKey,
     reset,
     acceptsClick,
   }

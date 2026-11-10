@@ -1,5 +1,6 @@
 :root[data-theme='mocha'] {
   color-scheme: light;
+  --theme-brand-mark: url('/brand/logos/mocha.png');
   --theme-canvas: #f3ebe4;
   --theme-surface: #fcf7f2;
   --theme-raised: #eee3da;

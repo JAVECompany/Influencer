@@ -1,5 +1,6 @@
 :root[data-theme='periwinkle'] {
   color-scheme: light;
+  --theme-brand-mark: url('/brand/logos/periwinkle.png');
   --theme-canvas: #f1effb;
   --theme-surface: #fcfbff;
   --theme-raised: #e9e5f8;
