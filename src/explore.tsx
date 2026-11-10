@@ -1,18 +1,35 @@
 import { useLayoutEffect, useRef, useState } from 'react'
+import type { CSSProperties, MouseEventHandler } from 'react'
 import { Check, Compass, Move, RotateCcw, Search } from 'lucide-react'
 import { number } from './data'
 import { hasSubscription, isPublic, subscriberCount, useApp } from './store'
 import { Avatar, Button, Empty, PageTitle, panel } from './ui'
+import type { Account, Creator, PageProps } from './types'
+
+interface ExploreItem {
+  creator: Creator
+  account?: Account
+  count: number
+  subscribed: boolean
+}
+
+type Angles = { yaw: number; pitch: number }
+type DragGesture = { id: number; x: number; y: number; angles: Angles }
+type Box = [number, number, number, number]
+type GlobeCard = { item: ExploreItem; size: number; left: number; top: number; width: number; depth: number }
 
 const startingAngles = { yaw: 0, pitch: 0 }
 const angleStep = 0.008
 const goldenAngle = Math.PI * (3 - Math.sqrt(5))
-const circleSize = (count, peak, compact) =>
+const circleSize = (count: number, peak: number, compact: boolean) =>
   Math.round((34 + 74 * (count / peak) ** 0.57) * (compact ? 0.72 : 1))
 
-function CreatorBubble({ item, size, onClick, style, disabled }) {
+function CreatorBubble({ item, size, onClick, style }: {
+  item: ExploreItem; size: number; onClick: MouseEventHandler<HTMLButtonElement>; style?: CSSProperties
+}) {
   const { creator, count, subscribed, account } = item
-  return <button type="button" onClick={onClick} style={{ ...style, '--portrait-size': size + 'px' }} disabled={disabled}
+  const bubbleStyle: CSSProperties & { '--portrait-size': string } = { ...style, '--portrait-size': size + 'px' }
+  return <button type="button" onClick={onClick} style={bubbleStyle}
     aria-label={creator.name + ' · 구독자 ' + number(count) + '명' + (subscribed ? ' · 구독 중' : '')}
     data-creator={creator.id} data-subscribed={subscribed}
     className="group flex min-h-11 min-w-11 flex-col items-center justify-center gap-1 rounded-xl text-center focus-visible:z-10">
@@ -27,12 +44,12 @@ function CreatorBubble({ item, size, onClick, style, disabled }) {
   </button>
 }
 
-function globeCards(orbit, width, height, angles, reserved, peak) {
+function globeCards(orbit: ExploreItem[], width: number, height: number, angles: Angles, reserved: Box, peak: number) {
   const compact = width < 560
   const radiusX = width * (compact ? 0.57 : 0.51)
   const radiusY = height * 0.49
   const occupied = [reserved]
-  const visible = []
+  const visible: GlobeCard[] = []
   const sinYaw = Math.sin(angles.yaw)
   const cosYaw = Math.cos(angles.yaw)
   const sinPitch = Math.sin(angles.pitch)
@@ -53,7 +70,7 @@ function globeCards(orbit, width, height, angles, reserved, peak) {
     const top = height / 2 + radiusY * rotY
     const w = Math.max(44, size + 10)
     const h = size + 18
-    const box = [left - w / 2, top - h / 2, left + w / 2, top + h / 2]
+    const box: Box = [left - w / 2, top - h / 2, left + w / 2, top + h / 2]
     if (box[0] < 5 || box[1] < 6 || box[2] > width - 5 || box[3] > height - 6) return
     if (occupied.some(([x1, y1, x2, y2]) => box[0] < x2 && box[2] > x1 && box[1] < y2 && box[3] > y1)) return
     occupied.push(box)
@@ -62,15 +79,16 @@ function globeCards(orbit, width, height, angles, reserved, peak) {
   return visible
 }
 
-function CreatorGlobe({ items, peak, openCreator }) {
-  const viewport = useRef(null)
-  const gesture = useRef(null)
+function CreatorGlobe({ items, peak, openCreator }: { items: ExploreItem[]; peak: number; openCreator: PageProps['openCreator'] }) {
+  const viewport = useRef<HTMLDivElement>(null)
+  const gesture = useRef<DragGesture | null>(null)
   const ignoreClick = useRef(false)
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 })
   const [angles, setAngles] = useState(startingAngles)
   const [dragging, setDragging] = useState(false)
   useLayoutEffect(() => {
     const element = viewport.current
+    if (!element) return
     const sync = () => setDimensions({ width: element.clientWidth, height: element.clientHeight })
     const observer = new ResizeObserver(sync)
     sync()
@@ -83,9 +101,9 @@ function CreatorGlobe({ items, peak, openCreator }) {
   }))
   const reserveWidth = Math.min(Math.max(0, width - 32), Math.max(150, 20 + pinned.reduce((total, { size }) => total + Math.max(48, size + 10), 0)))
   const reserveHeight = 43 + Math.max(24, ...pinned.map(({ size }) => size))
-  const reserved = [width / 2 - reserveWidth / 2 - 6, height / 2 - reserveHeight / 2 - 3, width / 2 + reserveWidth / 2 + 6, height / 2 + reserveHeight / 2 + 3]
+  const reserved: Box = [width / 2 - reserveWidth / 2 - 6, height / 2 - reserveHeight / 2 - 3, width / 2 + reserveWidth / 2 + 6, height / 2 + reserveHeight / 2 + 3]
   const visible = globeCards(items.filter((item) => !item.subscribed), width, height, angles, reserved, peak)
-  const move = (dx, dy, origin) => ({
+  const move = (dx: number, dy: number, origin: Angles) => ({
     yaw: (origin.yaw + dx) % (2 * Math.PI),
     pitch: (origin.pitch + dy) % (2 * Math.PI),
   })
@@ -101,7 +119,7 @@ function CreatorGlobe({ items, peak, openCreator }) {
     <div ref={viewport} tabIndex={0} aria-label="크리에이터 지구본, 방향키로 회전" data-constellation
       className={`relative isolate h-[440px] touch-none overflow-hidden bg-[radial-gradient(ellipse_at_center,#253e4a_0%,#182734_40%,#0e1722_76%)] select-none sm:h-[500px] ${dragging ? 'cursor-grabbing' : 'cursor-grab'}`}
       onPointerDown={(event) => {
-        if (event.button !== 0 || event.target.closest('[data-pinned]')) return
+        if (event.button !== 0 || (event.target instanceof Element && event.target.closest('[data-pinned]'))) return
         ignoreClick.current = false
         gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY, angles }
       }}
@@ -121,9 +139,9 @@ function CreatorGlobe({ items, peak, openCreator }) {
       onPointerUp={end} onPointerCancel={end} onLostPointerCapture={end}
       onPointerLeave={() => { if (!ignoreClick.current) end() }}
       onKeyDown={(event) => {
-        const steps = { ArrowLeft: [-0.32, 0], ArrowRight: [0.32, 0], ArrowUp: [0, -0.32], ArrowDown: [0, 0.32] }
+        const steps: Partial<Record<string, [number, number]>> = { ArrowLeft: [-0.32, 0], ArrowRight: [0.32, 0], ArrowUp: [0, -0.32], ArrowDown: [0, 0.32] }
         const step = steps[event.key]
-        if (!step || event.target.closest('[data-pinned]')) return
+        if (!step || (event.target instanceof Element && event.target.closest('[data-pinned]'))) return
         event.preventDefault()
         setAngles((old) => move(...step, old))
       }}>
@@ -153,7 +171,7 @@ function CreatorGlobe({ items, peak, openCreator }) {
   </section>
 }
 
-export function Explore({ account, openCreator }) {
+export function Explore({ account, openCreator }: Pick<PageProps, 'account' | 'openCreator'>) {
   const state = useApp()
   const [query, setQuery] = useState('')
   const term = query.trim().replace(/^@/, '').toLowerCase()

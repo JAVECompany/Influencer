@@ -1,6 +1,8 @@
 import { StrictMode, useEffect, useState } from 'react'
+import type { ComponentType } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ArrowRight, CheckCircle2, CircleAlert, ClipboardCheck, Coins, Home as HomeIcon, LayoutDashboard, LogOut, MessageCircle, Search, Shield, ShoppingBag, Sparkles, UserRound, Wallet } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { demos, number, roles } from './data'
 import { actor, useApp } from './store'
 import { Brand, Button, Feedback, field, Label, panel, Scene, Avatar } from './ui'
@@ -9,17 +11,20 @@ import { Explore } from './explore'
 import { AdminSettlement } from './admin-settlement'
 import { Chat, Profile } from './shared'
 import { AdminHome, Application, Catalog, Earnings, Moderate, Review, Studio } from './operator'
+import { ContentPrivacy, usePagePrivacyMask, usePrintPrivacyMask } from './content-privacy'
+import type { Notify, PageKey, PageProps, Role } from './types'
 import './index.css'
 
-const navItems = {
+type NavItem = [PageKey, string, LucideIcon]
+const navItems: Record<Role, NavItem[]> = {
   customer: [['home', '홈', HomeIcon], ['search', '검색', Search], ['chat', '채팅', MessageCircle], ['store', '스토어', ShoppingBag], ['profile', '프로필', UserRound]],
   influencer: [['studio', '스튜디오', LayoutDashboard], ['chat', '채팅', MessageCircle], ['catalog', '상품', ShoppingBag], ['earnings', '수익', Wallet], ['profile', '프로필', UserRound]],
   admin: [['ops', '운영', LayoutDashboard], ['home', '홈', HomeIcon], ['review', '심사', ClipboardCheck], ['moderate', '관리', Shield], ['settlement', '정산', Wallet], ['profile', '프로필', UserRound]],
 }
-const applicationNav = [['apply', '입점', ClipboardCheck], ['profile', '프로필', UserRound]]
-const pages = { home: Home, search: Explore, chat: Chat, store: Store, profile: Profile, studio: Studio, catalog: Catalog, earnings: Earnings, settlement: AdminSettlement, ops: AdminHome, review: Review, moderate: Moderate, apply: Application }
+const applicationNav: NavItem[] = [['apply', '입점', ClipboardCheck], ['profile', '프로필', UserRound]]
+const pages: Record<PageKey, ComponentType<PageProps>> = { home: Home, search: Explore, chat: Chat, store: Store, profile: Profile, studio: Studio, catalog: Catalog, earnings: Earnings, settlement: AdminSettlement, ops: AdminHome, review: Review, moderate: Moderate, apply: Application }
 
-function Auth({ notify }) {
+function Auth({ notify }: Pick<PageProps, 'notify'>) {
   const state = useApp()
   const [signup, setSignup] = useState(false)
   const [id, setId] = useState('')
@@ -46,11 +51,11 @@ function Auth({ notify }) {
         event.preventDefault()
         const data = new FormData(event.currentTarget)
         if (signup) {
-          notify(state.signUp({ id, password, terms, adult, name: data.get('name'), role: data.get('role') }), '데모 계정을 만들었어요.')
+          notify(state.signUp({ id, password, terms, adult, name: String(data.get('name') ?? ''), role: String(data.get('role') ?? '') }), '데모 계정을 만들었어요.')
         } else notify(state.signIn(id, password))
       }}>
         {signup && <>
-          <Label title="가입 유형"><select name="role" className={field}><option value="customer">고객</option><option value="influencer">인플루언서</option></select></Label>
+          <Label title="가입 유형"><select name="role" className={field}><option value="customer">고객</option><option value="influencer">크리에이터</option></select></Label>
           <label className="flex items-start gap-2 text-sm text-dim"><input type="checkbox" required checked={terms} onChange={(event) => setTerms(event.target.checked)} className="mt-1 accent-mint" />데모 이용 조건에 동의합니다. 입력 정보는 이 브라우저에 저장됩니다.</label>
           <Button tone="subtle" onClick={() => setAdult(!adult)} aria-pressed={adult}>{adult ? '만 19세 이상 확인 완료 · 모의' : 'PASS 성인 확인 체험 · 만 19세 이상'}</Button>
         </>}
@@ -68,23 +73,23 @@ function Auth({ notify }) {
   </main>
 }
 
-function Workspace({ account, notify }) {
+function Workspace({ account, notify }: Pick<PageProps, 'account' | 'notify'>) {
   const state = useApp()
   const nav = account.role === 'influencer' && state.creators[account.id]?.status !== 'approved' ? applicationNav : navItems[account.role]
   const [tab, setTab] = useState(nav[0][0])
-  const [detail, setDetail] = useState(null)
-  const [chat, setChat] = useState(null)
+  const [detail, setDetail] = useState<string | null>(null)
+  const [chat, setChat] = useState<string | null>(null)
   const current = nav.some(([id]) => id === tab) ? tab : nav[0][0]
   const Page = pages[current]
   const scrollTop = () => window.scrollTo({ top: 0, behavior: 'instant' })
-  const go = (id) => {
+  const go = (id: PageKey) => {
     setTab(id)
     setDetail(null)
     setChat(null)
     scrollTop()
   }
-  const openCreator = (id) => { setDetail(id); scrollTop() }
-  const openChat = (id) => { setDetail(null); setTab('chat'); setChat(id); scrollTop() }
+  const openCreator = (id: string) => { setDetail(id); scrollTop() }
+  const openChat = (id: string) => { setDetail(null); setTab('chat'); setChat(id); scrollTop() }
   const navButtons = nav.map(([id, title, Icon]) => <button key={id} type="button" aria-current={current === id ? 'page' : undefined} onClick={() => go(id)}
     className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-1 py-2 text-[10px] font-bold transition sm:text-xs lg:w-full lg:flex-none lg:flex-row lg:justify-start lg:gap-3 lg:px-3.5 lg:py-3 lg:text-sm ${current === id ? 'bg-[#163337] text-mint' : 'text-dim hover:bg-white/5 hover:text-white'}`}>
     <Icon size={20} strokeWidth={current === id ? 2.5 : 1.85} aria-hidden="true" /><span className="truncate">{title}</span>
@@ -107,7 +112,7 @@ function Workspace({ account, notify }) {
       <header className="sticky top-0 z-20 border-b border-edge/75 bg-night/92 backdrop-blur-md">
         <div className="mx-auto flex h-[68px] max-w-[1130px] items-center justify-between gap-3 px-4 sm:px-7 lg:px-10">
           <button type="button" className="text-left lg:hidden" onClick={() => go(nav[0][0])}><Brand /></button>
-          <p className="hidden text-xs font-bold tracking-[.16em] text-dim lg:block">{roles[account.role]} <span className="px-1 text-edge">/</span> {detail ? '크리에이터' : nav.find(([id]) => id === current)[1]}</p>
+          <p className="hidden text-xs font-bold tracking-[.16em] text-dim lg:block">{roles[account.role]} <span className="px-1 text-edge">/</span> {detail ? '크리에이터' : nav.find(([id]) => id === current)?.[1]}</p>
           <div className="flex min-w-0 items-center gap-2.5">
             {account.role === 'customer' && <button type="button" onClick={() => go('store')} className="flex items-center gap-1.5 rounded-full border border-edge px-2.5 py-1.5 text-xs font-bold text-mint hover:border-mint"><Coins size={14} />{number(state.balances[account.id] ?? 0)} <span className="hidden sm:inline">코인</span></button>}
             <span className="truncate rounded-full bg-panel px-2.5 py-1.5 text-[10px] font-bold text-dim">DEMO · {roles[account.role]}</span>
@@ -126,8 +131,10 @@ function Workspace({ account, notify }) {
 
 function App() {
   const account = useApp(actor)
-  const [message, setMessage] = useState(null)
-  const notify = (result, success) => {
+  const inactive = usePagePrivacyMask()
+  const printing = usePrintPrivacyMask()
+  const [message, setMessage] = useState<{ text: string; error: boolean; accountId: string | null } | null>(null)
+  const notify: Notify = (result, success) => {
     const text = result.error || success
     setMessage(text ? { text, error: Boolean(result.error), accountId: useApp.getState().session } : null)
   }
@@ -138,12 +145,16 @@ function App() {
   }, [message])
   const feedback = message?.accountId === (account?.id ?? null) ? message : null
   const Icon = feedback?.error ? CircleAlert : CheckCircle2
-  return <Feedback.Provider value={feedback}>
-    {account ? <Workspace key={account.id} account={account} notify={notify} /> : <Auth notify={notify} />}
-    {feedback && <div data-toast role={feedback.error ? 'alert' : 'status'} className="pointer-events-none fixed inset-x-4 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-[100] flex justify-center lg:bottom-6">
-      <span className={`inline-flex items-center gap-2 rounded-xl border bg-[#101922] px-4 py-3 text-sm font-bold shadow-xl ${feedback.error ? 'border-red-300/50 text-red-200' : 'border-mint/40 text-mint'}`}><Icon size={17} className="shrink-0" />{feedback.text}</span>
-    </div>}
-  </Feedback.Provider>
+  return <ContentPrivacy.Provider value={printing ? 'print' : inactive ? 'inactive' : null}>
+    <Feedback.Provider value={feedback}>
+      {account ? <Workspace key={account.id} account={account} notify={notify} /> : <Auth notify={notify} />}
+      {feedback && <div data-toast role={feedback.error ? 'alert' : 'status'} className="pointer-events-none fixed inset-x-4 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-[100] flex justify-center lg:bottom-6">
+        <span className={`inline-flex items-center gap-2 rounded-xl border bg-[#101922] px-4 py-3 text-sm font-bold shadow-xl ${feedback.error ? 'border-red-300/50 text-red-200' : 'border-mint/40 text-mint'}`}><Icon size={17} className="shrink-0" />{feedback.text}</span>
+      </div>}
+    </Feedback.Provider>
+  </ContentPrivacy.Provider>
 }
 
-createRoot(document.getElementById('root')).render(<StrictMode><App /></StrictMode>)
+const root = document.getElementById('root')
+if (!root) throw new Error('App root not found')
+createRoot(root).render(<StrictMode><App /></StrictMode>)

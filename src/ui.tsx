@@ -1,10 +1,14 @@
 import { createContext, useContext, useEffect, useId, useRef, useState } from 'react'
+import type { ComponentPropsWithoutRef, ReactNode, SyntheticEvent } from 'react'
 import { ArrowLeft, CircleHelp, LockKeyhole, X } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { palettes } from './data'
 import { portraitStyle } from './demo-data'
+import { ContentPrivacy } from './content-privacy'
+import type { Account, Creator } from './types'
 
 export const panel = 'rounded-2xl border border-edge bg-panel'
-export const Feedback = createContext(null)
+export const Feedback = createContext<{ text: string; error: boolean } | null>(null)
 export const field = 'w-full rounded-xl border border-edge bg-night px-4 py-3 text-sm text-white placeholder:text-dim/70 focus:border-mint focus:outline-none'
 const buttonStyles = {
   primary: 'bg-mint text-[#082621] hover:bg-[#99f5df]',
@@ -13,11 +17,12 @@ const buttonStyles = {
   danger: 'border border-red-400/40 text-red-200 hover:bg-red-400/10',
 }
 
-export function Button({ children, tone = 'primary', className = '', type = 'button', ...props }) {
+type ButtonProps = ComponentPropsWithoutRef<'button'> & { tone?: keyof typeof buttonStyles }
+export function Button({ children, tone = 'primary', className = '', type = 'button', ...props }: ButtonProps) {
   return <button type={type} className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition disabled:opacity-45 ${buttonStyles[tone]} ${className}`} {...props}>{children}</button>
 }
 
-export function Label({ title, children }) {
+export function Label({ title, children }: { title: string; children: ReactNode }) {
   return <label className="grid gap-2 text-sm font-semibold">{title}{children}</label>
 }
 
@@ -28,7 +33,7 @@ export function Brand() {
   </div>
 }
 
-export function PageTitle({ label, title, subtitle, children }) {
+export function PageTitle({ label, title, subtitle, children }: { label?: string; title: string; subtitle?: string; children?: ReactNode }) {
   return <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
     <div>
       {label && <p className="mb-2.5 text-[11px] font-bold tracking-[.18em] text-mint uppercase">{label}</p>}
@@ -39,7 +44,9 @@ export function PageTitle({ label, title, subtitle, children }) {
   </header>
 }
 
-export function Empty({ title, description, children, icon: Icon = CircleHelp }) {
+export function Empty({ title, description, children, icon: Icon = CircleHelp }: {
+  title: string; description?: string; children?: ReactNode; icon?: LucideIcon
+}) {
   return <div className={`${panel} grid justify-items-center gap-3 px-5 py-12 text-center`}>
     <Icon size={28} className="text-mint" aria-hidden="true" />
     <p className="font-bold">{title}</p>
@@ -48,23 +55,27 @@ export function Empty({ title, description, children, icon: Icon = CircleHelp })
   </div>
 }
 
-export function Back({ onClick }) {
+export function Back({ onClick }: { onClick: () => void }) {
   return <Button tone="plain" className="mb-3 -ml-2" onClick={onClick}><ArrowLeft size={17} /> 뒤로</Button>
 }
 
-export function Modal({ title, onClose, children }) {
-  const ref = useRef(null)
+export function Modal({ title, onClose, children, protectedContent = false }: {
+  title: string; onClose: () => void; children: ReactNode; protectedContent?: boolean
+}) {
+  const ref = useRef<HTMLDialogElement>(null)
   const heading = useId()
   const message = useContext(Feedback)
+  const mask = useContext(ContentPrivacy)
   useEffect(() => {
     const dialog = ref.current
+    if (!dialog) return
     dialog.showModal()
     return () => dialog.close()
   }, [])
-  return <dialog ref={ref} aria-labelledby={heading} onCancel={(event) => { event.preventDefault(); onClose() }}
+  return <dialog ref={ref} aria-labelledby={heading} data-protected={protectedContent || undefined} onCancel={(event) => { event.preventDefault(); onClose() }}
     className="fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-auto rounded-2xl border border-edge bg-panel p-5 text-white shadow-2xl sm:p-6">
     <div className="mb-4 flex items-center justify-between gap-3">
-      <h2 id={heading} className="text-lg font-black">{title}</h2>
+      <h2 id={heading} className="text-lg font-black">{protectedContent && mask ? '구독 전용 콘텐츠' : title}</h2>
       <button type="button" aria-label="닫기" onClick={onClose} className="grid size-10 shrink-0 place-items-center rounded-xl text-dim hover:bg-white/10"><X size={19} /></button>
     </div>
     {message?.error && <p role="alert" className="mb-4 rounded-xl border border-red-300/40 bg-red-400/10 px-3 py-2.5 text-sm text-red-200">{message.text}</p>}
@@ -72,12 +83,13 @@ export function Modal({ title, onClose, children }) {
   </dialog>
 }
 
-export function Badge({ children, live = false }) {
+export function Badge({ children, live = false }: { children: ReactNode; live?: boolean }) {
   return <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-black tracking-wide ${live ? 'bg-[#ec486d] text-white' : 'bg-[#1a3636] text-mint'}`}>{children}</span>
 }
 
-export function Avatar({ person, account, className = '' }) {
-  const color = palettes[person?.art % palettes.length] ?? palettes[0]
+type AvatarPerson = Pick<Creator, 'name'> & Partial<Pick<Creator, 'art' | 'avatar' | 'portrait'>>
+export function Avatar({ person, account, className = '' }: { person?: AvatarPerson; account?: Account; className?: string }) {
+  const color = palettes[(person?.art ?? 0) % palettes.length] ?? palettes[0]
   const gradient = useId()
   const image = account?.avatar || person?.avatar
   if (image) return <img src={image} alt="" className={`aspect-square shrink-0 rounded-full object-cover ${className}`} />
@@ -141,32 +153,26 @@ export function Scene({ art = 0, className = '' }) {
   </svg>
 }
 
-export function Protected({ viewer, children, className = '' }) {
-  const [away, setAway] = useState(document.hidden)
-  useEffect(() => {
-    const hide = () => setAway(true)
-    const restore = () => setAway(document.hidden)
-    const visibility = () => setAway(document.hidden || !document.hasFocus())
-    window.addEventListener('blur', hide)
-    window.addEventListener('focus', restore)
-    document.addEventListener('visibilitychange', visibility)
-    return () => {
-      window.removeEventListener('blur', hide)
-      window.removeEventListener('focus', restore)
-      document.removeEventListener('visibilitychange', visibility)
-    }
-  }, [])
-  const block = (event) => event.preventDefault()
+const watermarkTime = new Intl.DateTimeFormat('sv-SE', {
+  timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short',
+})
+
+export function Protected({ viewer, children, className = '' }: { viewer: string; children: ReactNode; className?: string }) {
+  const mask = useContext(ContentPrivacy)
+  const [openedAt] = useState(() => watermarkTime.format(Date.now()) + ' KST')
+  const block = (event: SyntheticEvent) => event.preventDefault()
   return <div data-protected onContextMenu={block} onDragStart={block} onCopy={block} className={`relative isolate overflow-hidden select-none ${className}`}>
-    <div className={away ? 'invisible' : undefined} aria-hidden={away}>{children}</div>
-    {!away && <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-10 grid grid-cols-2 place-items-center overflow-hidden text-[10px] font-black tracking-widest text-white/25">
-      {Array.from({ length: 6 }, (_, i) => <span key={i} className="-rotate-17 rounded-md bg-black/15 px-2 py-1">{viewer} · 밤결</span>)}
+    <div className={mask ? 'invisible' : undefined} aria-hidden={Boolean(mask)}>{children}</div>
+    {!mask && <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-10 grid grid-cols-2 place-items-center overflow-hidden text-[10px] font-black tracking-widest text-white/25">
+      {Array.from({ length: 6 }, (_, i) => <span key={i} className="max-w-full -rotate-17 rounded-md bg-black/20 px-1.5 py-1 text-center text-white/50 sm:px-2">
+        <span className="block break-all">{viewer} · 밤결</span><span className="block text-[8px] tracking-normal">{openedAt}</span>
+      </span>)}
     </div>}
-    {away && <div className="absolute inset-0 grid place-content-center gap-2 bg-night/95 text-center text-xs text-dim"><LockKeyhole className="mx-auto" size={20} />탭으로 돌아오면 다시 볼 수 있어요.</div>}
+    {mask && <div className="absolute inset-0 grid place-content-center gap-2 bg-night/95 text-center text-xs text-dim"><LockKeyhole className="mx-auto" size={20} />{mask === 'print' ? '인쇄 중에는 콘텐츠를 가립니다.' : '탭으로 돌아오면 다시 볼 수 있어요.'}</div>}
   </div>
 }
 
-export function fileData(file, allowVideo = false) {
+export function fileData(file: File | null | undefined, allowVideo = false): Promise<string> {
   if (!file) return Promise.resolve('')
   const image = ['image/png', 'image/jpeg', 'image/webp'].includes(file.type)
   const video = allowVideo && ['video/mp4', 'video/webm'].includes(file.type)
@@ -175,7 +181,7 @@ export function fileData(file, allowVideo = false) {
   }
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onload = () => resolve(reader.result)
+    reader.onload = () => typeof reader.result === 'string' ? resolve(reader.result) : reject(new Error('파일을 읽을 수 없습니다.'))
     reader.onerror = () => reject(new Error('이미지를 읽을 수 없습니다.'))
     reader.readAsDataURL(file)
   })

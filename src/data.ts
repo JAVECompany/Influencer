@@ -1,18 +1,19 @@
 import { addedRoster, mockApplicants, mockPosts, mockTransactions } from './demo-data'
+import type { Account, AppData, Content, ContentKind, Creator, Role } from './types'
 
-export const roles = {
+export const roles: Record<Role, string> = {
   admin: '관리자',
   influencer: '인플루언서',
   customer: '고객',
 }
 
-export const demos = [
+export const demos: Pick<Account, 'id' | 'role' | 'name'>[] = [
   { id: 'user123', role: 'customer', name: '나의 궤도' },
   { id: 'influencer123', role: 'influencer', name: '서린' },
   { id: 'admin123', role: 'admin', name: '밤결 운영팀' },
 ]
 
-const roster = [
+const roster: [string, string, string, string, number, number, number][] = [
   ['influencer123', '서린', 'seorin', '도시의 밤과 조용한 일상.', 3480, 7900, 0],
   ['doha', '도하', 'doha', '매일의 사운드와 스튜디오 비하인드.', 2120, 5900, 1],
   ['yuna', '윤아', 'yuna', '여행 끝에 남은 장면들을 모아요.', 4160, 8900, 2],
@@ -25,7 +26,7 @@ const roster = [
 ]
 const originalPortraits = [0, 70, 1, 2, 71, 72, 3, 4, 5]
 const approvedRoster = [
-  ...roster.map(([id, name, handle, bio, fans, price, art], i) => ({
+  ...roster.map(([id, name, handle, bio, fans, price, art], i): Creator => ({
     id, name, handle, bio, fans, price, art, status: 'approved', instagram: '', email: '', reason: '',
     portrait: originalPortraits[i], gender: originalPortraits[i] < 70 ? 'female' : 'male',
   })),
@@ -44,11 +45,11 @@ export const palettes = [
   ['#4f806a', '#203b37', '#c59980', '#192c27'],
 ]
 
-const ago = (minutes) => Date.now() - minutes * 60_000
-const content = (id, owner, kind, title, body, art, minutes) =>
+const ago = (minutes: number) => Date.now() - minutes * 60_000
+const content = (id: string, owner: string, kind: ContentKind, title: string, body: string, art: number, minutes: number): Content =>
   ({ id, owner, kind, title, body, art, at: ago(minutes), hidden: false, likes: [], reports: [] })
 
-export const initialData = {
+export const initialData: AppData = {
   accounts: Object.fromEntries(demos.map((demo) => [
     demo.id, { ...demo, password: demo.id, avatar: '', notifications: true, payment: '', disabled: false },
   ])),
@@ -72,7 +73,7 @@ export const initialData = {
     { id: 'goods2', owner: 'influencer123', name: '짧은 영상 편지', detail: '구독자에게 전하는 30초 인사', cost: 45, art: 1, kind: 'video' },
   ],
   roulettes: {
-    influencer123: { cost: 20, rewards: [{ name: '비공개 사진', chance: 30 }, { name: '다음 기회에', chance: 70 }] },
+    influencer123: { cost: 20, topPrizeCost: 80, rewards: [{ name: '비공개 사진', chance: 30 }, { name: '다음 기회에', chance: 70 }] },
   },
   messages: [
     { id: 'm1', customer: 'user123', creator: 'influencer123', from: 'influencer123', text: '밤결에 오신 걸 환영해요! 오늘의 사진은 어떠셨나요?', at: ago(16) },
@@ -85,11 +86,11 @@ export const packs = [
   { coins: 600, won: 19900, name: '플러스' },
 ]
 
-export const kindNames = { post: '게시글', story: '스토리', live: '라이브' }
-export const krw = (value) => '₩' + value.toLocaleString('ko-KR')
-export const number = (value) => value.toLocaleString('ko-KR')
+export const kindNames: Record<ContentKind, string> = { post: '게시글', story: '스토리', live: '라이브' }
+export const krw = (value: number) => '₩' + value.toLocaleString('ko-KR')
+export const number = (value: number) => value.toLocaleString('ko-KR')
 
-export function relativeTime(time) {
+export function relativeTime(time: number) {
   const minutes = Math.max(1, Math.floor((Date.now() - time) / 60_000))
   if (minutes < 60) return minutes + '분 전'
   if (minutes < 1440) return Math.floor(minutes / 60) + '시간 전'

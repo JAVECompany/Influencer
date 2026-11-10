@@ -17,6 +17,7 @@ button:disabled { cursor: not-allowed; }
 dialog::backdrop { background: #030609bf; backdrop-filter: blur(5px); }
 body:has(dialog[open]) [data-toast] { display: none; }
 ::selection { background: #276f61; color: white; }
+[data-protected] { -webkit-touch-callout: none; }
 
 @media print {
   [data-protected] { display: none !important; }

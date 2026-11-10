@@ -1,46 +1,88 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { initialData, packs } from './data'
+import { displayShare, drawRewardIndex, rouletteConfigurationError } from './roulette'
+import type {
+  ActionResult, ApplicationInput, Content, Failure, PostAction, ProfileChanges, PublishInput,
+  Reward, SessionData, SignUpInput, SpendResult, SpendType, Success, Transaction, TransactionType,
+} from './types'
+
+interface AppStore extends SessionData {
+  signIn: (id: string, password: string) => ActionResult
+  signOut: () => void
+  signUp: (input: SignUpInput) => ActionResult
+  profile: (changes: ProfileChanges) => ActionResult
+  apply: (input: ApplicationInput) => ActionResult
+  review: (id: string, status: 'approved' | 'rejected', reason?: string) => ActionResult
+  configureSettlement: (coinWon: number, feeBps: number) => ActionResult
+  overrideSettlementCoins: (periodKey: string, id: string, coins: number | null) => ActionResult
+  toggleAccount: (id: string) => ActionResult
+  editCreator: (price: number, bio: string) => ActionResult
+  publish: (input: PublishInput) => ActionResult
+  recordAudience: (id: string) => void
+  managePost: (id: string, action: PostAction) => ActionResult
+  subscribe: (id: string) => ActionResult
+  unsubscribe: (id: string) => ActionResult
+  topUp: (coins: number) => ActionResult
+  addProduct: (name: string, detail: string, cost: number, media?: string) => ActionResult
+  removeProduct: (id: string) => ActionResult
+  saveRoulette: (cost: number, rewards: Reward[], topPrizeCost?: number | null) => ActionResult
+  spend: (creator: string, type: SpendType, productId?: string) => SpendResult
+  sendMessage: (counterpart: string, text: string) => ActionResult
+}
 
 const uid = () => crypto.randomUUID()
-const fail = (error) => ({ error })
-const ok = { success: true }
-const amount = (n, min, max) => Number.isInteger(n) && n >= min && n <= max
+const fail = (error: string): Failure => ({ error })
+const ok: Success = { success: true }
+const amount = (n: number, min: number, max: number) => Number.isInteger(n) && n >= min && n <= max
 
-export const actor = (state) => {
-  const account = state.accounts[state.session]
+export const actor = (state: SessionData) => {
+  const account = state.session ? state.accounts[state.session] : undefined
   return account?.disabled ? undefined : account
 }
 
-export const isPublic = (state, id) =>
+export const isPublic = (state: SessionData, id: string) =>
   state.creators[id]?.status === 'approved' && !state.accounts[id]?.disabled
 
-export const hasSubscription = (state, customer, creator) =>
+export const hasSubscription = (state: SessionData, customer: string, creator: string) =>
   state.accounts[customer]?.role === 'customer' && !state.accounts[customer].disabled
   && isPublic(state, creator) && (state.subscriptions[customer] ?? []).includes(creator)
 
-export const subscriberCount = (state, creator) => (state.creators[creator]?.fans ?? 0)
+export const subscriberCount = (state: SessionData, creator: string) => (state.creators[creator]?.fans ?? 0)
   + Object.keys(state.subscriptions).filter((customer) => hasSubscription(state, customer, creator)).length
 
-export const canRead = (state, post) => {
+export const canRead = (state: SessionData, post: Content | undefined) => {
   const a = actor(state)
   if (!a || !post) return false
   if (a.role === 'admin' || post.owner === a.id) return true
   return !post.hidden && a.role === 'customer' && hasSubscription(state, a.id, post.owner)
 }
 
-const approved = (state) => {
+export const isStoryAvailable = (post: Content) => post.kind !== 'story' || Date.now() - post.at < 86_400_000
+
+export const tracksAudience = (post: Content | undefined): post is Content & { kind: 'story' | 'live' } =>
+  post?.kind === 'story' || post?.kind === 'live'
+
+export function audienceForCreator(state: SessionData, post: Content | undefined) {
+  const account = actor(state)
+  if (account?.role !== 'influencer' || !tracksAudience(post) || post.owner !== account.id) return []
+  return [...new Set(post.viewers)].map((id) => state.accounts[id]).filter((viewer) => viewer?.role === 'customer')
+}
+
+const approved = (state: SessionData) => {
   const account = actor(state)
   return account?.role === 'influencer' && isPublic(state, account.id) ? account : null
 }
 
-const txn = (type, owner, customer, changes) => ({ id: uid(), type, owner, customer, at: Date.now(), ...changes })
-const mergeFixtures = (stored, fixtures) => {
+type TransactionChanges = Partial<Pick<Transaction, 'won' | 'coins' | 'productId' | 'reward' | 'guaranteed'>>
+const txn = (type: TransactionType, owner: string | null, customer: string, changes: TransactionChanges): Transaction =>
+  ({ id: uid(), type, owner, customer, at: Date.now(), ...changes })
+const mergeFixtures = <Entry extends { id: string }>(stored: Entry[], fixtures: Entry[]) => {
   const ids = new Set(stored.map((entry) => entry.id))
   return [...stored, ...fixtures.filter((entry) => !ids.has(entry.id))]
 }
-const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
-const validInstagram = (value) => {
+const sameName = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase()
+const validInstagram = (value: string) => {
   try {
     const url = new URL(value)
     return url.protocol === 'https:' && ['www.instagram.com', 'instagram.com'].includes(url.hostname)
@@ -51,7 +93,7 @@ const validInstagram = (value) => {
   }
 }
 
-export const useApp = create(persist((set, get) => ({
+export const useApp = create<AppStore>()(persist((set, get) => ({
   ...initialData,
   session: null,
 
@@ -76,7 +118,7 @@ export const useApp = create(persist((set, get) => ({
     if (password.length < 6 || password.length > 72) return fail('비밀번호는 6~72자로 입력해 주세요.')
     if (!nickname || nickname.length > 20 || Object.values(state.accounts).some((a) => sameName(a.name, nickname))
       || Object.values(state.creators).some((c) => sameName(c.name, nickname))) return fail('중복되지 않는 닉네임을 입력해 주세요.')
-    if (!['customer', 'influencer'].includes(role)) return fail('가입 유형을 선택해 주세요.')
+    if (role !== 'customer' && role !== 'influencer') return fail('가입 유형을 선택해 주세요.')
     set({
       accounts: { ...state.accounts, [key]: { id: key, name: nickname, password, role, avatar: '', payment: '', notifications: true, disabled: false } },
       session: key,
@@ -88,7 +130,7 @@ export const useApp = create(persist((set, get) => ({
     const state = get()
     const a = actor(state)
     if (!a) return fail('로그인이 필요합니다.')
-    const update = {}
+    const update: ProfileChanges = {}
     if (typeof changes.name === 'string') {
       const name = changes.name.trim()
       const taken = Object.values(state.accounts).some((item) => item.id !== a.id && sameName(item.name, name))
@@ -123,7 +165,7 @@ export const useApp = create(persist((set, get) => ({
     const state = get()
     const a = actor(state)
     const current = a && state.creators[a.id]
-    if (a?.role !== 'influencer' || ['approved', 'pending'].includes(current?.status)) return fail('현재 입점 신청을 변경할 수 없습니다.')
+    if (a?.role !== 'influencer' || current?.status === 'approved' || current?.status === 'pending') return fail('현재 입점 신청을 변경할 수 없습니다.')
     if (method === 'link' && !validInstagram(instagram)) return fail('https://www.instagram.com/사용자이름 형식으로 입력해 주세요.')
     const normalized = method === 'link' ? new URL(instagram).pathname.split('/')[1].toLowerCase() : handle.trim().toLowerCase()
     if (!/^[a-z0-9_.]{1,30}$/.test(normalized)
@@ -201,10 +243,24 @@ export const useApp = create(persist((set, get) => ({
     const a = approved(state)
     if (!a || !title.trim() || !body.trim() || !['post', 'story', 'live'].includes(kind)) return fail('콘텐츠 제목과 내용을 입력해 주세요.')
     if (media && (media.length > 400_000 || !/^data:image\/(png|jpeg|webp);base64,/.test(media))) return fail('지원하는 이미지 파일을 선택해 주세요.')
-    const post = { id: uid(), owner: a.id, kind, title: title.trim().slice(0, 80), body: body.trim().slice(0, 500),
+    const post: Content = { id: uid(), owner: a.id, kind, title: title.trim().slice(0, 80), body: body.trim().slice(0, 500),
       media, at: Date.now(), art: state.creators[a.id].art, likes: [], reports: [], hidden: false }
     set({ posts: [post, ...state.posts] })
     return ok
+  },
+
+  recordAudience(id) {
+    const state = get()
+    const account = actor(state)
+    if (account?.role !== 'customer') return
+    const index = state.posts.findIndex((post) => post.id === id)
+    const post = state.posts[index]
+    if (!tracksAudience(post) || !canRead(state, post) || !isStoryAvailable(post)) return
+    const viewers = post.viewers ?? []
+    if (viewers.includes(account.id)) return
+    const posts = [...state.posts]
+    posts[index] = { ...post, viewers: [...viewers, account.id] }
+    set({ posts })
   },
 
   managePost(id, action) {
@@ -244,8 +300,9 @@ export const useApp = create(persist((set, get) => ({
   unsubscribe(id) {
     const state = get()
     const a = actor(state)
-    const list = state.subscriptions[a?.id] ?? []
-    if (a?.role !== 'customer' || !list.includes(id)) return fail('구독 내역을 찾을 수 없습니다.')
+    if (a?.role !== 'customer') return fail('구독 내역을 찾을 수 없습니다.')
+    const list = state.subscriptions[a.id] ?? []
+    if (!list.includes(id)) return fail('구독 내역을 찾을 수 없습니다.')
     set({
       subscriptions: { ...state.subscriptions, [a.id]: list.filter((item) => item !== id) },
       transactions: [txn('unsubscribe', id, a.id, {}), ...state.transactions],
@@ -283,16 +340,16 @@ export const useApp = create(persist((set, get) => ({
     return ok
   },
 
-  saveRoulette(cost, rewards) {
+  saveRoulette(cost, rewards, topPrizeCost = null) {
     const state = get()
     const a = approved(state)
-    if (!a || !amount(cost, 1, 10000) || rewards.length < 2 || rewards.length > 8
-      || rewards.some((r) => !r.name.trim() || !amount(r.chance, 1, 99))
-      || rewards.reduce((sum, r) => sum + r.chance, 0) !== 100) {
-      return fail('상품명을 채우고 정수 확률의 합계를 100%로 맞춰 주세요.')
-    }
+    if (!a) return fail('룰렛을 설정할 권한이 없습니다.')
+    const error = rouletteConfigurationError(cost, rewards, topPrizeCost)
+    if (error) return fail(error)
     set({ roulettes: { ...state.roulettes, [a.id]: {
-      cost, rewards: rewards.map((r) => ({ ...r, name: r.name.trim().slice(0, 60) })),
+      cost, topPrizeCost, rewards: rewards.map((r) => ({
+        name: r.name.trim().slice(0, 60), chance: r.chance, displayChance: displayShare(r),
+      })),
     } } })
     return ok
   },
@@ -301,26 +358,22 @@ export const useApp = create(persist((set, get) => ({
     const state = get()
     const a = actor(state)
     if (a?.role !== 'customer' || !hasSubscription(state, a.id, creator)) return fail('구독 중인 고객만 이용할 수 있습니다.')
-    const product = type === 'product' && state.products.find((p) => p.id === productId && p.owner === creator && !p.archived)
-    const roulette = type === 'roulette' && state.roulettes[creator]
-    const offer = product || roulette
+    const guaranteed = type === 'roulette-guaranteed'
+    const product = type === 'product' ? state.products.find((p) => p.id === productId && p.owner === creator && !p.archived) : undefined
+    const roulette = type === 'roulette' || guaranteed ? state.roulettes[creator] : undefined
+    const cost = guaranteed ? roulette?.topPrizeCost : (product || roulette)?.cost
     const balance = state.balances[a.id] ?? 0
-    if (!offer) return fail('판매가 종료되었습니다.')
+    if (!cost) return fail('판매가 종료되었습니다.')
     if (product && state.transactions.some((t) => t.productId === productId && t.customer === a.id)) return fail('이미 구매한 상품입니다.')
-    if (balance < offer.cost) return fail('코인이 부족합니다. 스토어에서 충전할 수 있어요.')
-    let reward = product ? product.name : ''
-    if (roulette) {
-      let draw = Math.random() * 100
-      reward = roulette.rewards.find((item) => {
-        draw -= item.chance
-        return draw < 0
-      }).name
-    }
+    if (balance < cost) return fail('코인이 부족합니다. 스토어에서 충전할 수 있어요.')
+    const rewardIndex = roulette ? (guaranteed ? 0 : drawRewardIndex(roulette.rewards)) : undefined
+    const reward = roulette && rewardIndex !== undefined ? roulette.rewards[rewardIndex]?.name : product?.name
+    if (!reward) return fail('상품을 찾을 수 없습니다.')
     set({
-      balances: { ...state.balances, [a.id]: balance - offer.cost },
-      transactions: [txn(type, creator, a.id, { coins: offer.cost, productId, reward }), ...state.transactions],
+      balances: { ...state.balances, [a.id]: balance - cost },
+      transactions: [txn(roulette ? 'roulette' : 'product', creator, a.id, { coins: cost, productId, reward, guaranteed }), ...state.transactions],
     })
-    return { success: true, reward }
+    return { success: true, reward, rewardIndex }
   },
 
   sendMessage(counterpart, text) {
@@ -336,15 +389,20 @@ export const useApp = create(persist((set, get) => ({
 }), {
   name: 'bamgyeol-demo-v1',
   version: 1,
-  migrate: (stored) => ({
-    ...stored,
-    creators: Object.fromEntries(Object.entries({ ...initialData.creators, ...stored.creators }).map(([id, creator]) => [
-      id, { ...initialData.creators[id], ...creator },
-    ])),
-    posts: mergeFixtures(stored.posts ?? [], initialData.posts.filter((post) => post.owner.startsWith('demo-creator-'))),
-    transactions: mergeFixtures(stored.transactions ?? [], initialData.transactions).sort((a, b) => b.at - a.at),
-    settlement: initialData.settlement,
-  }),
+  migrate: (persisted): SessionData => {
+    const stored = persisted as Partial<SessionData> | undefined
+    return {
+      ...initialData,
+      session: null,
+      ...stored,
+      creators: Object.fromEntries(Object.entries({ ...initialData.creators, ...stored?.creators }).map(([id, creator]) => [
+        id, { ...initialData.creators[id], ...creator },
+      ])),
+      posts: mergeFixtures(stored?.posts ?? [], initialData.posts.filter((post) => post.owner.startsWith('demo-creator-'))),
+      transactions: mergeFixtures(stored?.transactions ?? [], initialData.transactions).sort((a, b) => b.at - a.at),
+      settlement: initialData.settlement,
+    }
+  },
   partialize: ({ accounts, creators, posts, subscriptions, balances, transactions, products, roulettes, messages, session, settlement }) =>
     ({ accounts, creators, posts, subscriptions, balances, transactions, products, roulettes, messages, session, settlement }),
 }))

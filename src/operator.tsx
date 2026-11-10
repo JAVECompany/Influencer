@@ -1,25 +1,31 @@
 import { useState } from 'react'
 import { BadgeCheck, CircleDollarSign, ClipboardList, Eye, FileText, Layers3, PackagePlus, Shield, Sparkles, Trash2, UserRoundCheck, UsersRound } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { kindNames, krw, number, relativeTime, roles } from './data'
-import { isPublic, subscriberCount, useApp } from './store'
+import { audienceForCreator, isPublic, subscriberCount, tracksAudience, useApp } from './store'
 import { Avatar, Badge, Button, Empty, field, fileData, Label, Modal, PageTitle, panel } from './ui'
 import { Ledger } from './shared'
 import { ContentPreview } from './customer'
-import { ProductThumbnail } from './product-media'
+import { ProductCard, ProductMedia } from './product-media'
+import { RouletteEditor } from './roulette-editor'
+import { RouletteWheelDialog } from './roulette-wheel'
+import { displayShare } from './roulette'
+import type { ActionResult, ApplicationMethod, Content, ContentKind, Creator, PageProps, Product } from './types'
 
 const statusText = { pending: '검토 대기', approved: '승인', rejected: '반려' }
-const value = (data, key) => String(data.get(key) ?? '')
+const value = (data: FormData, key: string) => String(data.get(key) ?? '')
 
-function Stat({ label, value, icon: Icon }) {
+function Stat({ label, value, icon: Icon }: { label: string; value: string; icon: LucideIcon }) {
   return <div className={`${panel} min-w-0 p-4 sm:p-5`}>
     <div className="flex items-center justify-between gap-2 text-sm text-dim">{label}<Icon size={17} className="shrink-0 text-mint" /></div>
     <p className="mt-3 text-xl font-black break-words tabular-nums sm:text-2xl">{value}</p>
   </div>
 }
 
-export function Application({ account, notify }) {
+type OperatorProps = Pick<PageProps, 'account' | 'notify'>
+export function Application({ account, notify }: OperatorProps) {
   const state = useApp()
-  const [method, setMethod] = useState('link')
+  const [method, setMethod] = useState<ApplicationMethod>('link')
   const creator = state.creators[account.id]
   return <>
     <PageTitle label="CREATOR APPLICATION" title="크리에이터 입점" subtitle="Instagram 계정을 연결하거나 기본 정보를 직접 입력하세요." />
@@ -49,14 +55,17 @@ export function Application({ account, notify }) {
   </>
 }
 
-export function Studio({ account, notify }) {
+export function Studio({ account, notify }: OperatorProps) {
   const state = useApp()
-  const [dialog, setDialog] = useState(null)
-  const [kind, setKind] = useState('post')
-  const [preview, setPreview] = useState(null)
+  const [dialog, setDialog] = useState<'publish' | 'settings' | Content | null>(null)
+  const [kind, setKind] = useState<ContentKind>('post')
+  const [preview, setPreview] = useState<string | null>(null)
+  const [audienceId, setAudienceId] = useState<string | null>(null)
   const creator = state.creators[account.id]
   const posts = state.posts.filter((p) => p.owner === account.id)
-  const finish = (result, message) => {
+  const audiencePost = posts.find((p) => p.id === audienceId)
+  const viewers = audienceForCreator(state, audiencePost)
+  const finish = (result: ActionResult, message: string) => {
     notify(result, message)
     if (!result.error) setDialog(null)
   }
@@ -76,28 +85,46 @@ export function Studio({ account, notify }) {
     <section className={`${panel} divide-y divide-edge`}>
       <h2 className="p-5 font-black">내 콘텐츠</h2>
       {!posts.length && <p className="p-5 text-sm text-dim">등록된 콘텐츠가 없어요.</p>}
-      {posts.map((p) => <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
-        <div className="min-w-0"><p className="text-sm font-bold break-words">{p.title}</p><p className="mt-1 text-xs text-dim">{kindNames[p.kind]} · {relativeTime(p.at)}{p.hidden && ' · 운영자 숨김'}</p></div>
-        <div className="flex gap-2">
-          <Button tone="plain" aria-label={p.title + ' 미리보기'} onClick={() => setPreview(p.id)}><Eye size={17} /></Button>
-          <Button tone="plain" aria-label={p.title + ' 삭제'} onClick={() => setDialog(p)}><Trash2 size={17} /></Button>
+      {posts.map((p) => {
+        const label = p.kind === 'live' ? '참여자' : '조회 고객'
+        return <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+          <div className="min-w-0"><p className="text-sm font-bold break-words">{p.title}</p><p className="mt-1 text-xs text-dim">{kindNames[p.kind]} · {relativeTime(p.at)}{p.hidden && ' · 운영자 숨김'}</p></div>
+          <div className="flex flex-wrap gap-2">
+            {tracksAudience(p) && <Button tone="subtle" onClick={() => setAudienceId(p.id)}>
+              <UsersRound size={16} aria-hidden="true" />{label} {number(audienceForCreator(state, p).length)}명
+            </Button>}
+            <Button tone="plain" aria-label={p.title + ' 미리보기'} onClick={() => setPreview(p.id)}><Eye size={17} /></Button>
+            <Button tone="plain" aria-label={p.title + ' 삭제'} onClick={() => setDialog(p)}><Trash2 size={17} /></Button>
+          </div>
         </div>
-      </div>)}
+      })}
     </section>
     {preview && <ContentPreview post={state.posts.find((p) => p.id === preview)} account={account} onClose={() => setPreview(null)} />}
+    {audiencePost && <Modal title={audiencePost.kind === 'live' ? '라이브 참여자 명단' : '스토리 조회 고객 목록'} onClose={() => setAudienceId(null)}>
+      <p className="text-sm font-bold break-words">{audiencePost.title} · {number(viewers.length)}명</p>
+      {audiencePost.kind === 'live' && <p className="mt-1 text-xs text-dim">이 데모에서는 라이브 미리보기를 연 고객을 집계합니다.</p>}
+      {viewers.length ? <ul className="mt-4 grid gap-2">
+        {viewers.map((viewer) => <li key={viewer.id} className="flex items-center gap-3 rounded-xl bg-night p-2.5 text-sm font-bold">
+          <Avatar account={viewer} className="size-8" /><span className="min-w-0 break-words">{viewer.name}</span>
+        </li>)}
+      </ul> : <p className="mt-4 text-sm text-dim">아직 집계된 고객이 없어요.</p>}
+    </Modal>}
     {dialog === 'publish' && <Modal title="콘텐츠 등록" onClose={() => setDialog(null)}>
       <form className="grid gap-4" onSubmit={async (event) => {
         event.preventDefault()
         const data = new FormData(event.currentTarget)
         const file = data.get('media')
         try {
-          const media = file?.size ? await fileData(file) : ''
+          const media = file instanceof File && file.size ? await fileData(file) : ''
           finish(state.publish({ title: value(data, 'title'), body: value(data, 'body'), kind, media }), '콘텐츠를 등록했어요.')
         } catch (error) {
-          notify({ error: error.message })
+          notify({ error: error instanceof Error ? error.message : '파일을 읽을 수 없습니다.' })
         }
       }}>
-        <Label title="유형"><select className={field} value={kind} onChange={(event) => setKind(event.target.value)}>
+        <Label title="유형"><select className={field} value={kind} onChange={(event) => {
+          const next = event.target.value
+          if (next === 'post' || next === 'story' || next === 'live') setKind(next)
+        }}>
           <option value="post">게시글</option><option value="story">스토리 · 24시간</option><option value="live">라이브 미리보기</option>
         </select></Label>
         <Label title="제목"><input name="title" required maxLength={80} className={field} /></Label>
@@ -125,13 +152,13 @@ export function Studio({ account, notify }) {
   </>
 }
 
-export function Catalog({ account, notify }) {
+export function Catalog({ account, notify }: OperatorProps) {
   const state = useApp()
-  const [dialog, setDialog] = useState(null)
-  const [rows, setRows] = useState(2)
+  const [dialog, setDialog] = useState<'product' | 'roulette-preview' | 'roulette' | Product | null>(null)
+  const [preview, setPreview] = useState<Product | null>(null)
   const products = state.products.filter((p) => p.owner === account.id && !p.archived)
   const roulette = state.roulettes[account.id]
-  const finish = (result, message) => {
+  const finish = (result: ActionResult, message: string) => {
     notify(result, message)
     if (!result.error) setDialog(null)
   }
@@ -139,34 +166,39 @@ export function Catalog({ account, notify }) {
     <PageTitle label="CREATOR SHOP" title="상품 · 룰렛" subtitle="구독자가 코인으로 이용할 데모 상품을 구성하세요.">
       <Button onClick={() => setDialog('product')}><PackagePlus size={17} /> 상품 등록</Button>
     </PageTitle>
-    <div className={`${panel} mb-4 divide-y divide-edge`}>
-      <h2 className="p-5 font-black">개별 상품</h2>
-      {!products.length && <p className="p-5 text-sm text-dim">등록된 상품이 없어요.</p>}
-      {products.map((p) => <div key={p.id} className="flex items-center justify-between gap-3 px-5 py-3">
-        <ProductThumbnail product={p} className="aspect-video w-[72px] sm:w-[100px]" />
-        <div className="min-w-0 flex-1"><p className="text-sm font-bold break-words">{p.name} · {number(p.cost)} 코인</p><p className="mt-1 text-xs break-words text-dim">{p.detail}</p></div>
+    <div className={`${panel} mb-4 p-5`}>
+      <h2 className="mb-3 font-black">개별 상품</h2>
+      {!products.length && <p className="text-sm text-dim">등록된 상품이 없어요.</p>}
+      <div className="grid gap-2">{products.map((p) => <ProductCard key={p.id} product={p}>
+        <span className="text-xs text-dim">{number(p.cost)} 코인</span>
+        <Button tone="subtle" onClick={() => setPreview(p)}>콘텐츠 열기</Button>
         <Button tone="plain" aria-label={p.name + ' 판매 종료'} onClick={() => setDialog(p)}><Trash2 size={17} /></Button>
-      </div>)}
+      </ProductCard>)}</div>
     </div>
     <div className={`${panel} p-5`}>
       <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="flex items-center gap-2 font-black"><Sparkles size={17} className="text-mint" /> 룰렛</h2>
-        <Button tone="subtle" onClick={() => { setRows(roulette?.rewards.length ?? 2); setDialog('roulette') }}>{roulette ? '설정 수정' : '룰렛 등록'}</Button></div>
+        <div className="flex flex-wrap gap-2">
+          {roulette && <Button tone="subtle" onClick={() => setDialog('roulette-preview')}>미리보기</Button>}
+          <Button tone="subtle" onClick={() => setDialog('roulette')}>{roulette ? '설정 수정' : '룰렛 등록'}</Button>
+        </div></div>
       {roulette ? <div className="mt-3 grid gap-2 text-sm text-dim">
         <p>{number(roulette.cost)} 코인 / 1회</p>
-        {roulette.rewards.map((r, i) => <p key={i} className="flex justify-between gap-3 rounded-lg bg-night px-3 py-2"><span>{r.name}</span><span>{r.chance}%</span></p>)}
+        {roulette.topPrizeCost != null && <p>1등 확정 구매 · {number(roulette.topPrizeCost)} 코인</p>}
+        {roulette.rewards.map((r, i) => <p key={i} className="flex flex-wrap justify-between gap-3 rounded-lg bg-night px-3 py-2"><span>{i + 1}번 · {r.name}</span><span>표시 {displayShare(r)}% · 실제 {r.chance}%</span></p>)}
       </div> : <p className="mt-3 text-sm text-dim">설정된 룰렛이 없어요.</p>}
-      <p className="mt-4 text-xs text-dim">확률은 구독자에게 공개됩니다. 누적 소비 조건과 확정가는 운영 정책에서 검토합니다.</p>
+      <p className="mt-4 text-xs text-dim">고객 데모에는 번호가 표시된 원판을 보여 줍니다. 원판 표시 비중과 실제 추첨 확률은 이 설정에서 확인할 수 있어요.</p>
     </div>
+    {preview && <Modal title={preview.name} onClose={() => setPreview(null)} protectedContent><ProductMedia product={preview} viewer={account.id} /></Modal>}
     {dialog === 'product' && <Modal title="개별 상품 등록" onClose={() => setDialog(null)}>
       <form className="grid gap-4" onSubmit={async (event) => {
         event.preventDefault()
         const data = new FormData(event.currentTarget)
         const file = data.get('media')
         try {
-          const media = file?.size ? await fileData(file, true) : ''
+          const media = file instanceof File && file.size ? await fileData(file, true) : ''
           finish(state.addProduct(value(data, 'name'), value(data, 'detail'), Number(data.get('cost')), media), '상품을 등록했어요.')
         } catch (error) {
-          notify({ error: error.message })
+          notify({ error: error instanceof Error ? error.message : '파일을 읽을 수 없습니다.' })
         }
       }}>
         <Label title="상품명"><input name="name" required maxLength={60} className={field} /></Label>
@@ -176,22 +208,9 @@ export function Catalog({ account, notify }) {
         <Button type="submit">상품 등록</Button>
       </form>
     </Modal>}
-    {dialog === 'roulette' && <Modal title="룰렛 설정" onClose={() => setDialog(null)}>
-      <form className="grid gap-3" onSubmit={(event) => {
-        event.preventDefault()
-        const data = new FormData(event.currentTarget)
-        const rewards = Array.from({ length: rows }, (_, i) => ({ name: value(data, 'name' + i), chance: Number(data.get('chance' + i)) }))
-        finish(state.saveRoulette(Number(data.get('cost')), rewards), '룰렛을 저장했어요.')
-      }}>
-        <Label title="1회 이용 (코인)"><input name="cost" type="number" required min={1} max={10000} defaultValue={roulette?.cost} className={field} /></Label>
-        {Array.from({ length: rows }, (_, i) => <div key={i} className="grid grid-cols-[minmax(0,1fr)_96px] gap-2">
-          <Label title={'보상 ' + (i + 1)}><input name={'name' + i} required maxLength={60} defaultValue={roulette?.rewards[i]?.name} className={field} /></Label>
-          <Label title="확률 (%)"><input name={'chance' + i} type="number" required min={1} max={99} defaultValue={roulette?.rewards[i]?.chance} className={field} /></Label>
-        </div>)}
-        <div className="flex gap-2"><Button tone="plain" disabled={rows === 8} onClick={() => setRows(rows + 1)}>보상 추가</Button><Button tone="plain" disabled={rows === 2} onClick={() => setRows(rows - 1)}>마지막 보상 제거</Button></div>
-        <Button type="submit">확률 저장</Button>
-      </form>
-    </Modal>}
+    {dialog === 'roulette-preview' && <RouletteWheelDialog roulette={roulette} mode="preview" onClose={() => setDialog(null)} />}
+    {dialog === 'roulette' && <RouletteEditor roulette={roulette} onClose={() => setDialog(null)}
+      onSave={({ cost, rewards, topPrizeCost }) => finish(state.saveRoulette(cost, rewards, topPrizeCost), '룰렛을 저장했어요.')} />}
     {dialog && typeof dialog === 'object' && <Modal title="상품 판매 종료" onClose={() => setDialog(null)}>
       <p className="mb-4 text-sm text-dim">{dialog.name} 판매를 종료할까요?</p>
       <Button className="w-full" tone="danger" onClick={() => finish(state.removeProduct(dialog.id), '판매를 종료했어요.')}>판매 종료</Button>
@@ -199,14 +218,14 @@ export function Catalog({ account, notify }) {
   </>
 }
 
-export function Earnings({ account }) {
+export function Earnings({ account }: Pick<PageProps, 'account'>) {
   const state = useApp()
   const items = state.transactions.filter((t) => t.owner === account.id)
   const month = new Intl.DateTimeFormat('sv-SE', { year: 'numeric', month: '2-digit', timeZone: 'Asia/Seoul' })
   const [period, setPeriod] = useState(month.format(Date.now()))
   const filtered = items.filter((t) => !period || month.format(t.at) === period)
-  const revenue = filtered.filter((t) => t.type === 'subscribe').reduce((sum, t) => sum + t.won, 0)
-  const used = filtered.filter((t) => ['product', 'roulette'].includes(t.type)).reduce((sum, t) => sum + t.coins, 0)
+  const revenue = filtered.filter((t) => t.type === 'subscribe').reduce((sum, t) => sum + (t.won ?? 0), 0)
+  const used = filtered.filter((t) => ['product', 'roulette'].includes(t.type)).reduce((sum, t) => sum + (t.coins ?? 0), 0)
   return <>
     <PageTitle label="TRANSACTIONS" title="수익 내역" subtitle="데모 거래 원장 · 수수료, 환불, 송금 정책은 협의 중입니다.">
       <Label title="조회 월"><input type="month" className={field} value={period} onChange={(event) => setPeriod(event.target.value)} /></Label>
@@ -219,7 +238,7 @@ export function Earnings({ account }) {
   </>
 }
 
-export function AdminHome({ go }) {
+export function AdminHome({ go }: Pick<PageProps, 'go'>) {
   const state = useApp()
   const pending = Object.values(state.creators).filter((c) => c.status === 'pending').length
   const reported = state.posts.filter((p) => p.reports.length > 0 && !p.hidden).length
@@ -238,9 +257,9 @@ export function AdminHome({ go }) {
   </>
 }
 
-export function Review({ notify }) {
+export function Review({ notify }: Pick<PageProps, 'notify'>) {
   const state = useApp()
-  const [target, setTarget] = useState(null)
+  const [target, setTarget] = useState<Creator | null>(null)
   const applicants = Object.values(state.creators).filter((c) => c.method)
     .sort((a, b) => Number(b.status === 'pending') - Number(a.status === 'pending'))
   return <>
@@ -267,10 +286,10 @@ export function Review({ notify }) {
   </>
 }
 
-export function Moderate({ account, notify }) {
+export function Moderate({ account, notify, openCreator }: OperatorProps & Pick<PageProps, 'openCreator'>) {
   const state = useApp()
   const [tab, setTab] = useState('content')
-  const [preview, setPreview] = useState(null)
+  const [preview, setPreview] = useState<string | null>(null)
   const posts = [...state.posts].sort((a, b) => b.reports.length - a.reports.length || b.at - a.at)
   return <>
     <PageTitle label="MODERATION" title="운영 관리" subtitle="콘텐츠 공개 상태와 계정 이용 권한을 관리하세요." />
@@ -280,7 +299,9 @@ export function Moderate({ account, notify }) {
     </div>
     <section className={`${panel} divide-y divide-edge`}>
       {tab === 'content' ? posts.map((p) => <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
-        <div className="min-w-0"><p className="text-sm font-black break-words">{p.title}</p><p className="mt-1 text-xs text-dim">{state.creators[p.owner]?.name} · {kindNames[p.kind]} · 신고 {p.reports.length}건 · {p.hidden ? '숨김' : '공개'}</p></div>
+        <div className="min-w-0"><p className="text-sm font-black break-words">{p.title}</p><p className="mt-1 text-xs text-dim">
+          <button type="button" aria-label={(state.creators[p.owner]?.name ?? p.owner) + ' 크리에이터 상세'} onClick={() => openCreator(p.owner)} className="font-bold text-mint hover:underline">{state.creators[p.owner]?.name ?? p.owner}</button>
+          {' · '}{kindNames[p.kind]} · 신고 {p.reports.length}건 · {p.hidden ? '숨김' : '공개'}</p></div>
         <div className="flex gap-2"><Button tone="plain" onClick={() => setPreview(p.id)}>열람</Button><Button tone="subtle" onClick={() => notify(state.managePost(p.id, 'hide'), p.hidden ? '다시 공개했어요.' : '콘텐츠를 숨겼어요.')}>{p.hidden ? '공개' : '숨김'}</Button></div>
       </div>) : Object.values(state.accounts).map((a) => <div key={a.id} className="flex items-center gap-3 p-4">
         <Avatar account={a} person={state.creators[a.id]} className="size-10" />

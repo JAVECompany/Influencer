@@ -1,12 +1,17 @@
 import { useState } from 'react'
 import { Calculator, CalendarDays, Coins, Wallet } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { krw, number } from './data'
 import { dateInKorea, periodOptions, settlementPeriod, summarizeSettlement } from './settlements'
+import type { PeriodMode } from './settlements'
 import { useApp } from './store'
 import { Ledger } from './shared'
 import { Avatar, Badge, Button, field, Label, Modal, PageTitle, panel } from './ui'
+import type { PageProps } from './types'
 
-function Total({ label, value, detail, icon: Icon, emphasis }) {
+function Total({ label, value, detail, icon: Icon, emphasis }: {
+  label: string; value: string; detail: string; icon: LucideIcon; emphasis?: boolean
+}) {
   return <div className={`${panel} min-w-0 p-4 ${emphasis ? 'border-mint/35 bg-[#142c30]' : ''}`}>
     <div className="flex items-center justify-between gap-3 text-xs font-bold text-dim">{label}<Icon className="shrink-0 text-mint" size={17} /></div>
     <p className={`mt-3 text-2xl font-black break-words tabular-nums ${emphasis ? 'text-mint' : ''}`}>{value}</p>
@@ -14,24 +19,27 @@ function Total({ label, value, detail, icon: Icon, emphasis }) {
   </div>
 }
 
-export function AdminSettlement({ notify }) {
+type SettlementRow = ReturnType<typeof summarizeSettlement>['rows'][number]
+export function AdminSettlement({ notify }: Pick<PageProps, 'notify'>) {
   const state = useApp()
-  const [mode, setMode] = useState('month')
+  const [mode, setMode] = useState<PeriodMode>('month')
   const [start, setStart] = useState('')
   const [end, setEnd] = useState('')
   const [query, setQuery] = useState('')
-  const [edit, setEdit] = useState(null)
+  const [edit, setEdit] = useState<SettlementRow | null>(null)
   const [historyLimit, setHistoryLimit] = useState(12)
   const now = Date.now()
   const today = dateInKorea(now)
   const month = settlementPeriod('month', '', '', now)
   const period = settlementPeriod(mode, start, end, now)
+  if (!month) return null
   const current = summarizeSettlement(state, month)
   const report = period && (period.key === month.key ? current : summarizeSettlement(state, period))
   const { coinWon, feeBps } = state.settlement
   const term = query.trim().toLowerCase().replace(/^@/, '')
   const rows = report?.rows.filter(({ creator }) => creator.name.toLowerCase().includes(term) || creator.handle.toLowerCase().includes(term)) ?? []
-  const editCoins = (coins) => {
+  const editCoins = (coins: number | null) => {
+    if (!period || !edit) return
     const result = state.overrideSettlementCoins(period.key, edit.creator.id, coins)
     notify(result, coins === null ? '거래 내역의 코인 수로 복원했어요.' : '선택 기간의 정산 코인 수를 설정했어요.')
     if (!result.error) setEdit(null)

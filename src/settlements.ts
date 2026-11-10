@@ -3,13 +3,20 @@ const KST = 9 * 3_600_000
 
 export const periodOptions = [
   ['day', '1일'], ['week', '1주일'], ['month', '한 달'], ['half', '6개월'], ['year', '1년'], ['custom', '직접 선택'],
-]
+] as const
 
-export const dateInKorea = (time) => new Date(time + KST).toISOString().slice(0, 10)
-const firstOfMonth = (date, monthsBack) =>
+export type PeriodMode = (typeof periodOptions)[number][0]
+interface SettlementPeriod {
+  start: string
+  end: string
+  key: string
+}
+
+export const dateInKorea = (time: number) => new Date(time + KST).toISOString().slice(0, 10)
+const firstOfMonth = (date: Date, monthsBack: number) =>
   new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() - monthsBack, 1)).toISOString().slice(0, 10)
 
-export function settlementPeriod(mode, customStart, customEnd, now = Date.now()) {
+export function settlementPeriod(mode: PeriodMode, customStart: string, customEnd: string, now = Date.now()): SettlementPeriod | null {
   const today = dateInKorea(now)
   const month = new Date(now + KST)
   const starts = {
@@ -24,16 +31,16 @@ export function settlementPeriod(mode, customStart, customEnd, now = Date.now())
   return { start, end, key: start + '/' + end }
 }
 
-export function coinSplit(coins, coinWon, feeBps) {
+export function coinSplit(coins: number, coinWon: number, feeBps: number) {
   const gross = coins * coinWon
   const fee = Math.round(gross * feeBps / 10_000)
   return { gross, fee, net: gross - fee }
 }
 
-export function summarizeSettlement(state, period) {
-  const items = []
-  const totals = new Map()
-  const monthly = new Map()
+export function summarizeSettlement(state: AppData, period: SettlementPeriod) {
+  const items: Transaction[] = []
+  const totals = new Map<string, { coins: number; subs: number }>()
+  const monthly = new Map<string, number>()
   const { coinWon, feeBps, overrides } = state.settlement
   const manual = overrides[period.key] ?? {}
   for (const transaction of state.transactions) {
@@ -42,7 +49,7 @@ export function summarizeSettlement(state, period) {
     if (date < period.start || date > period.end) continue
     items.push(transaction)
     const { owner, type, coins = 0, won = 0 } = transaction
-    if (!state.creators[owner]) continue
+    if (!owner || !state.creators[owner]) continue
     const total = totals.get(owner) ?? { coins: 0, subs: 0 }
     if (type === 'product' || type === 'roulette') total.coins += coins
     if (type === 'subscribe') {
@@ -71,3 +78,5 @@ export function summarizeSettlement(state, period) {
   }), { coins: 0, actualGross: 0, subs: 0, gross: 0, fee: 0, net: 0, due: 0 })
   return { rows, total, monthly: [...monthly].sort(([a], [b]) => b.localeCompare(a)), items }
 }
+import type { AppData, Transaction } from './types'
+

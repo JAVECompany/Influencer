@@ -3,34 +3,37 @@ import { Bell, CreditCard, KeyRound, LogOut, MessageCircle, ReceiptText, Send, U
 import { krw, number, relativeTime, roles } from './data'
 import { hasSubscription, useApp } from './store'
 import { Avatar, Badge, Button, Empty, field, fileData, Label, Modal, PageTitle, panel } from './ui'
+import type { Creator, PageProps, ProfileChanges, Transaction, TransactionType } from './types'
 
-const txnNames = { subscribe: '구독 시작', unsubscribe: '구독 해지', topup: '코인 충전', product: '상품 구매', roulette: '룰렛 참여' }
+const txnNames: Record<TransactionType, string> = { subscribe: '구독 시작', unsubscribe: '구독 해지', topup: '코인 충전', product: '상품 구매', roulette: '룰렛 참여' }
 
 const settlementDate = new Intl.DateTimeFormat('ko-KR', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Seoul' })
 
-export function Ledger({ title = '거래 내역', items, showParties = false, absoluteDates = false }) {
+export function Ledger({ title = '거래 내역', items, showParties = false, absoluteDates = false }: {
+  title?: string; items: Transaction[]; showParties?: boolean; absoluteDates?: boolean
+}) {
   const state = useApp()
   return <section className={`${panel} overflow-hidden`}>
     <h2 className="flex items-center gap-2 px-5 py-4 font-black"><ReceiptText size={17} className="text-mint" /> {title}</h2>
     {!items.length && <p className="border-t border-edge p-5 text-sm text-dim">표시할 거래 내역이 없어요.</p>}
     {items.map((t) => <div key={t.id} className="flex items-center justify-between gap-4 border-t border-edge px-5 py-3.5">
       <div className="min-w-0">
-        <p className="text-sm font-bold break-words">{txnNames[t.type]}{t.reward && ' · ' + t.reward}</p>
-        <p className="mt-1 text-xs break-words text-dim">{[showParties && (state.accounts[t.customer]?.name ?? t.customer), state.creators[t.owner]?.name, absoluteDates ? settlementDate.format(t.at) : relativeTime(t.at)].filter(Boolean).join(' · ')}</p>
+        <p className="text-sm font-bold break-words">{t.guaranteed ? '룰렛 1등 확정 구매' : txnNames[t.type]}{t.reward && ' · ' + t.reward}</p>
+        <p className="mt-1 text-xs break-words text-dim">{[showParties && (state.accounts[t.customer]?.name ?? t.customer), t.owner && state.creators[t.owner]?.name, absoluteDates ? settlementDate.format(t.at) : relativeTime(t.at)].filter(Boolean).join(' · ')}</p>
       </div>
       <p className="shrink-0 text-right text-sm font-bold text-mint">{t.coins ? (t.type === 'topup' ? '+' : '−') + number(t.coins) + ' 코인' : t.won ? krw(t.won) : '—'}</p>
     </div>)}
   </section>
 }
 
-export function Profile({ account, notify, openCreator }) {
+export function Profile({ account, notify, openCreator }: Pick<PageProps, 'account' | 'notify' | 'openCreator'>) {
   const state = useApp()
-  const [dialog, setDialog] = useState(null)
+  const [dialog, setDialog] = useState<'profile' | 'password' | 'payment' | Creator | null>(null)
   const creator = state.creators[account.id]
   const subs = (state.subscriptions[account.id] ?? []).map((id) => state.creators[id]).filter(Boolean)
   const [name, setName] = useState(account.name)
   const [payment, setPayment] = useState(account.payment)
-  const save = (changes, message) => {
+  const save = (changes: ProfileChanges, message: string) => {
     const result = state.profile(changes)
     notify(result, message)
     if (!result.error) setDialog(null)
@@ -67,10 +70,10 @@ export function Profile({ account, notify, openCreator }) {
         event.preventDefault()
         const file = new FormData(event.currentTarget).get('avatar')
         try {
-          const avatar = file?.size ? await fileData(file) : account.avatar
+          const avatar = file instanceof File && file.size ? await fileData(file) : account.avatar
           save({ name, avatar }, '프로필을 저장했어요.')
         } catch (error) {
-          notify({ error: error.message })
+          notify({ error: error instanceof Error ? error.message : '이미지를 읽을 수 없습니다.' })
         }
       }}>
         <Label title="닉네임"><input required maxLength={20} className={field} value={name} onChange={(event) => setName(event.target.value)} /></Label>
@@ -83,7 +86,7 @@ export function Profile({ account, notify, openCreator }) {
         event.preventDefault()
         const data = new FormData(event.currentTarget)
         if (data.get('next') !== data.get('confirm')) return notify({ error: '새 비밀번호 확인이 일치하지 않아요.' })
-        save({ current: data.get('current'), password: data.get('next') }, '비밀번호를 변경했어요.')
+        save({ current: String(data.get('current') ?? ''), password: String(data.get('next') ?? '') }, '비밀번호를 변경했어요.')
       }}>
         <Label title="현재 비밀번호"><input name="current" type="password" required autoComplete="current-password" className={field} /></Label>
         <Label title="새 비밀번호"><input name="next" type="password" required minLength={6} maxLength={72} autoComplete="new-password" className={field} /></Label>
@@ -109,7 +112,7 @@ export function Profile({ account, notify, openCreator }) {
   </>
 }
 
-export function Chat({ account, initial, notify }) {
+export function Chat({ account, initial, notify }: Pick<PageProps, 'account' | 'initial' | 'notify'>) {
   const state = useApp()
   const [selected, setSelected] = useState(initial ?? null)
   const [text, setText] = useState('')
@@ -117,10 +120,10 @@ export function Chat({ account, initial, notify }) {
   const ids = customerView
     ? (state.subscriptions[account.id] ?? []).filter((id) => hasSubscription(state, account.id, id))
     : Object.keys(state.subscriptions).filter((id) => !state.accounts[id]?.disabled && hasSubscription(state, id, account.id))
-  const other = (id) => customerView ? state.creators[id] : state.accounts[id]
-  const thread = ids.includes(selected) ? selected : null
+  const other = (id: string) => customerView ? state.creators[id] : state.accounts[id]
+  const thread = selected && ids.includes(selected) ? selected : null
   const messages = thread ? state.messages.filter((m) => customerView ? m.customer === account.id && m.creator === thread : m.creator === account.id && m.customer === thread) : []
-  const log = useRef(null)
+  const log = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (log.current) log.current.scrollTop = log.current.scrollHeight
   }, [thread, messages.length])

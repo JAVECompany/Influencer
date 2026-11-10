@@ -8,7 +8,7 @@ const themes = [
   ['천천히 보는 풍경', '지난 주말 가장 오래 기억에 남은 순간입니다.'],
 ]
 
-export const addedRoster = [...women, ...men].map((name, i) => {
+export const addedRoster = [...women, ...men].map((name, i): Creator => {
   const serial = String(i + 1).padStart(3, '0')
   const female = i < women.length
   const rank = (i * 37) % (women.length + men.length)
@@ -29,12 +29,15 @@ export const addedRoster = [...women, ...men].map((name, i) => {
   }
 })
 
-export const mockApplicants = [
+const applicationFixtures = [
   { id: 'demo-request-dabin', name: '다빈', handle: 'dabin_orbit', bio: '카페와 여행을 필름으로 기록합니다.', method: 'direct', email: 'dabin@example.test' },
   { id: 'demo-request-geon', name: '건', handle: 'geon_daily', bio: '산책과 러닝 기록.', method: 'link', instagram: 'https://www.instagram.com/geon_daily/' },
   { id: 'demo-request-sera', name: '세라', handle: 'sera_journal', bio: '일상에서 찾은 디자인 이야기.', method: 'direct', email: 'sera@example.test' },
   { id: 'demo-request-haon', name: '하온', handle: 'haon_archive', bio: '공연과 음악의 기록.', method: 'direct', email: 'haon@example.test' },
-].map((creator, i) => ({ price: 5900, fans: 0, reason: '', art: i + 1, status: 'pending', ...creator }))
+] satisfies Pick<Creator, 'id' | 'name' | 'handle' | 'bio' | 'method' | 'instagram' | 'email'>[]
+
+export const mockApplicants = applicationFixtures.map((creator, i): Creator =>
+  ({ price: 5900, fans: 0, reason: '', art: i + 1, status: 'pending', ...creator }))
 
 const atlases = [
   { path: '/portraits/women.jpg', width: 1499, height: 1049, columns: 10, centers: [80, 241, 406, 568, 731, 890] },
@@ -42,8 +45,8 @@ const atlases = [
   { path: '/portraits/men.jpg', width: 1374, height: 1145, columns: 6, centers: [114, 352, 587, 805, 1030] },
 ]
 
-export function portraitStyle(index) {
-  if (!Number.isInteger(index) || index < 0 || index >= 100) return undefined
+export function portraitStyle(index?: number): CSSProperties | undefined {
+  if (index === undefined || !Number.isInteger(index) || index < 0 || index >= 100) return undefined
   const atlas = atlases[index < 60 ? 0 : index < 70 ? 1 : 2]
   const tile = index < 60 ? index : index < 70 ? index - 60 : index - 70
   const cell = atlas.width / atlas.columns
@@ -57,10 +60,10 @@ export function portraitStyle(index) {
   }
 }
 
-export function mockPosts(now) {
+export function mockPosts(now: number): Content[] {
   return addedRoster.flatMap((creator, i) => {
     const [title, body] = themes[i % themes.length]
-    const entry = (kind, minutes) => ({
+    const entry = (kind: ContentKind, minutes: number): Content => ({
       id: creator.id + '-' + kind, owner: creator.id, kind, title, body, art: creator.art,
       at: now - minutes * 60_000, hidden: false, likes: [], reports: [],
     })
@@ -70,7 +73,7 @@ export function mockPosts(now) {
   })
 }
 
-export function mockTransactions(now, roster) {
+export function mockTransactions(now: number, roster: Creator[]): Transaction[] {
   const time = new Date(now + 9 * 3_600_000)
   const year = time.getUTCFullYear()
   const month = time.getUTCMonth()
@@ -84,8 +87,11 @@ export function mockTransactions(now, roster) {
   return sampleDates.flatMap((at, period) => roster.flatMap((creator, i) => {
     const id = 'demo-ledger-' + period + '-' + i
     const data = { customer: 'demo-fan-' + (i + 1), owner: creator.id, at }
-    const items = [{ ...data, id, type: i % 2 ? 'roulette' : 'product', coins: 25 + (period * 31 + i * 17) % 230 }]
+    const items: Transaction[] = [{ ...data, id, type: i % 2 ? 'roulette' : 'product', coins: 25 + (period * 31 + i * 17) % 230 }]
     if (i < 9 || (i + period) % 3 !== 0) items.push({ ...data, id: id + '-sub', type: 'subscribe', won: creator.price })
     return items
   })).sort((a, b) => b.at - a.at)
 }
+import type { CSSProperties } from 'react'
+import type { Content, ContentKind, Creator, Transaction } from './types'
+
