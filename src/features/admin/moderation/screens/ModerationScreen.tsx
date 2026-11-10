@@ -5,6 +5,7 @@ import { panel } from '../../../../shared/styles/controlStyles'
 import type { OperatorProps, PageProps } from '../../../../shared/types/navigation'
 import ModerationAccountRow from '../components/ModerationAccountRow'
 import ModerationContentRow from '../components/ModerationContentRow'
+import ProductReviewPanel from '../components/ProductReviewPanel'
 import { useModeration } from '../hooks/useModeration'
 
 export default function ModerationScreen({
@@ -19,6 +20,10 @@ export default function ModerationScreen({
     previewPost,
     setPreview,
     posts,
+    products,
+    productPreview,
+    setProductPreview,
+    reviewProduct,
     managedAccounts,
     creators,
     togglePost,
@@ -27,7 +32,7 @@ export default function ModerationScreen({
   return (
     <>
       <PageTitle title="운영 관리" />
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex flex-wrap gap-2">
         <Button
           tone={tab === 'content' ? 'primary' : 'subtle'}
           aria-pressed={tab === 'content'}
@@ -42,29 +47,46 @@ export default function ModerationScreen({
         >
           계정
         </Button>
+        <Button
+          tone={tab === 'products' ? 'primary' : 'subtle'}
+          aria-pressed={tab === 'products'}
+          onClick={() => setTab('products')}
+        >
+          상품 검수
+        </Button>
       </div>
-      <section className={`${panel} divide-y divide-line`}>
-        {tab === 'content'
-          ? posts.map((post) => (
-              <ModerationContentRow
-                key={post.id}
-                post={post}
-                ownerName={creators[post.owner]?.name ?? post.owner}
-                openCreator={openCreator}
-                onPreview={setPreview}
-                onToggle={togglePost}
-              />
-            ))
-          : managedAccounts.map(({ id, account, creator, disabled }) => (
-              <ModerationAccountRow
-                key={id}
-                account={account}
-                creator={creator}
-                disabled={disabled}
-                onToggle={() => toggleAccount(id)}
-              />
-            ))}
-      </section>
+      {tab === 'products' ? (
+        <ProductReviewPanel
+          products={products}
+          creators={creators}
+          preview={productPreview}
+          onPreview={setProductPreview}
+          onDecision={reviewProduct}
+        />
+      ) : (
+        <section className={`${panel} divide-y divide-line`}>
+          {tab === 'content'
+            ? posts.map((post) => (
+                <ModerationContentRow
+                  key={post.id}
+                  post={post}
+                  ownerName={creators[post.owner]?.name ?? post.owner}
+                  openCreator={openCreator}
+                  onPreview={setPreview}
+                  onToggle={togglePost}
+                />
+              ))
+            : managedAccounts.map(({ id, account, creator, disabled }) => (
+                <ModerationAccountRow
+                  key={id}
+                  account={account}
+                  creator={creator}
+                  disabled={disabled}
+                  onToggle={() => toggleAccount(id)}
+                />
+              ))}
+        </section>
+      )}
       {preview && (
         <ContentPreviewDialog post={previewPost} account={account} onClose={() => setPreview(null)} />
       )}

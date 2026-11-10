@@ -1,5 +1,6 @@
 import { PackagePlus } from 'lucide-react'
 import ProductMedia from '../../../shared/components/products/ProductMedia'
+import ShippingOrderList from '../../../shared/components/products/ShippingOrderList'
 import RouletteWheelDialog from '../../../shared/components/roulette/RouletteWheelDialog'
 import Button from '../../../shared/components/ui/actions/Button'
 import ConfirmActionDialog from '../../../shared/components/ui/dialogs/ConfirmActionDialog'
@@ -34,6 +35,7 @@ export default function CreatorCatalogScreen({ account, notify }: OperatorProps)
         </Button>
       </PageTitle>
       <CreatorProductList products={products} onPreview={setPreview} onArchive={setDialog} />
+      <ShippingOrderList account={account} notify={notify} />
       <CreatorRouletteSettings
         roulette={roulette}
         onPreview={() => setDialog('roulette-preview')}

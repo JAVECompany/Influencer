@@ -1,4 +1,5 @@
 import { Bell, CreditCard, KeyRound, LogOut, UserRound } from 'lucide-react'
+import ShippingOrderList from '../../../shared/components/products/ShippingOrderList'
 import Avatar from '../../../shared/components/ui/media/Avatar'
 import Badge from '../../../shared/components/ui/display/Badge'
 import Button from '../../../shared/components/ui/actions/Button'
@@ -85,12 +86,15 @@ export default function ProfileScreen({
         </button>
       </section>
       {account.role === 'customer' && (
-        <ProfileSubscriptions
-          subscriptions={subs}
-          accounts={accounts}
-          openCreator={openCreator}
-          onUnsubscribe={setDialog}
-        />
+        <>
+          <ProfileSubscriptions
+            subscriptions={subs}
+            accounts={accounts}
+            openCreator={openCreator}
+            onUnsubscribe={setDialog}
+          />
+          <ShippingOrderList account={account} notify={notify} />
+        </>
       )}
       <Button tone="subtle" onClick={signOut}>
         <LogOut size={16} /> 로그아웃

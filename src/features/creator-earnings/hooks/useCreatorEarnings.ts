@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAppStore } from '../../../shared/store/core/useAppStore'
+import { useAppStore } from '../../../shared/store/app'
 
 export function useCreatorEarnings(creatorId: string) {
   const state = useAppStore()

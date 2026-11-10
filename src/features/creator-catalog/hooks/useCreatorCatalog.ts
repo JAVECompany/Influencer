@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useAppStore } from '../../../shared/store/core/useAppStore'
+import { useAppStore } from '../../../shared/store/app'
 import type { ActionResult } from '../../../shared/types/actionResult'
-import type { Product, Roulette } from '../../../shared/types/commerce'
+import type { Product, ProductSubmission, Roulette } from '../../../shared/types/commerce'
 import type { OperatorProps } from '../../../shared/types/navigation'
 
 export function useCreatorCatalog({ account, notify }: OperatorProps) {
@@ -15,8 +15,8 @@ export function useCreatorCatalog({ account, notify }: OperatorProps) {
     if (!result.error) setDialog(null)
   }
   const closeDialog = () => setDialog(null)
-  const createProduct = (name: string, detail: string, cost: number, media: string) =>
-    finish(state.addProduct(name, detail, cost, media), '상품을 등록했어요.')
+  const createProduct = (submission: ProductSubmission) =>
+    finish(state.addProduct(submission), '상품 검수를 요청했어요.')
   const saveRoulette = ({ cost, rewards, topPrizeCost }: Roulette) =>
     finish(state.saveRoulette(cost, rewards, topPrizeCost), '룰렛을 저장했어요.')
   const archiveProduct = (id: string) => finish(state.removeProduct(id), '판매를 종료했어요.')

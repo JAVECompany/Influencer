@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { isPhysicalProduct } from '../../utils/products/productAvailability'
 import type { Product } from '../../types/commerce'
 import ProductThumbnail from './ProductThumbnail'
 
@@ -17,6 +18,7 @@ export default function ProductCard({
       <div className="min-w-0">
         <p className="text-sm font-bold break-words">{product.name}</p>
         <p className="mt-1 text-xs break-words text-muted">
+          {isPhysicalProduct(product) && '실물 배송 · '}
           {product.detail}
           {product.archived && ' · 판매 종료'}
         </p>

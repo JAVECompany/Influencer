@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import CreatorDetailScreen from '../../features/creator-detail/screens/CreatorDetailScreen'
-import { useAppStore } from '../../shared/store/core/useAppStore'
+import { useAppStore } from '../../shared/store/app'
 import type { PageKey, PageProps } from '../../shared/types/navigation'
 import { applicationNav, navItems, pages } from '../navigation/workspaceNavigation'
 import WorkspaceHeader from './WorkspaceHeader'

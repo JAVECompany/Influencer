@@ -1,6 +1,7 @@
 import { ShoppingBag } from 'lucide-react'
 import ProductCard from '../../../shared/components/products/ProductCard'
 import Button from '../../../shared/components/ui/actions/Button'
+import { isPhysicalProduct } from '../../../shared/utils/products/productAvailability'
 import { panel } from '../../../shared/styles/controlStyles'
 import type { Product, Roulette } from '../../../shared/types/commerce'
 import { formatNumber } from '../../../shared/utils/format/format'
@@ -27,11 +28,24 @@ export default function CreatorShop({
       {!products.length && !roulette && <p className="text-sm text-muted">등록된 상품이 없어요.</p>}
       <div className="grid gap-2">
         {products.map((p) => {
-          const unlocked = staff || purchases.has(p.id)
+          const physical = isPhysicalProduct(p)
+          const purchased = purchases.has(p.id)
+          const unlocked = staff || purchased
+          const label = staff
+            ? '상품 검수 보기'
+            : purchased
+            ? physical
+              ? '주문 완료'
+              : '구매 콘텐츠 열기'
+            : formatNumber(p.cost) + ' 코인'
           return (
-            <ProductCard key={p.id} product={p} locked={!unlocked}>
-              <Button tone="subtle" onClick={() => onOffer({ ...p, type: unlocked ? 'owned' : 'product' })}>
-                {unlocked ? '구매 콘텐츠 열기' : formatNumber(p.cost) + ' 코인'}
+            <ProductCard key={p.id} product={p} locked={!physical && !unlocked}>
+              <Button
+                tone="subtle"
+                disabled={physical && purchased && !staff}
+                onClick={() => onOffer({ ...p, type: unlocked ? 'owned' : 'product' })}
+              >
+                {label}
               </Button>
             </ProductCard>
           )

@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { hasSubscription } from '../../../shared/store/subscription/subscriptionSelectors'
-import { useAppStore } from '../../../shared/store/core/useAppStore'
+import {
+  hasSubscription,
+  subscriptionsForCustomer,
+} from '../../../shared/utils/subscription/subscriptionAccess'
+import { useAppStore } from '../../../shared/store/app'
 import type { PageProps } from '../../../shared/types/navigation'
 
 export function useChat({ account, initial, notify }: Pick<PageProps, 'account' | 'initial' | 'notify'>) {
@@ -9,7 +12,7 @@ export function useChat({ account, initial, notify }: Pick<PageProps, 'account' 
   const [text, setText] = useState('')
   const customerView = account.role === 'customer'
   const ids = customerView
-    ? (state.subscriptions[account.id] ?? []).filter((id) => hasSubscription(state, account.id, id))
+    ? subscriptionsForCustomer(state, account.id).filter((id) => hasSubscription(state, account.id, id))
     : account.role === 'influencer'
     ? Object.keys(state.subscriptions).filter((id) => hasSubscription(state, id, account.id))
     : []

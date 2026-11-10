@@ -1,6 +1,6 @@
 import { Flag, Heart, LockKeyhole, MessageCircle } from 'lucide-react'
-import { canRead } from '../../store/content/contentSelectors'
-import { useAppStore } from '../../store/core/useAppStore'
+import { canRead } from '../../utils/content/contentAccess'
+import { useAppStore } from '../../store/app'
 import { panel } from '../../styles/controlStyles'
 import type { Content } from '../../types/content'
 import type { FeedProps } from '../../types/feed'

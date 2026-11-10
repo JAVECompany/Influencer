@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { canRead, isStoryAvailable } from '../../../shared/store/content/contentSelectors'
-import { hasSubscription, subscriberCount } from '../../../shared/store/subscription/subscriptionSelectors'
-import { isPublic } from '../../../shared/store/creator/creatorSelectors'
-import { useAppStore } from '../../../shared/store/core/useAppStore'
+import { canRead, isStoryAvailable } from '../../../shared/utils/content/contentAccess'
+import { hasSubscription, subscriberCount } from '../../../shared/utils/subscription/subscriptionAccess'
+import { isPublic } from '../../../shared/utils/creator/creatorAccess'
+import { useAppStore } from '../../../shared/store/app'
+import { isPhysicalProduct, isProductForSale } from '../../../shared/utils/products/productAvailability'
 import type { Account } from '../../../shared/types/account'
 import type { Notify } from '../../../shared/types/actionResult'
+import type { ShippingAddress } from '../../../shared/types/commerce'
 import { byRecent } from '../../../shared/utils/content/contentOrder'
 import type { ShopOffer } from '../types/shopOffer'
 
@@ -25,17 +27,27 @@ export function useCreatorDetail(id: string, account: Account, notify: Notify) {
       .map((t) => t.productId)
   )
   const products = state.products.filter(
-    (p) => p.owner === id && (staff || !p.archived || purchases.has(p.id))
+    (p) =>
+      p.owner === id &&
+      (staff ||
+        isProductForSale(p, state.transactions) ||
+        (p.reviewStatus !== 'rejected' && purchases.has(p.id)))
   )
   const roulette = state.roulettes[id]
   const balance = state.balances[account.id] ?? 0
   const previewPost = state.posts.find((post) => post.id === preview)
   const closeOffer = () => setOffer(null)
-  const confirmOffer = () => {
+  const confirmOffer = (address?: ShippingAddress) => {
     if (offer?.type !== 'subscribe' && offer?.type !== 'product') return
-    const result = offer.type === 'subscribe' ? state.subscribe(id) : state.spend(id, offer.type, offer.id)
-    const success = { subscribe: '구독을 시작했어요.', product: '구매한 콘텐츠를 열 수 있어요.' }
-    notify(result, success[offer.type])
+    const result =
+      offer.type === 'subscribe' ? state.subscribe(id) : state.spend(id, offer.type, offer.id, address)
+    const message =
+      offer.type === 'subscribe'
+        ? '구독을 시작했어요.'
+        : isPhysicalProduct(offer)
+        ? '주문이 완료됐어요. 프로필에서 배송 상태를 확인할 수 있어요.'
+        : '구매한 콘텐츠를 열 수 있어요.'
+    notify(result, message)
     if (!result.error) closeOffer()
   }
   const playRoulette = (guaranteed: boolean) =>

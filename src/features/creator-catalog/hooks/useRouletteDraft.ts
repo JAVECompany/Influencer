@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { defaultRouletteRewards } from '../../../shared/constants/roulette'
 import type { Roulette } from '../../../shared/types/commerce'
-import { rouletteConfigurationError } from '../../../shared/utils/roulette/roulette'
+import { rouletteConfigurationError } from '../../../shared/utils/roulette/configuration'
 import type { DraftReward } from '../types/rouletteDraft'
 
 export function useRouletteDraft(roulette?: Roulette) {

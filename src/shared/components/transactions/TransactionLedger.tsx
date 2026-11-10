@@ -1,5 +1,5 @@
 import { ReceiptText } from 'lucide-react'
-import { useAppStore } from '../../store/core/useAppStore'
+import { useAppStore } from '../../store/app'
 import { panel } from '../../styles/controlStyles'
 import type { Transaction, TransactionType } from '../../types/commerce'
 import { formatKrw, formatNumber, formatRelativeTime } from '../../utils/format/format'

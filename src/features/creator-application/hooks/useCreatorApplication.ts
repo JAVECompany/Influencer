@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { useAppStore } from '../../../shared/store/core/useAppStore'
+import { useAppStore } from '../../../shared/store/app'
 import type { ApplicationMethod } from '../../../shared/types/account'
 import type { OperatorProps } from '../../../shared/types/navigation'
 import { readFormValue } from '../../../shared/utils/forms/formData'

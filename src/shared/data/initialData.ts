@@ -100,6 +100,7 @@ export const initialData: AppData = {
       detail: '미공개 사진 3장',
       cost: 30,
       art: 0,
+      reviewStatus: 'approved',
     },
     {
       id: 'goods2',
@@ -109,6 +110,7 @@ export const initialData: AppData = {
       cost: 45,
       art: 1,
       kind: 'video',
+      reviewStatus: 'approved',
     },
   ],
   roulettes: {

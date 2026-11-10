@@ -1,6 +1,6 @@
 import { ChevronDown, Palette } from 'lucide-react'
 import { isThemePreference, themeLabels } from '../../../shared/constants/theme/themePreferences'
-import { useThemeStore } from '../../../shared/store/theme/useThemeStore'
+import { useThemeStore } from '../../../shared/store/theme/theme'
 
 export default function ThemeSetting() {
   const theme = useThemeStore((state) => state.theme)
